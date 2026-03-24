@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧥 Trion OOTD-Logic - 지능형 의류 관리</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 메인 컨테이너 -->
+        <header class="header">
+            <h1>🧥 Trion OOTD-Logic</h1>
+            <p>지능형 의류 관리 플랫폼</p>
+        </header>
+
+        <nav class="navbar">
+            <ul>
+                <li><a href="#dashboard">대시보드</a></li>
+                <li><a href="#clothing">의류 관리</a></li>
+                <li><a href="#recommendation">오늘의 추천</a></li>
+                <li><a href="#setting">설정</a></li>
+            </ul>
+        </nav>
+
+        <main class="container">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section">
+                <h2>📊 대시보드</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>오늘의 날씨</h3>
+                        <p id="weather-info">날씨 정보 로딩 중...</p>
+                    </div>
+                    <div class="card">
+                        <h3>추천 코디</h3>
+                        <p id="recommendation-info">추천 로딩 중...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clothing Management Section -->
+            <section id="clothing" class="section">
+                <h2>👕 의류 관리</h2>
+                <button class="btn btn-primary" onclick="openAddClothingModal()">의류 추가</button>
+                <div class="clothing-list">
+                    <div id="clothing-items">아직 등록된 의류가 없습니다.</div>
+                </div>
+            </section>
+
+            <!-- Recommendation Section -->
+            <section id="recommendation" class="section">
+                <h2>🎨 오늘의 추천 코디</h2>
+                <div id="recommendation-list" class="recommendation-grid">
+                    추천 로딩 중...
+                </div>
+            </section>
+
+            <!-- Setting Section -->
+            <section id="setting" class="section">
+                <h2>⚙️ 설정</h2>
+                <div class="settings-form">
+                    <label>온도 민감도 (1-10)</label>
+                    <input type="range" id="tempSensitivity" min="1" max="10" value="5">
+                    <span id="tempValue">5</span>
+
+                    <label>피부톤</label>
+                    <select id="skinTone">
+                        <option value="warm">따뜻한 톤</option>
+                        <option value="cool">차가운 톤</option>
+                        <option value="neutral">중간 톤</option>
+                    </select>
+
+                    <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2026 Trion Team. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- 모달 -->
+    <div id="addClothingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddClothingModal()">&times;</span>
+            <h2>의류 추가</h2>
+            <form id="clothingForm">
+                <input type="text" id="clothingName" placeholder="의류 이름" required>
+                <select id="clothingCategory" required>
+                    <option value="">카테고리 선택</option>
+                    <option value="top">상의</option>
+                    <option value="bottom">하의</option>
+                    <option value="outer">아우터</option>
+                    <option value="shoe">신발</option>
+                </select>
+                <input type="text" id="clothingColor" placeholder="색상">
+                <textarea id="clothingTags" placeholder="태그 (쉼표로 구분)"></textarea>
+                <button type="submit" class="btn btn-primary">추가</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
