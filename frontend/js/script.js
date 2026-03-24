@@ -1,6 +1,56 @@
 // ===== API Configuration =====
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// ===== Main Page Navigation =====
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMainPage();
+    
+    // 기존 함수들 초기화
+    const tempSlider = document.getElementById('tempSensitivity');
+    if (tempSlider) {
+        const tempValue = document.getElementById('tempValue');
+        tempSlider.addEventListener('input', function() {
+            tempValue.textContent = this.value;
+        });
+    }
+});
+
+function initializeMainPage() {
+    // Navigation toggle for mobile
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    
+    if (navbarToggle && navbarMenu) {
+        navbarToggle.addEventListener('click', function() {
+            navbarMenu.classList.toggle('active');
+        });
+    }
+    
+    // Close menu when link is clicked
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (navbarMenu && this.classList.contains('nav-link')) {
+                navbarMenu.classList.remove('active');
+            }
+        });
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
 // ===== Modal Functions =====
 function openAddClothingModal() {
     document.getElementById('addClothingModal').classList.add('show');
@@ -179,24 +229,3 @@ async function saveSettings() {
         alert('오류가 발생했습니다.');
     }
 }
-
-// ===== Initialize on Page Load =====
-document.addEventListener('DOMContentLoaded', function() {
-    loadClothing();
-    getWeatherInfo();
-    getRecommendation();
-});
-
-// ===== Smooth Scroll =====
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});

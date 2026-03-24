@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세탁 관리 - OOTD-Logic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/laundry.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation Bar -->
+        <header class="navbar-main">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <h1 class="logo">🧵 OOTD-Logic</h1>
+                </div>
+                <nav class="navbar-menu">
+                    <ul>
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="recommend.html" class="nav-link">AI 코디 추천</a></li>
+                        <li><a href="closet.html" class="nav-link">디지털 옷장</a></li>
+                        <li><a href="laundry.html" class="nav-link active">세탁 관리</a></li>
+                        <li><a href="mypage.html" class="nav-link">마이페이지</a></li>
+                        <li><a href="login.html" class="nav-link btn-login">로그인</a></li>
+                    </ul>
+                </nav>
+                <button class="navbar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Header Section -->
+        <section class="laundry-header">
+            <div class="header-content">
+                <h1><i class="fas fa-water"></i> Laundry-Sync - 세탁 주기 관리</h1>
+                <p>의류의 세탁 방법, 빈도, 최근 세탁일을 기록하여 의류의 수명을 연장합니다</p>
+            </div>
+        </section>
+
+        <!-- Laundry Overview Stats -->
+        <section class="section">
+            <h2>세탁 현황</h2>
+            <div class="laundry-overview">
+                <div class="overview-card urgent-count">
+                    <h3><i class="fas fa-exclamation-circle"></i> 긴급 세탁</h3>
+                    <p class="count">2</p>
+                    <p class="desc">즉시 세탁이 필요한 의류</p>
+                </div>
+                <div class="overview-card scheduled-count">
+                    <h3><i class="fas fa-calendar-check"></i> 세탁 예정</h3>
+                    <p class="count">5</p>
+                    <p class="desc">이번 주 세탁 예정 의류</p>
+                </div>
+                <div class="overview-card clean-count">
+                    <h3><i class="fas fa-check-circle"></i> 안심</h3>
+                    <p class="count">118</p>
+                    <p class="desc">최근 세탁된 의류</p>
+                </div>
+                <div class="overview-card total-count">
+                    <h3><i class="fas fa-chart-bar"></i> 총 의류</h3>
+                    <p class="count">125</p>
+                    <p class="desc">관리 중인 전체 의류</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Laundry Management Tabs -->
+        <section class="section">
+            <h2>세탁 상태별 의류</h2>
+            <div class="laundry-tabs">
+                <button class="laundry-tab active" data-status="urgent">
+                    <i class="fas fa-exclamation-circle"></i> 긴급 세탁 (2)
+                </button>
+                <button class="laundry-tab" data-status="scheduled">
+                    <i class="fas fa-calendar"></i> 예정됨 (5)
+                </button>
+                <button class="laundry-tab" data-status="clean">
+                    <i class="fas fa-shield-alt"></i> 안심 (118)
+                </button>
+            </div>
+
+            <div class="laundry-grid" id="laundryGrid">
+                <!-- Urgent Laundry Items -->
+                <div class="laundry-card urgent">
+                    <div class="laundry-header">
+                        <h3>스키니 데님 팬츠</h3>
+                        <span class="urgency-badge">
+                            <i class="fas fa-exclamation"></i> 긴급
+                        </span>
+                    </div>
+                    <div class="laundry-info">
+                        <div class="info-row">
+                            <strong>카테고리:</strong> <span>하의</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>마지막 세탁:</strong> <span>15일 전</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>권장 주기:</strong> <span>10일마다</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>세탁 방법:</strong> <span>중성 세제로 손세탁 (냉수)</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>주의사항:</strong> <span>색이 물색 수 있으니 뒤집어서 세탁하세요</span>
+                        </div>
+                    </div>
+                    <div class="laundry-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 150%;"></div>
+                        </div>
+                        <p class="progress-text">세탁 예정일 초과됨</p>
+                    </div>
+                    <button class="btn btn-mark-clean">
+                        <i class="fas fa-check"></i> 세탁 완료 표시
+                    </button>
+                </div>
+
+                <div class="laundry-card urgent">
+                    <div class="laundry-header">
+                        <h3>화이트 스니커즈</h3>
+                        <span class="urgency-badge">
+                            <i class="fas fa-exclamation"></i> 긴급
+                        </span>
+                    </div>
+                    <div class="laundry-info">
+                        <div class="info-row">
+                            <strong>카테고리:</strong> <span>신발</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>마지막 세탁:</strong> <span>12일 전</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>권장 주기:</strong> <span>7일마다</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>세탁 방법:</strong> <span>부드러운 브러시로 물세탁</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>주의사항:</strong> <span>건조기 사용 금지, 자연건조 추천</span>
+                        </div>
+                    </div>
+                    <div class="laundry-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 171%;"></div>
+                        </div>
+                        <p class="progress-text">세탁 예정일 초과됨</p>
+                    </div>
+                    <button class="btn btn-mark-clean">
+                        <i class="fas fa-check"></i> 세탁 완료 표시
+                    </button>
+                </div>
+
+                <!-- Scheduled Laundry Items -->
+                <div class="laundry-card scheduled">
+                    <div class="laundry-header">
+                        <h3>화이트 베이직 티셔츠</h3>
+                        <span class="urgency-badge">
+                            <i class="fas fa-calendar"></i> 예정
+                        </span>
+                    </div>
+                    <div class="laundry-info">
+                        <div class="info-row">
+                            <strong>카테고리:</strong> <span>상의</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>마지막 세탁:</strong> <span>5일 전</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>권장 주기:</strong> <span>7일마다</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>세탁 방법:</strong> <span>일반 세제로 세탁기 사용 가능</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>주의사항:</strong> <span>뜨거운 물에 삶지 마세요</span>
+                        </div>
+                    </div>
+                    <div class="laundry-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 71%;"></div>
+                        </div>
+                        <p class="progress-text">2일 후 세탁 예정</p>
+                    </div>
+                    <button class="btn btn-mark-clean">
+                        <i class="fas fa-check"></i> 세탁 완료 표시
+                    </button>
+                </div>
+
+                <div class="laundry-card scheduled">
+                    <div class="laundry-header">
+                        <h3>캐주얼 체크 셔츠</h3>
+                        <span class="urgency-badge">
+                            <i class="fas fa-calendar"></i> 예정
+                        </span>
+                    </div>
+                    <div class="laundry-info">
+                        <div class="info-row">
+                            <strong>카테고리:</strong> <span>상의</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>마지막 세탁:</strong> <span>4일 전</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>권장 주기:</strong> <span>5일마다</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>세탁 방법:</strong> <span>일반 세제로 세탁기 사용 가능</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>주의사항:</strong> <span>색깔이 선명하므로 분리 세탁 권장</span>
+                        </div>
+                    </div>
+                    <div class="laundry-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                        <p class="progress-text">1일 후 세탁 예정</p>
+                    </div>
+                    <button class="btn btn-mark-clean">
+                        <i class="fas fa-check"></i> 세탁 완료 표시
+                    </button>
+                </div>
+
+                <!-- Clean Items -->
+                <div class="laundry-card clean">
+                    <div class="laundry-header">
+                        <h3>검정 무스탕 자켓</h3>
+                        <span class="urgency-badge">
+                            <i class="fas fa-shield-alt"></i> 안심
+                        </span>
+                    </div>
+                    <div class="laundry-info">
+                        <div class="info-row">
+                            <strong>카테고리:</strong> <span>아우터</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>마지막 세탁:</strong> <span>2일 전</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>권장 주기:</strong> <span>30일마다</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>세탁 방법:</strong> <span>드라이클리닝 권장</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>주의사항:</strong> <span>가죽 부분은 특수 관리 필요</span>
+                        </div>
+                    </div>
+                    <div class="laundry-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 7%;"></div>
+                        </div>
+                        <p class="progress-text">28일 후 세탁 예정</p>
+                    </div>
+                    <button class="btn btn-mark-clean">
+                        <i class="fas fa-redo"></i> 세탁 기록
+                    </button>
+                </div>
+
+                <div class="laundry-card clean">
+                    <div class="laundry-header">
+                        <h3>베이지 와이드 팬츠</h3>
+                        <span class="urgency-badge">
+                            <i class="fas fa-shield-alt"></i> 안심
+                        </span>
+                    </div>
+                    <div class="laundry-info">
+                        <div class="info-row">
+                            <strong>카테고리:</strong> <span>하의</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>마지막 세탁:</strong> <span>3일 전</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>권장 주기:</strong> <span>7일마다</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>세탁 방법:</strong> <span>세탁기 사용 가능 (중온수)</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>주의사항:</strong> <span>베이지 색상이 갈수 있으니 주의</span>
+                        </div>
+                    </div>
+                    <div class="laundry-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 43%;"></div>
+                        </div>
+                        <p class="progress-text">4일 후 세탁 예정</p>
+                    </div>
+                    <button class="btn btn-mark-clean">
+                        <i class="fas fa-redo"></i> 세탁 기록
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Laundry Methods Guide -->
+        <section class="section">
+            <h2><i class="fas fa-book"></i> 세탁 가이드</h2>
+            <div class="methods-grid">
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-hands"></i>
+                    </div>
+                    <h3>손세탁</h3>
+                    <div class="method-steps">
+                        <p><strong>언제:</strong> 섬세한 소재, 울, 실크</p>
+                        <p><strong>방법:</strong></p>
+                        <ol>
+                            <li>미온수에 중성 세제 푼다</li>
+                            <li>10-15분 불린다</li>
+                            <li>부드럽게 비비며 세탁한다</li>
+                            <li>깨끗한 물로 헹군다</li>
+                            <li>타올로 톡톡 두드려 물빼기</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3>일반 세탁</h3>
+                    <div class="method-steps">
+                        <p><strong>언제:</strong> 면, 린넨, 일반 재료</p>
+                        <p><strong>방법:</strong></p>
+                        <ol>
+                            <li>세제를 적정량 넣는다</li>
+                            <li>세탁기에 중온수 설정</li>
+                            <li>일반 코스로 세탁한다</li>
+                            <li>건조기 또는 자연건조</li>
+                            <li>필요시 다림질한다</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-brush"></i>
+                    </div>
+                    <h3>드라이클리닝</h3>
+                    <div class="method-steps">
+                        <p><strong>언제:</strong> 스웨이드, 가죽, 짙은 색상</p>
+                        <p><strong>방법:</strong></p>
+                        <ol>
+                            <li>전문점에 의뢰한다</li>
+                            <li>세탁 주의사항 전달</li>
+                            <li>특수 용제로 세척</li>
+                            <li>전문적 건조 및 정리</li>
+                            <li>보관 방법 문의</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <div class="method-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <h3>섬세한 코스</h3>
+                    <div class="method-steps">
+                        <p><strong>언제:</strong> 레이스, 자수, 마름모 패턴</p>
+                        <p><strong>방법:</strong></p>
+                        <ol>
+                            <li>세탁망에 넣는다</li>
+                            <li>세탁기 섬세한 코스 선택</li>
+                            <li>중성 세제 사용</li>
+                            <li>냉수로 설정한다</li>
+                            <li>평평하게 자연건조</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Laundry Tips -->
+        <section class="section">
+            <h2><i class="fas fa-lightbulb"></i> 세탁 팁</h2>
+            <div class="tips-container">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <div class="tip-content">
+                        <h4>색상별 분류</h4>
+                        <p>흰색, 밝은 색, 어두운 색 옷을 구분하여 세탁하면 색감이 오래 지속됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <div class="tip-content">
+                        <h4>온도 관리</h4>
+                        <p>찬물은 색상 보존, 따뜻한 물은 때 제거에 효과적입니다. 의류 소재에 맞게 온도를 선택하세요.</p>
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <div class="tip-content">
+                        <h4>지퍼와 단추</h4>
+                        <p>세탁 전에 지퍼를 올리고 단추를 잠금 상태로 두면 의류가 엉키거나 손상되는 것을 방지합니다.</p>
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <div class="tip-content">
+                        <h4>뒤집어서 세탁</h4>
+                        <p>프린트나 무늬가 있는 옷은 뒤집어서 세탁하면 색감과 패턴이 더 오래 유지됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <div class="tip-content">
+                        <h4>자연건조</h4>
+                        <p>건조기 사용을 최소화하고 자연건조하면 의류 손상을 줄이고 수명을 연장할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-number">6</div>
+                    <div class="tip-content">
+                        <h4>울 보관</h4>
+                        <p>울 옷은 습도 낮은 곳에 보관하고 방충제를 사용하여 해충으로부터 보호하세요.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Laundry Schedule Reminder -->
+        <section class="section">
+            <h2><i class="fas fa-calendar-alt"></i> 이번 주 세탁 스케줄</h2>
+            <div class="schedule-grid">
+                <div class="schedule-day">
+                    <h4>오늘</h4>
+                    <div class="schedule-items">
+                        <span class="urgent">스키니 데님 팬츠 (긴급)</span>
+                        <span class="urgent">화이트 스니커즈 (긴급)</span>
+                    </div>
+                </div>
+                <div class="schedule-day">
+                    <h4>내일</h4>
+                    <div class="schedule-items">
+                        <span class="scheduled">캐주얼 체크 셔츠</span>
+                    </div>
+                </div>
+                <div class="schedule-day">
+                    <h4>모레</h4>
+                    <div class="schedule-items">
+                        <span class="scheduled">화이트 베이직 티셔츠</span>
+                    </div>
+                </div>
+                <div class="schedule-day">
+                    <h4>이번 주 중</h4>
+                    <div class="schedule-items">
+                        <span class="scheduled">캐멀 롱 코트</span>
+                        <span class="scheduled">플로럴 원피스</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-main">
+            <div class="footer-content">
+                <p><strong>Team TRION</strong></p>
+                <p>OOTD-Logic Project 2026</p>
+                <div class="footer-links">
+                    <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                    <a href="mailto:contact@ootd-logic.com"><i class="fas fa-envelope"></i> Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/laundry.js"></script>
+</body>
+</html>

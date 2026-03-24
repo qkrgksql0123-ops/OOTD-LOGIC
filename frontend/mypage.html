@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - OOTD Logic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mypage.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation Bar -->
+        <header class="navbar-main">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <h1 class="logo">🧵 OOTD-Logic</h1>
+                </div>
+                <nav class="navbar-menu">
+                    <ul>
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="recommend.html" class="nav-link">AI 코디 추천</a></li>
+                        <li><a href="closet.html" class="nav-link">디지털 옷장</a></li>
+                        <li><a href="laundry.html" class="nav-link">세탁 관리</a></li>
+                        <li><a href="mypage.html" class="nav-link active">마이페이지</a></li>
+                        <li><a href="login.html" class="nav-link btn-login">로그인</a></li>
+                    </ul>
+                </nav>
+                <button class="navbar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Header Section -->
+        <section class="mypage-header">
+            <div class="header-content">
+                <h1><i class="fas fa-user-circle"></i> 마이페이지</h1>
+                <p>프로필 정보를 관리하고 개인화된 설정을 조정하세요</p>
+            </div>
+        </section>
+
+        <main>
+            <!-- Sidebar -->
+            <div class="mypage-layout">
+                <aside class="mypage-sidebar">
+                    <nav class="sidebar-menu">
+                        <a href="#profile" class="sidebar-item active" data-section="profile">
+                            <i class="fas fa-user"></i> 프로필
+                        </a>
+                        <a href="#style-profile" class="sidebar-item" data-section="style-profile">
+                            <i class="fas fa-palette"></i> 스타일 프로필
+                        </a>
+                        <a href="#settings" class="sidebar-item" data-section="settings">
+                            <i class="fas fa-cog"></i> 설정
+                        </a>
+                        <a href="#statistics" class="sidebar-item" data-section="statistics">
+                            <i class="fas fa-chart-bar"></i> 통계
+                        </a>
+                        <a href="#account" class="sidebar-item" data-section="account">
+                            <i class="fas fa-lock"></i> 계정 관리
+                        </a>
+                    </nav>
+                </aside>
+
+                <div class="mypage-content">
+                    <!-- Profile Section -->
+                    <section id="profile" class="section-content active">
+                        <h2>프로필 정보</h2>
+                        
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-picture">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="profile-info">
+                                    <h3>김효진</h3>
+                                    <p class="user-email">hyo.jin@example.com</p>
+                                    <p class="user-joined">가입일: 2024년 8월 15일</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nickname">닉네임</label>
+                            <input type="text" id="nickname" value="효진의 코디가이드" placeholder="닉네임 입력">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bio">자기소개</label>
+                            <textarea id="bio" placeholder="자기소개를 입력하세요">패션을 사랑하는 직장인입니다. AI 추천으로 더 나은 코디를 찾아보세요!</textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">휴대폰</label>
+                                <input type="tel" id="phone" value="010-1234-5678" placeholder="휴대폰 번호">
+                            </div>
+                            <div class="form-group">
+                                <label for="birthdate">생년월일</label>
+                                <input type="date" id="birthdate" value="1995-03-20">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="gender">성별</label>
+                                <select id="gender">
+                                    <option value="female" selected>여성</option>
+                                    <option value="male">남성</option>
+                                    <option value="other">기타</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="location">지역</label>
+                                <input type="text" id="location" value="서울시 강남구" placeholder="지역 입력">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> 프로필 저장
+                        </button>
+                    </section>
+
+                    <!-- Style Profile Section -->
+                    <section id="style-profile" class="section-content">
+                        <h2>스타일 프로필</h2>
+                        
+                        <div class="style-grid">
+                            <div class="style-card">
+                                <h3>선호 색상</h3>
+                                <div class="color-palette">
+                                    <div class="color-item" style="background-color: #2C3E50;" title="검정"></div>
+                                    <div class="color-item" style="background-color: #E8E8E8;" title="흰색"></div>
+                                    <div class="color-item" style="background-color: #34495E;" title="네이비"></div>
+                                    <div class="color-item" style="background-color: #E74C3C;" title="빨강"></div>
+                                    <div class="color-item" style="background-color: #3498DB;" title="파랑"></div>
+                                    <div class="color-item" style="background-color: #F39C12;" title="주황"></div>
+                                    <div class="color-item" style="background-color: #9B59B6;" title="보라"></div>
+                                    <div class="color-item" style="background-color: #1ABC9C;" title="민트"></div>
+                                </div>
+                                <p class="hint">선호하는 색상을 선택하세요</p>
+                            </div>
+
+                            <div class="style-card">
+                                <h3>스타일 타입</h3>
+                                <div class="style-options">
+                                    <label class="style-checkbox">
+                                        <input type="checkbox" value="casual" checked>
+                                        <span>캐주얼</span>
+                                    </label>
+                                    <label class="style-checkbox">
+                                        <input type="checkbox" value="formal" checked>
+                                        <span>포멀</span>
+                                    </label>
+                                    <label class="style-checkbox">
+                                        <input type="checkbox" value="sporty">
+                                        <span>스포티</span>
+                                    </label>
+                                    <label class="style-checkbox">
+                                        <input type="checkbox" value="romantic">
+                                        <span>로맨틱</span>
+                                    </label>
+                                    <label class="style-checkbox">
+                                        <input type="checkbox" value="vintage" checked>
+                                        <span>빈티지</span>
+                                    </label>
+                                    <label class="style-checkbox">
+                                        <input type="checkbox" value="trendy">
+                                        <span>트렌디</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="style-card">
+                                <h3>신체 정보</h3>
+                                <div class="form-group">
+                                    <label for="height">키</label>
+                                    <input type="number" id="height" value="162" placeholder="cm">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fit-preference">체형 별 선호</label>
+                                    <select id="fit-preference">
+                                        <option value="slim" selected>슬림핏</option>
+                                        <option value="regular">레귤러핏</option>
+                                        <option value="loose">루즈핏</option>
+                                        <option value="oversized">오버사이즈</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="style-card">
+                                <h3>퍼스널 정보</h3>
+                                <div class="form-group">
+                                    <label for="face-shape">얼굴형</label>
+                                    <select id="face-shape">
+                                        <option value="oval" selected>계란형</option>
+                                        <option value="round">둥근형</option>
+                                        <option value="square">각진형</option>
+                                        <option value="heart">하트형</option>
+                                        <option value="long">긴형</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="personal-tone">퍼스널 톤</label>
+                                    <select id="personal-tone">
+                                        <option value="cool" selected>쿨톤</option>
+                                        <option value="warm">웜톤</option>
+                                        <option value="neutral">뉴트럴톤</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tone-season">세부 톤</label>
+                                    <select id="tone-season">
+                                        <option value="summer-cool" selected>여름 쿨</option>
+                                        <option value="winter-cool">겨울 쿨</option>
+                                        <option value="spring-warm">봄 웜</option>
+                                        <option value="autumn-warm">가을 웜</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> 스타일 프로필 저장
+                        </button>
+                    </section>
+
+                    <!-- Settings Section -->
+                    <section id="settings" class="section-content">
+                        <h2>설정</h2>
+
+                        <div class="settings-group">
+                            <h3>알림 설정</h3>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>세탁 리마인더</label>
+                                    <p>세탁 시기 도알림 알림을 받습니다</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>코디 추천 알림</label>
+                                    <p>새로운 아우핏 추천 알림을 받습니다</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>판매 및 이벤트</label>
+                                    <p>세일 정보와 이벤트 알림을 받습니다</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h3>개인정보 설정</h3>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>AI 학습 동의</label>
+                                    <p>의류 추천 개선을 위한 패턴 학습 동의</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label>추천 공유</label>
+                                    <p>내 코디 추천을 다른 사용자와 공유 가능</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i> 설정 저장
+                        </button>
+                    </section>
+
+                    <!-- Statistics Section -->
+                    <section id="statistics" class="section-content">
+                        <h2>통계 & 활동 현황</h2>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-shirt"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>보유 의류</h3>
+                                    <p class="stat-number">125</p>
+                                    <p class="stat-desc">관리 중인 총 의류</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-sparkles"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>코디 추천</h3>
+                                    <p class="stat-number">48</p>
+                                    <p class="stat-desc">AI 추천 횟수</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-checkmark"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>코디 선택</h3>
+                                    <p class="stat-number">32</p>
+                                    <p class="stat-desc">선택한 추천 코디</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-flame"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3>연속 사용</h3>
+                                    <p class="stat-number">28</p>
+                                    <p class="stat-desc">연속 사용 일수</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-section">
+                            <h3>최근 활동</h3>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p>새 의류 등록: 화이트 블라우스</p>
+                                        <span class="activity-date">오늘, 14:30</span>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p>코디 추천 선택: 캐주얼 업데이트</p>
+                                        <span class="activity-date">어제, 09:15</span>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-water"></i>
+                                    </div>
+                                    <div class="activity-info">
+                                        <p>세탁 기록: 스키니 데님 완료</p>
+                                        <span class="activity-date">3일 전, 11:20</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Account Section -->
+                    <section id="account" class="section-content">
+                        <h2>계정 관리</h2>
+
+                        <div class="account-section">
+                            <h3>보안</h3>
+                            <div class="account-item">
+                                <div class="item-info">
+                                    <label>비밀번호</label>
+                                    <p>마지막 변경: 2024년 6월 10일</p>
+                                </div>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-edit"></i> 변경
+                                </button>
+                            </div>
+
+                            <div class="account-item">
+                                <div class="item-info">
+                                    <label>2단계 인증</label>
+                                    <p>이메일 확인 인증 설정</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="account-section">
+                            <h3>세션</h3>
+                            <div class="session-item">
+                                <div class="session-info">
+                                    <p class="session-device"><i class="fas fa-desktop"></i> Windows Chrome</p>
+                                    <p class="session-location">서울, 대한민국</p>
+                                    <p class="session-time">현재 활성</p>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-outline">
+                                <i class="fas fa-sign-out-alt"></i> 다른 장치에서 로그아웃
+                            </button>
+                        </div>
+
+                        <div class="account-section danger-zone">
+                            <h3>위험 구역</h3>
+                            <div class="danger-item">
+                                <div class="item-info">
+                                    <label>계정 데이터 다운로드</label>
+                                    <p>내 모든 정보의 백업을 받으실 수 있습니다</p>
+                                </div>
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-download"></i> 다운로드
+                                </button>
+                            </div>
+
+                            <div class="danger-item">
+                                <div class="item-info">
+                                    <label>계정 삭제</label>
+                                    <p>이 작업은 취소할 수 없습니다. 모든 데이터가 삭제됩니다</p>
+                                </div>
+                                <button class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> 계정 삭제
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="logout-section">
+                            <button class="btn btn-logout">
+                                <i class="fas fa-sign-out-alt"></i> 로그아웃
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>OOTD Logic</h4>
+                <p>AI 기반 의류 관리 및 코디 추천 플랫폼</p>
+            </div>
+            <div class="footer-section">
+                <h4>팀</h4>
+                <p>Team TRION</p>
+            </div>
+            <div class="footer-section">
+                <h4>팔로우</h4>
+                <div class="social-links">
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 OOTD Logic. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/mypage.js"></script>
+</body>
+</html>
