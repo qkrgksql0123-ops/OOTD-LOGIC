@@ -19,6 +19,7 @@ public class GeminiService {
     private String geminiApiKey;
 
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+    private static final String GEMINI_VISION_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -47,6 +48,39 @@ public class GeminiService {
         } catch (Exception e) {
             log.error("Error calling Gemini API", e);
             return "오류가 발생했습니다.";
+        }
+    }
+
+    public String analyzeClothingImage(String imageUrl) {
+        try {
+            String prompt = "이 의류의 색상, 소재, 카테고리(상의/하의/아우터/신발 등), 계절성을 분석해주세요. " +
+                    "JSON 형식으로 다음과 같이 응답해주세요: {\"color\": \"색상\", \"material\": \"소재\", " +
+                    "\"category\": \"카테고리\", \"season\": \"계절\"}";
+
+            String requestBody = String.format(
+                "{\"contents\": [{\"parts\": [{\"text\": \"%s\"}, {\"inline_data\": {\"mime_type\": \"image/jpeg\", \"data\": \"%s\"}}]}]}",
+                prompt.replace("\"", "\\\""),
+                imageUrl
+            );
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(GEMINI_VISION_API_URL + "?key=" + geminiApiKey))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                log.info("Gemini Vision API Response received");
+                return parseGeminiResponse(response.body());
+            } else {
+                log.error("Gemini Vision API Error: {}", response.statusCode());
+                return "{\"color\": \"미분석\", \"material\": \"미분석\", \"category\": \"기타\", \"season\": \"사계절\"}";
+            }
+        } catch (Exception e) {
+            log.error("Error analyzing clothing image", e);
+            return "{\"color\": \"미분석\", \"material\": \"미분석\", \"category\": \"기타\", \"season\": \"사계절\"}";
         }
     }
 
