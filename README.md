@@ -13,11 +13,13 @@ OOTD-LOGIC/
 │   ├── gradlew
 │   └── ...
 │
-├── frontend/                   # React 프론트엔드
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── ...
+├── frontend/                   # HTML/CSS/JS 프론트엔드
+│   ├── index.html
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── script.js
+│   └── assets/
 │
 ├── TRION_PROJECT_DESIGN.md     # 프로젝트 설계 문서
 ├── IMPLEMENTATION_CHECKLIST.md # 구현 체크리스트
@@ -42,12 +44,15 @@ cd backend
 ./gradlew bootRun
 ```
 
-### 프론트엔드 (React)
+### 프론트엔드 (HTML/CSS/JS)
 
 ```bash
 cd frontend
-npm install
-npm start
+# 간단한 HTTP 서버 실행 (Python)
+python -m http.server 3000
+
+# 또는 Live Server 확장 사용
+# VS Code에서 index.html을 우클릭 후 "Open with Live Server"
 ```
 
 ## 📚 기술 스택
@@ -60,9 +65,9 @@ npm start
 - Gradle
 
 **프론트엔드:**
-- React
-- TypeScript (예정)
-- Axios (예정)
+- HTML5
+- CSS3
+- Vanilla JavaScript (ES6+)
 
 ## 📖 문서
 
