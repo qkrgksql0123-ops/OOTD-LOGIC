@@ -1,0 +1,50 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.0.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.trion.ootd'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('awsJavaSDKVersion', "2.26.22")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+	// AWS SDK v2 for DynamoDB
+	implementation "software.amazon.awssdk:dynamodb:${awsJavaSDKVersion}"
+	implementation "software.amazon.awssdk:dynamodb-enhanced:${awsJavaSDKVersion}"
+
+	// HTTP Client for Gemini API (REST calls)
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
