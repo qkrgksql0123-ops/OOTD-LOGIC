@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: ootd-backend
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:test-api-key}
+
+aws:
+  dynamodb:
+    region: ap-northeast-2
+    endpoint: http://localhost:8000
+
+server:
+  port: 8081
+
+logging:
+  level:
+    com.trion.ootd: INFO
+    org.springframework: WARN
