@@ -1,6 +1,7 @@
 package com.trion.ootd.controller;
 
 import com.trion.ootd.entity.Recommendation;
+import com.trion.ootd.service.GeminiService;
 import com.trion.ootd.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
+    private final GeminiService geminiService;
 
     @PostMapping
     public ResponseEntity<Recommendation> saveRecommendation(
@@ -73,5 +75,21 @@ public class RecommendationController {
         log.info("Deleting recommendation for user: {} on date: {}", userId, recommendDate);
         recommendationService.deleteRecommendation(userId, recommendDate);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/generate")
+    public ResponseEntity<String> generateOutfitRecommendation(
+            @PathVariable String userId,
+            @RequestParam(required = false) String temperature,
+            @RequestParam(required = false) String weather,
+            @RequestParam(required = false) String preferences) {
+        log.info("Generating outfit recommendation for user: {}", userId);
+
+        String temp = temperature != null ? temperature : "중간(20도)";
+        String weatherCond = weather != null ? weather : "맑음";
+        String pref = preferences != null ? preferences : "편안함";
+
+        String recommendation = geminiService.generateOutfitRecommendation(temp, weatherCond, pref);
+        return ResponseEntity.ok(recommendation);
     }
 }

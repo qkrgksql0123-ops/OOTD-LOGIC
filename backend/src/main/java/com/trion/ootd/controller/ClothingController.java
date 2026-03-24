@@ -2,6 +2,7 @@ package com.trion.ootd.controller;
 
 import com.trion.ootd.dto.ClothingDTO;
 import com.trion.ootd.service.ClothingService;
+import com.trion.ootd.service.GeminiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class ClothingController {
 
     private final ClothingService clothingService;
+    private final GeminiService geminiService;
 
     @PostMapping
     public ResponseEntity<ClothingDTO> addClothing(
@@ -68,5 +70,14 @@ public class ClothingController {
         log.info("Getting clothing count for user: {}", userId);
         long count = clothingService.getClothingCount(userId);
         return ResponseEntity.ok(count);
+    }
+
+    @PostMapping("/analyze-image")
+    public ResponseEntity<String> analyzeClothingImage(
+            @PathVariable String userId,
+            @RequestParam String imageUrl) {
+        log.info("Analyzing clothing image for user: {}", userId);
+        String analysis = geminiService.analyzeClothingImage(imageUrl);
+        return ResponseEntity.ok(analysis);
     }
 }
