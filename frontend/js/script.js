@@ -1,6 +1,16 @@
 // ===== API Configuration =====
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// ===== Authentication Utility =====
+function getCurrentUserId() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return userId;
+}
+
 // ===== Main Page Navigation =====
 document.addEventListener('DOMContentLoaded', function() {
     initializeMainPage();
@@ -91,6 +101,7 @@ document.getElementById('clothingForm')?.addEventListener('submit', function(e) 
 
 // Add Clothing
 async function addClothing() {
+    const userId = getCurrentUserId();
     const clothing = {
         category: document.getElementById('clothingCategory').value,
         imageUrl: '', // 이미지 업로드는 나중에 추가
@@ -98,7 +109,7 @@ async function addClothing() {
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/clothing`, {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -121,8 +132,9 @@ async function addClothing() {
 
 // Load Clothing List
 async function loadClothing() {
+    const userId = getCurrentUserId();
     try {
-        const response = await fetch(`${API_BASE_URL}/clothing`);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
         const clothings = await response.json();
 
         const clothingItems = document.getElementById('clothing-items');
@@ -153,8 +165,9 @@ async function loadClothing() {
 
 // Get Recommendation
 async function getRecommendation() {
+    const userId = getCurrentUserId();
     try {
-        const response = await fetch(`${API_BASE_URL}/recommendations`);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/recommendations`);
         const recommendations = await response.json();
 
         const recommendationList = document.getElementById('recommendation-list');
@@ -186,7 +199,7 @@ async function getRecommendation() {
 // Get Weather Info
 async function getWeatherInfo() {
     try {
-        const response = await fetch(`${API_BASE_URL}/environment`);
+        const response = await fetch(`${API_BASE_URL}/environment/weather-description?temperature=20&weatherCondition=맑음`);
         const weather = await response.json();
 
         const weatherInfo = document.getElementById('weather-info');
@@ -205,18 +218,16 @@ async function getWeatherInfo() {
 
 // Save Settings
 async function saveSettings() {
-    const settings = {
-        tempSensitivity: document.getElementById('tempSensitivity').value,
-        skinTone: document.getElementById('skinTone').value
-    };
+    const userId = getCurrentUserId();
+    const tempSensitivity = document.getElementById('tempSensitivity').value;
+    const skinTone = document.getElementById('skinTone').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/user/settings`, {
-            method: 'POST',
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/settings?tempSensitivity=${tempSensitivity}&skinTone=${skinTone}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(settings)
+            }
         });
 
         if (response.ok) {

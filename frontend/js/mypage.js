@@ -1,6 +1,22 @@
 /* ===== MyPage Scripts ===== */
 
+const API_BASE_URL = 'http://localhost:8080/api';
+
+// ===== Authentication Utility =====
+function getCurrentUserId() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return userId;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const userId = getCurrentUserId();
+    if (userId) {
+        loadUserProfile(userId);
+    }
     initializeMypagePage();
 });
 
@@ -91,6 +107,34 @@ function setupSidebarNavigation() {
     }
 }
 
+// Load user profile
+async function loadUserProfile(userId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const user = await response.json();
+            // Fill form fields with user data
+            const nicknameInput = document.querySelector('input[placeholder*="닉네임"]');
+            const emailInput = document.querySelector('input[placeholder*="이메일"]');
+            const tempSlider = document.getElementById('tempSensitivity');
+            const skinToneSelect = document.getElementById('skinTone');
+
+            if (nicknameInput) nicknameInput.value = user.nickname || '';
+            if (emailInput) emailInput.value = user.email || '';
+            if (tempSlider) tempSlider.value = user.tempSensitivity || 5;
+            if (skinToneSelect) skinToneSelect.value = user.skinTone || '';
+        }
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+    }
+}
+
 // Setup button handlers
 function setupButtonHandlers() {
     const saveButtons = document.querySelectorAll('.btn-primary');
@@ -105,19 +149,42 @@ function setupButtonHandlers() {
 
             const sectionContent = this.closest('.section-content');
             const sectionTitle = sectionContent ? sectionContent.querySelector('h2').textContent : '정보';
+            const userId = getCurrentUserId();
 
-            // Show success message
-            showNotification(`${sectionTitle}가 저장되었습니다!`, 'success');
+            if (!userId) return;
 
-            // Animate button
-            const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-check"></i> 저장 완료!';
-            this.style.background = 'linear-gradient(138deg, #27ae60, #229954)';
+            // Get form data
+            const tempSensitivity = document.getElementById('tempSensitivity').value;
+            const skinTone = document.getElementById('skinTone').value;
 
-            setTimeout(() => {
-                this.innerHTML = originalText;
-                this.style.background = '';
-            }, 2000);
+            // Send to API
+            fetch(`${API_BASE_URL}/users/${userId}/settings?tempSensitivity=${tempSensitivity}&skinTone=${skinTone}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    showNotification(`${sectionTitle}가 저장되었습니다!`, 'success');
+
+                    // Animate button
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> 저장 완료!';
+                    this.style.background = 'linear-gradient(138deg, #27ae60, #229954)';
+
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.style.background = '';
+                    }, 2000);
+                } else {
+                    showNotification('저장에 실패했습니다.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('오류가 발생했습니다.', 'error');
+            });
         });
     });
 
@@ -127,8 +194,12 @@ function setupButtonHandlers() {
             e.preventDefault();
 
             if (confirm('정말로 로그아웃하시겠습니까?')) {
-                alert('로그아웃되었습니다. 메인 페이지로 이동합니다.');
-                window.location.href = 'index.html';
+                localStorage.removeItem('userId');
+                localStorage.removeItem('nickname');
+                showNotification('로그아웃되었습니다.', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
             }
         });
     }
@@ -140,8 +211,31 @@ function setupButtonHandlers() {
 
             if (confirm('정말로 계정을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) {
                 if (confirm('계정 삭제를 한 번 더 확인해주세요. 모든 데이터가 영구적으로 삭제됩니다.')) {
-                    alert('계정이 삭제되었습니다. 메인 페이지로 이동합니다.');
-                    window.location.href = 'index.html';
+                    const userId = getCurrentUserId();
+                    if (!userId) return;
+
+                    fetch(`${API_BASE_URL}/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            localStorage.removeItem('userId');
+                            localStorage.removeItem('nickname');
+                            showNotification('계정이 삭제되었습니다.', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 1000);
+                        } else {
+                            showNotification('계정 삭제에 실패했습니다.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('오류가 발생했습니다.', 'error');
+                    });
                 }
             }
         });

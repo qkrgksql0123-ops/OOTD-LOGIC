@@ -69,6 +69,19 @@ public class ClothingService {
         return clothingRepository.countByUserId(userId);
     }
 
+    public void updateLaundryStatus(String userId, String clothingId, Boolean isInLaundry) {
+        log.info("Updating laundry status for clothing: {} for user: {}", clothingId, userId);
+        Optional<Clothing> optionalClothing = clothingRepository.findById(userId, clothingId);
+        if (optionalClothing.isPresent()) {
+            Clothing clothing = optionalClothing.get();
+            clothing.setIsInLaundry(isInLaundry);
+            clothingRepository.save(clothing);
+            log.info("Laundry status updated successfully");
+        } else {
+            log.warn("Clothing not found: {}", clothingId);
+        }
+    }
+
     private ClothingDTO convertToDTO(Clothing clothing) {
         return ClothingDTO.builder()
                 .id(clothing.getId())
@@ -77,6 +90,7 @@ public class ClothingService {
                 .imageUrl(clothing.getImageUrl())
                 .tags(clothing.getTags())
                 .createdAt(clothing.getCreatedAt())
+                .isInLaundry(clothing.getIsInLaundry())
                 .build();
     }
 }

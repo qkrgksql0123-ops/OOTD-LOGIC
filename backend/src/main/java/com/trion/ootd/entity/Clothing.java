@@ -23,6 +23,7 @@ public class Clothing {
     private String imageUrl;
     private List<String> tags;
     private String createdAt;
+    private Boolean isInLaundry;
 
     @DynamoDbSortKey
     @DynamoDbAttribute("id")
@@ -86,5 +87,14 @@ public class Clothing {
 
     public void setCreatedAtFromLocalDateTime(LocalDateTime dateTime) {
         this.createdAt = dateTime != null ? dateTime.toString() : null;
+    }
+
+    @DynamoDbAttribute("isInLaundry")
+    public Boolean getIsInLaundry() {
+        return isInLaundry != null ? isInLaundry : false;
+    }
+
+    public void setIsInLaundry(Boolean isInLaundry) {
+        this.isInLaundry = isInLaundry;
     }
 }

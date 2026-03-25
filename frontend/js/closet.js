@@ -1,8 +1,124 @@
 // ===== Closet Page JavaScript =====
 
+const API_BASE_URL = 'http://localhost:8080/api';
+
+// ===== Authentication Utility =====
+function getCurrentUserId() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return userId;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const userId = getCurrentUserId();
+    if (userId) {
+        loadClothingList(userId);
+    }
     initializeClosetPage();
 });
+
+// Load clothing list from API
+async function loadClothingList(userId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const clothings = await response.json();
+            renderClothingItems(clothings);
+        }
+    } catch (error) {
+        console.error('Error loading clothing list:', error);
+    }
+}
+
+// Render clothing items
+function renderClothingItems(clothings) {
+    const clothingGrid = document.querySelector('.clothing-grid');
+    if (!clothingGrid) return;
+
+    clothingGrid.innerHTML = '';
+
+    if (clothings.length === 0) {
+        clothingGrid.innerHTML = '<p>등록된 의류가 없습니다.</p>';
+        return;
+    }
+
+    clothings.forEach(clothing => {
+        const clothingItem = document.createElement('div');
+        clothingItem.className = 'clothing-item';
+        clothingItem.setAttribute('data-category', clothing.category);
+        clothingItem.setAttribute('data-clothing-id', clothing.id);
+        clothingItem.innerHTML = `
+            <div class="clothing-image">
+                <img src="${clothing.imageUrl || 'https://via.placeholder.com/200'}" alt="${clothing.category}">
+            </div>
+            <div class="clothing-info">
+                <h3>${clothing.category}</h3>
+                ${clothing.tags ? `<p class="tags">${clothing.tags.join(', ')}</p>` : ''}
+                <div class="clothing-actions">
+                    <button class="btn-edit">수정</button>
+                    <button class="btn-delete">삭제</button>
+                </div>
+            </div>
+        `;
+        clothingGrid.appendChild(clothingItem);
+    });
+
+    // Re-attach event listeners to new elements
+    attachClothingEventListeners();
+}
+
+// Attach event listeners to clothing items
+function attachClothingEventListeners() {
+    const userId = getCurrentUserId();
+    const editBtns = document.querySelectorAll('.btn-edit');
+    const deleteBtns = document.querySelectorAll('.btn-delete');
+
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            alert('의류 정보를 수정하는 기능은 추후 업데이트됩니다.');
+        });
+    });
+
+    deleteBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('이 의류를 삭제하시겠습니까?')) {
+                const clothingItem = this.closest('.clothing-item');
+                const clothingId = clothingItem.getAttribute('data-clothing-id');
+
+                fetch(`${API_BASE_URL}/users/${userId}/clothing/${clothingId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        clothingItem.style.animation = 'slideUp 0.3s ease';
+                        setTimeout(() => {
+                            clothingItem.remove();
+                            alert('의류가 삭제되었습니다.');
+                        }, 300);
+                    } else {
+                        alert('삭제에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        });
+    });
+}
 
 function initializeClosetPage() {
     // Navigation toggle for mobile
@@ -48,19 +164,36 @@ function initializeClosetPage() {
     if (clothingForm) {
         clothingForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = {
+            const userId = getCurrentUserId();
+
+            const clothing = {
                 category: document.getElementById('clothingCategory').value,
-                brand: document.getElementById('clothingBrand').value,
-                name: document.getElementById('clothingName').value,
+                imageUrl: '',
                 color: document.getElementById('clothingColor').value,
-                price: document.getElementById('clothingPrice').value,
-                purchaseDate: document.getElementById('clothingPurchaseDate').value,
-                tags: document.getElementById('clothingTags').value
+                tags: document.getElementById('clothingTags').value.split(',').map(tag => tag.trim())
             };
-            console.log('새 의류 등록:', formData);
-            alert('의류가 등록되었습니다!');
-            addClothingForm.style.display = 'none';
-            clothingForm.reset();
+
+            fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(clothing)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('의류가 등록되었습니다!');
+                    addClothingForm.style.display = 'none';
+                    clothingForm.reset();
+                    loadClothingList(userId);
+                } else {
+                    alert('의류 등록에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            });
         });
     }
     
@@ -103,29 +236,6 @@ function initializeClosetPage() {
                     card.style.display = 'none';
                 }
             });
-        });
-    });
-    
-    // Clothing Item Actions
-    const editBtns = document.querySelectorAll('.btn-edit');
-    const deleteBtns = document.querySelectorAll('.btn-delete');
-    
-    editBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            alert('의류 정보를 수정하는 기능은 추후 업데이트됩니다.');
-        });
-    });
-    
-    deleteBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('이 의류를 삭제하시겠습니까?')) {
-                const item = this.closest('.clothing-item');
-                item.style.animation = 'slideUp 0.3s ease';
-                setTimeout(() => {
-                    item.remove();
-                    alert('의류가 삭제되었습니다.');
-                }, 300);
-            }
         });
     });
     

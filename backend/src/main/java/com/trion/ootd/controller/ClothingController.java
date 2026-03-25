@@ -80,4 +80,14 @@ public class ClothingController {
         String analysis = geminiService.analyzeClothingImage(imageUrl);
         return ResponseEntity.ok(analysis);
     }
+
+    @PatchMapping("/{clothingId}/laundry-status")
+    public ResponseEntity<Void> updateLaundryStatus(
+            @PathVariable String userId,
+            @PathVariable String clothingId,
+            @RequestBody ClothingDTO clothingDTO) {
+        log.info("Updating laundry status for clothing: {} for user: {}", clothingId, userId);
+        clothingService.updateLaundryStatus(userId, clothingId, clothingDTO.getIsInLaundry());
+        return ResponseEntity.ok().build();
+    }
 }

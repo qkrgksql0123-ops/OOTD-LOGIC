@@ -1,7 +1,17 @@
+const API_BASE_URL = 'http://localhost:8080/api';
 const signupForm = document.getElementById('signupForm');
 const signupStatusMessage = document.getElementById('statusMessage');
 const styleError = document.getElementById('styleError');
 const agreeError = document.getElementById('agreeError');
+
+// UUID 생성 함수
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 function setFieldError(input, message) {
   const errorEl = input.parentElement.querySelector('.error-message');
@@ -89,9 +99,37 @@ signupForm?.addEventListener('submit', (event) => {
 
   signupStatusMessage.textContent = '회원가입 처리 중입니다...';
 
-  setTimeout(() => {
-    signupStatusMessage.textContent = '회원가입 완료! 로그인 페이지로 이동해 주세요.';
-    signupStatusMessage.classList.remove('error');
-    signupStatusMessage.classList.add('ok');
-  }, 900);
+  const userId = generateUUID();
+  const user = {
+    userId: userId,
+    email: signupForm.elements.email.value,
+    nickname: signupForm.elements.nickname.value,
+    tempSensitivity: 5
+  };
+
+  fetch(`${API_BASE_URL}/users`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(user)
+  })
+  .then(response => {
+    if (response.ok) {
+      signupStatusMessage.textContent = '회원가입 완료! 로그인 페이지로 이동해 주세요.';
+      signupStatusMessage.classList.remove('error');
+      signupStatusMessage.classList.add('ok');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1000);
+    } else {
+      throw new Error('회원가입 실패');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    signupStatusMessage.textContent = '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.';
+    signupStatusMessage.classList.remove('ok');
+    signupStatusMessage.classList.add('error');
+  });
 });

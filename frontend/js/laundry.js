@@ -1,8 +1,121 @@
 /* ===== Laundry Page Scripts ===== */
 
+const API_BASE_URL = 'http://localhost:8080/api';
+
+// ===== Authentication Utility =====
+function getCurrentUserId() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return userId;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const userId = getCurrentUserId();
+    if (userId) {
+        loadLaundryList(userId);
+    }
     initializeLaundryPage();
 });
+
+// Load laundry list from API
+async function loadLaundryList(userId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const clothings = await response.json();
+            renderLaundryItems(clothings);
+        }
+    } catch (error) {
+        console.error('Error loading laundry list:', error);
+    }
+}
+
+// Render laundry items
+function renderLaundryItems(clothings) {
+    const laundryGrid = document.querySelector('.laundry-items');
+    if (!laundryGrid) return;
+
+    laundryGrid.innerHTML = '';
+
+    // Filter only items in laundry
+    const laundryItems = clothings.filter(c => c.isInLaundry === true);
+
+    if (laundryItems.length === 0) {
+        laundryGrid.innerHTML = '<p>세탁 중인 의류가 없습니다.</p>';
+        return;
+    }
+
+    laundryItems.forEach(clothing => {
+        const card = document.createElement('div');
+        card.className = 'laundry-card in-laundry';
+        card.setAttribute('data-clothing-id', clothing.id);
+        card.innerHTML = `
+            <div class="laundry-image">
+                <img src="${clothing.imageUrl || 'https://via.placeholder.com/200'}" alt="${clothing.category}">
+            </div>
+            <div class="laundry-info">
+                <h3>${clothing.category}</h3>
+                ${clothing.tags ? `<p class="tags">${clothing.tags.join(', ')}</p>` : ''}
+                <div class="laundry-actions">
+                    <button class="btn-mark-clean">세탁 완료</button>
+                    <button class="btn-laundry-record">세탁 기록</button>
+                </div>
+            </div>
+        `;
+        laundryGrid.appendChild(card);
+    });
+
+    // Re-attach event listeners to new elements
+    attachLaundryEventListeners();
+}
+
+// Attach event listeners to laundry items
+function attachLaundryEventListeners() {
+    const userId = getCurrentUserId();
+    const markCleanBtns = document.querySelectorAll('.btn-mark-clean');
+
+    markCleanBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('세탁이 완료되었습니까?')) {
+                const card = this.closest('.laundry-card');
+                const clothingId = card.getAttribute('data-clothing-id');
+                const itemName = card.querySelector('h3').textContent;
+
+                fetch(`${API_BASE_URL}/users/${userId}/clothing/${clothingId}/laundry-status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isInLaundry: false })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert(`"${itemName}"을(를) 세탁 완료로 표시했습니다.`);
+                        card.style.animation = 'slideUp 0.5s ease forwards';
+                        setTimeout(() => {
+                            card.remove();
+                        }, 500);
+                    } else {
+                        alert('업데이트 실패');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('오류가 발생했습니다.');
+                });
+            }
+        });
+    });
+}
 
 // Initialize laundry page
 function initializeLaundryPage() {
@@ -42,8 +155,6 @@ function initializeLaundryPage() {
         });
     });
 
-    // Button handlers
-    setupLaundryButtons();
 }
 
 // Setup laundry tabs
@@ -93,35 +204,6 @@ function setupLaundryTabs() {
     if (tabs.length > 0) {
         tabs[0].classList.add('active');
     }
-}
-
-// Setup laundry buttons
-function setupLaundryButtons() {
-    const buttons = document.querySelectorAll('.btn-mark-clean');
-
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            const card = this.closest('.laundry-card');
-            const itemName = card.querySelector('h3').textContent;
-            const buttonText = this.textContent;
-
-            if (buttonText.includes('세탁 완료')) {
-                // Mark as clean
-                alert(`"${itemName}"을(를) 세탁 완료로 표시했습니다.`);
-                
-                // Animate removal
-                card.style.animation = 'slideUp 0.5s ease forwards';
-                setTimeout(() => {
-                    card.style.display = 'none';
-                }, 500);
-            } else if (buttonText.includes('세탁 기록')) {
-                // Record wash
-                alert(`"${itemName}"에 대한 세탁 기록을 저장했습니다.`);
-            }
-        });
-    });
 }
 
 // Add slideUp animation to stylesheet
