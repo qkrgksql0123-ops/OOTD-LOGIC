@@ -653,3 +653,28 @@
         gap: 12px;
     }
 }
+
+/* ===== Weather Badge Styles ===== */
+.weather-badge {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(179, 217, 232, 0.2), rgba(255, 255, 255, 0.8));
+    border: 1px solid rgba(179, 217, 232, 0.4);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+}
+
+.weather-badge span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    font-weight: 500;
+    color: var(--ink);
+    border: 1px solid rgba(179, 217, 232, 0.3);
+}
