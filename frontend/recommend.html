@@ -319,5 +319,19 @@
 
     <script src="js/script.js"></script>
     <script src="js/recommend.js"></script>
+
+    <!-- Force load weather on page ready -->
+    <script>
+        // Ensure weather loads immediately after page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Page loaded - Loading weather data...');
+                setTimeout(loadWeatherForRecommend, 500);
+            });
+        } else {
+            console.log('Page already loaded - Loading weather data...');
+            setTimeout(loadWeatherForRecommend, 500);
+        }
+    </script>
 </body>
 </html>

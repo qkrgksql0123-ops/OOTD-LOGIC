@@ -38,35 +38,56 @@ async function fetchWeatherData() {
 // Load weather data for recommendation page
 async function loadWeatherForRecommend() {
     try {
+        console.log('📍 loadWeatherForRecommend() called');
         const weatherData = await fetchWeatherData();
+
+        console.log('🌤️ Weather data received:', weatherData);
+
         if (weatherData) {
             // Update temperature
             const tempValue = document.querySelector('.temp-value');
-            if (tempValue) tempValue.textContent = `${weatherData.temperature}°C`;
+            console.log('🌡️ temp-value element:', tempValue);
+            if (tempValue) {
+                tempValue.textContent = `${weatherData.temperature}°C`;
+                console.log('✅ Temperature updated to:', `${weatherData.temperature}°C`);
+            }
 
             // Update weather condition
             const weatherValue = document.querySelector('.weather-value');
-            if (weatherValue) weatherValue.textContent = weatherData.weatherCondition || '정보 없음';
+            console.log('☁️ weather-value element:', weatherValue);
+            if (weatherValue) {
+                weatherValue.textContent = weatherData.weatherCondition || '정보 없음';
+                console.log('✅ Weather updated to:', weatherData.weatherCondition);
+            }
 
             // Update PM2.5 (미세먼지)
             const dustValue = document.querySelector('.dust-value');
+            console.log('💨 dust-value element:', dustValue);
             if (dustValue) {
                 const pm25Status = getPm25Status(weatherData.pm25);
                 dustValue.textContent = pm25Status;
+                console.log('✅ Dust updated to:', pm25Status);
             }
 
             // Update humidity
             const humidityValue = document.querySelector('.humidity-value');
-            if (humidityValue) humidityValue.textContent = `${weatherData.humidity}%`;
+            console.log('💧 humidity-value element:', humidityValue);
+            if (humidityValue) {
+                humidityValue.textContent = `${weatherData.humidity}%`;
+                console.log('✅ Humidity updated to:', `${weatherData.humidity}%`);
+            }
 
             // Add weather data to page for use by recommendation engine
             window.currentWeatherData = weatherData;
 
             // Generate AI recommendations based on weather
             generateWeatherBasedRecommendations();
+            console.log('✅ Recommendations generated');
+        } else {
+            console.warn('⚠️ No weather data received');
         }
     } catch (error) {
-        console.error('Error loading weather for recommend page:', error);
+        console.error('❌ Error loading weather for recommend page:', error);
     }
 }
 
