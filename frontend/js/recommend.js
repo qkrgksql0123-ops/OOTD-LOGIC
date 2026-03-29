@@ -40,22 +40,24 @@ async function loadWeatherForRecommend() {
     try {
         const weatherData = await fetchWeatherData();
         if (weatherData) {
-            // Update conditions grid
-            const conditionCards = document.querySelectorAll('.condition-card');
-            if (conditionCards.length >= 4) {
-                // Update temperature
-                conditionCards[0].querySelector('.value').textContent = `${weatherData.temperature}°C`;
+            // Update temperature
+            const tempValue = document.querySelector('.temp-value');
+            if (tempValue) tempValue.textContent = `${weatherData.temperature}°C`;
 
-                // Update weather condition
-                conditionCards[1].querySelector('.value').textContent = weatherData.weatherCondition || '정보 없음';
+            // Update weather condition
+            const weatherValue = document.querySelector('.weather-value');
+            if (weatherValue) weatherValue.textContent = weatherData.weatherCondition || '정보 없음';
 
-                // Update PM2.5 (미세먼지)
+            // Update PM2.5 (미세먼지)
+            const dustValue = document.querySelector('.dust-value');
+            if (dustValue) {
                 const pm25Status = getPm25Status(weatherData.pm25);
-                conditionCards[2].querySelector('.value').textContent = pm25Status;
-
-                // Update humidity
-                conditionCards[3].querySelector('.value').textContent = `${weatherData.humidity}%`;
+                dustValue.textContent = pm25Status;
             }
+
+            // Update humidity
+            const humidityValue = document.querySelector('.humidity-value');
+            if (humidityValue) humidityValue.textContent = `${weatherData.humidity}%`;
 
             // Add weather data to page for use by recommendation engine
             window.currentWeatherData = weatherData;
