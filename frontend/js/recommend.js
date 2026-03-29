@@ -1,16 +1,6 @@
 // ===== Recommend Page JavaScript =====
-
-const API_BASE_URL = 'http://localhost:8080/api';
-
-// ===== Authentication Utility =====
-function getCurrentUserId() {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    return userId;
-}
+// API_BASE_URL is defined in script.js
+// getCurrentUserId() is defined in script.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const userId = getCurrentUserId();
