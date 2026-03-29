@@ -322,15 +322,35 @@
 
     <!-- Force load weather on page ready -->
     <script>
-        // Ensure weather loads immediately after page load
+        // Direct weather update function
+        async function updateWeatherDirectly() {
+            try {
+                console.log('🌍 Fetching weather data directly...');
+                const response = await fetch('http://localhost:8080/api/environment/weather');
+                const weatherData = await response.json();
+                console.log('✅ Data received:', weatherData);
+
+                // Update temperature
+                document.querySelector('.temp-value').textContent = weatherData.temperature + '°C';
+                // Update weather
+                document.querySelector('.weather-value').textContent = weatherData.weatherCondition;
+                // Update humidity
+                document.querySelector('.humidity-value').textContent = weatherData.humidity + '%';
+                // Update dust
+                const dustStatus = weatherData.pm25 <= 30 ? '좋음' : weatherData.pm25 <= 80 ? '보통' : weatherData.pm25 <= 150 ? '나쁨' : '매우 나쁨';
+                document.querySelector('.dust-value').textContent = dustStatus;
+
+                console.log('✅ All values updated!');
+            } catch (error) {
+                console.error('❌ Error:', error);
+            }
+        }
+
+        // Run after page load
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('Page loaded - Loading weather data...');
-                setTimeout(loadWeatherForRecommend, 500);
-            });
+            document.addEventListener('DOMContentLoaded', updateWeatherDirectly);
         } else {
-            console.log('Page already loaded - Loading weather data...');
-            setTimeout(loadWeatherForRecommend, 500);
+            setTimeout(updateWeatherDirectly, 1000);
         }
     </script>
 </body>
