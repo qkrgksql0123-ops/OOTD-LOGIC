@@ -1,6 +1,67 @@
 // ===== API Configuration =====
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// ===== Authentication Utility =====
+function getCurrentUserId() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    return userId;
+}
+
+// ===== Main Page Navigation =====
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMainPage();
+    getWeatherInfo(); // Load weather data
+
+    // 기존 함수들 초기화
+    const tempSlider = document.getElementById('tempSensitivity');
+    if (tempSlider) {
+        const tempValue = document.getElementById('tempValue');
+        tempSlider.addEventListener('input', function() {
+            tempValue.textContent = this.value;
+        });
+    }
+});
+
+function initializeMainPage() {
+    // Navigation toggle for mobile
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    
+    if (navbarToggle && navbarMenu) {
+        navbarToggle.addEventListener('click', function() {
+            navbarMenu.classList.toggle('active');
+        });
+    }
+    
+    // Close menu when link is clicked
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (navbarMenu && this.classList.contains('nav-link')) {
+                navbarMenu.classList.remove('active');
+            }
+        });
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+}
+
 // ===== Modal Functions =====
 function openAddClothingModal() {
     document.getElementById('addClothingModal').classList.add('show');
@@ -41,6 +102,7 @@ document.getElementById('clothingForm')?.addEventListener('submit', function(e) 
 
 // Add Clothing
 async function addClothing() {
+    const userId = getCurrentUserId();
     const clothing = {
         category: document.getElementById('clothingCategory').value,
         imageUrl: '', // 이미지 업로드는 나중에 추가
@@ -48,7 +110,7 @@ async function addClothing() {
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/clothing`, {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -71,8 +133,9 @@ async function addClothing() {
 
 // Load Clothing List
 async function loadClothing() {
+    const userId = getCurrentUserId();
     try {
-        const response = await fetch(`${API_BASE_URL}/clothing`);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
         const clothings = await response.json();
 
         const clothingItems = document.getElementById('clothing-items');
@@ -103,8 +166,9 @@ async function loadClothing() {
 
 // Get Recommendation
 async function getRecommendation() {
+    const userId = getCurrentUserId();
     try {
-        const response = await fetch(`${API_BASE_URL}/recommendations`);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/recommendations`);
         const recommendations = await response.json();
 
         const recommendationList = document.getElementById('recommendation-list');
@@ -133,40 +197,91 @@ async function getRecommendation() {
     }
 }
 
+// Fetch Real Weather Data from KMA API
+async function fetchWeatherData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/environment/weather`);
+        if (!response.ok) {
+            throw new Error('날씨 데이터 조회 실패');
+        }
+        const weatherData = await response.json();
+        return weatherData;
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+        return null;
+    }
+}
+
 // Get Weather Info
 async function getWeatherInfo() {
     try {
-        const response = await fetch(`${API_BASE_URL}/environment`);
-        const weather = await response.json();
+        const weatherData = await fetchWeatherData();
 
         const weatherInfo = document.getElementById('weather-info');
-        if (weather) {
-            weatherInfo.innerHTML = `
-                <p>기온: ${weather.temperature}°C</p>
-                <p>날씨: ${weather.weatherCondition}</p>
-                <p>습도: ${weather.humidity}%</p>
+        const weatherDisplay = document.querySelector('.weather-info');
+        const dashboardWeather = document.querySelector('.dashboard-preview .preview-card:nth-child(2) .weather-info');
+
+        if (weatherData) {
+            const temp = weatherData.temperature || 'N/A';
+            const condition = weatherData.weatherCondition || '정보 없음';
+            const humidity = weatherData.humidity || 'N/A';
+            const minTemp = weatherData.minTemp || 'N/A';
+            const maxTemp = weatherData.maxTemp || 'N/A';
+
+            const weatherHTML = `
+                <p><strong>현재 기온:</strong> ${temp}°C</p>
+                <p><strong>최저/최고:</strong> ${minTemp}°C / ${maxTemp}°C</p>
+                <p><strong>날씨:</strong> ${condition}</p>
+                <p><strong>습도:</strong> ${humidity}%</p>
+                <p style="font-size: 0.85em; color: #999; margin-top: 10px;">기상청 공공 API 연동</p>
             `;
+
+            if (weatherInfo) weatherInfo.innerHTML = weatherHTML;
+            if (weatherDisplay) weatherDisplay.innerHTML = weatherHTML;
+            if (dashboardWeather) dashboardWeather.innerHTML = weatherHTML;
+
+            // Update weather warning
+            updateWeatherWarning(weatherData);
+        } else {
+            const errorHTML = '<p style="color: #e74c3c;">날씨 정보를 불러올 수 없습니다.</p>';
+            if (weatherInfo) weatherInfo.innerHTML = errorHTML;
+            if (weatherDisplay) weatherDisplay.innerHTML = errorHTML;
         }
     } catch (error) {
-        console.error('Error loading weather:', error);
-        document.getElementById('weather-info').innerHTML = '<p>날씨 정보를 불러올 수 없습니다.</p>';
+        console.error('Error in getWeatherInfo:', error);
+    }
+}
+
+// Update weather warning based on conditions
+async function updateWeatherWarning(weatherData) {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/environment/weather-warning?weatherCondition=${encodeURIComponent(weatherData.weatherCondition || '맑음')}&pm25=${weatherData.pm25 || 0}&pm10=${weatherData.pm10 || 0}`
+        );
+        if (response.ok) {
+            const warning = await response.text();
+            const warningElement = document.querySelector('.weather-warning');
+            if (warningElement) {
+                warningElement.innerHTML = `<p>${warning}</p>`;
+            }
+        }
+    } catch (error) {
+        console.error('Error updating weather warning:', error);
     }
 }
 
 // Save Settings
 async function saveSettings() {
-    const settings = {
-        tempSensitivity: document.getElementById('tempSensitivity').value,
-        skinTone: document.getElementById('skinTone').value
-    };
+    const userId = getCurrentUserId();
+    const tempSensitivity = document.getElementById('tempSensitivity').value;
+    const skinTone = document.getElementById('skinTone').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/user/settings`, {
-            method: 'POST',
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/settings?tempSensitivity=${tempSensitivity}&skinTone=${skinTone}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(settings)
+            }
         });
 
         if (response.ok) {
@@ -179,24 +294,3 @@ async function saveSettings() {
         alert('오류가 발생했습니다.');
     }
 }
-
-// ===== Initialize on Page Load =====
-document.addEventListener('DOMContentLoaded', function() {
-    loadClothing();
-    getWeatherInfo();
-    getRecommendation();
-});
-
-// ===== Smooth Scroll =====
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});

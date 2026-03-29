@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 코디 추천 - OOTD-Logic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/recommend.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation Bar -->
+        <header class="navbar-main">
+            <div class="navbar-container">
+                <div class="navbar-brand">
+                    <h1 class="logo">🧵 OOTD-Logic</h1>
+                </div>
+                <nav class="navbar-menu">
+                    <ul>
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="recommend.html" class="nav-link active">AI 코디 추천</a></li>
+                        <li><a href="closet.html" class="nav-link">디지털 옷장</a></li>
+                        <li><a href="laundry.html" class="nav-link">세탁 관리</a></li>
+                        <li><a href="mypage.html" class="nav-link">마이페이지</a></li>
+                        <li><a href="login.html" class="nav-link btn-login">로그인</a></li>
+                    </ul>
+                </nav>
+                <button class="navbar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Header Section -->
+        <section class="recommend-header">
+            <div class="header-content">
+                <h1><i class="fas fa-sparkles"></i> AI 기반 오늘의 코디 추천</h1>
+                <p>당신의 스타일과 오늘의 날씨, 환경 조건을 분석해 최적의 코디를 추천합니다</p>
+            </div>
+        </section>
+
+        <!-- Today's Conditions -->
+        <section class="section">
+            <h2>오늘의 조건</h2>
+            <div class="conditions-grid">
+                <div class="condition-card" id="temp-card">
+                    <div class="condition-icon">
+                        <i class="fas fa-thermometer-half"></i>
+                    </div>
+                    <div class="condition-info">
+                        <p class="label">기온</p>
+                        <p class="value temp-value">18°C</p>
+                    </div>
+                </div>
+                <div class="condition-card" id="weather-card">
+                    <div class="condition-icon">
+                        <i class="fas fa-cloud-sun"></i>
+                    </div>
+                    <div class="condition-info">
+                        <p class="label">날씨</p>
+                        <p class="value weather-value">맑음</p>
+                    </div>
+                </div>
+                <div class="condition-card" id="dust-card">
+                    <div class="condition-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <div class="condition-info">
+                        <p class="label">미세먼지</p>
+                        <p class="value dust-value">좋음</p>
+                    </div>
+                </div>
+                <div class="condition-card" id="humidity-card">
+                    <div class="condition-icon">
+                        <i class="fas fa-droplets"></i>
+                    </div>
+                    <div class="condition-info">
+                        <p class="label">습도</p>
+                        <p class="value humidity-value">65%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Your Profile -->
+        <section class="section">
+            <h2>당신의 스타일 프로필</h2>
+            <div class="profile-grid">
+                <div class="profile-card">
+                    <h3>퍼스널 컬러</h3>
+                    <div class="color-palette">
+                        <div class="color-item" style="background: #FFB347;"></div>
+                        <div class="color-item" style="background: #CD853F;"></div>
+                        <div class="color-item" style="background: #DEB887;"></div>
+                        <div class="color-item" style="background: #D2691E;"></div>
+                    </div>
+                    <p class="profile-desc">따뜻한 톤 (Warm)</p>
+                </div>
+                <div class="profile-card">
+                    <h3>얼굴형</h3>
+                    <div class="profile-info">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <p class="profile-desc">원형 얼굴형</p>
+                </div>
+                <div class="profile-card">
+                    <h3>스타일</h3>
+                    <div class="style-tags">
+                        <span class="tag">캐주얼</span>
+                        <span class="tag">모던</span>
+                        <span class="tag">미니멀</span>
+                    </div>
+                </div>
+                <div class="profile-card">
+                    <h3>선호 핏</h3>
+                    <div class="fit-bar">
+                        <div class="fit-item">
+                            <label>오버핏</label>
+                            <div class="progress">
+                                <div class="progress-fill" style="width: 35%;"></div>
+                            </div>
+                        </div>
+                        <div class="fit-item">
+                            <label>루즈</label>
+                            <div class="progress">
+                                <div class="progress-fill" style="width: 70%;"></div>
+                            </div>
+                        </div>
+                        <div class="fit-item">
+                            <label>슬림</label>
+                            <div class="progress">
+                                <div class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommended Outfits -->
+        <section class="section">
+            <h2>추천 코디</h2>
+            <div class="recommendation-tabs">
+                <button class="tab-btn active" data-tab="all">모두 보기</button>
+                <button class="tab-btn" data-tab="casual">캐주얼</button>
+                <button class="tab-btn" data-tab="formal">포멀</button>
+                <button class="tab-btn" data-tab="soft">소프트</button>
+            </div>
+
+            <div class="outfits-grid">
+                <!-- Outfit 1 -->
+                <div class="outfit-card">
+                    <div class="outfit-image">
+                        <div class="outfit-placeholder">
+                            <i class="fas fa-shirt"></i>
+                        </div>
+                        <span class="confidence-badge">
+                            <i class="fas fa-check-circle"></i> 85% 추천도
+                        </span>
+                    </div>
+                    <div class="outfit-info">
+                        <h3>클래식 카주얼</h3>
+                        <div class="outfit-items">
+                            <p><i class="fas fa-check"></i> 화이트 기본 티셔츠</p>
+                            <p><i class="fas fa-check"></i> 라이트 데님 팬츠</p>
+                            <p><i class="fas fa-check"></i> 베이지 오버핏 재킷</p>
+                            <p><i class="fas fa-check"></i> 스니커즈</p>
+                        </div>
+                        <div class="outfit-reason">
+                            <strong>추천 이유:</strong> 오늘의 18도 기온에 맞는 가벼운 레이어링이 완벽하며, 당신의 따뜻한 톤과 캐주얼 스타일을 극대화합니다.
+                        </div>
+                        <button class="btn btn-outfit">자세히 보기</button>
+                    </div>
+                </div>
+
+                <!-- Outfit 2 -->
+                <div class="outfit-card">
+                    <div class="outfit-image">
+                        <div class="outfit-placeholder">
+                            <i class="fas fa-shirt"></i>
+                        </div>
+                        <span class="confidence-badge">
+                            <i class="fas fa-check-circle"></i> 78% 추천도
+                        </span>
+                    </div>
+                    <div class="outfit-info">
+                        <h3>모던 미니멀</h3>
+                        <div class="outfit-items">
+                            <p><i class="fas fa-check"></i> 크림 색 긴소매 셔츠</p>
+                            <p><i class="fas fa-check"></i> 차콜 슬렉스</p>
+                            <p><i class="fas fa-check"></i> 카멜 토트백</p>
+                            <p><i class="fas fa-check"></i> 로퍼</p>
+                        </div>
+                        <div class="outfit-reason">
+                            <strong>추천 이유:</strong> 깔끔한 미니멀 스타일로 어디든 어울리며, 따뜻한 톤의 색상 조화가 뛰어난 조합입니다.
+                        </div>
+                        <button class="btn btn-outfit">자세히 보기</button>
+                    </div>
+                </div>
+
+                <!-- Outfit 3 -->
+                <div class="outfit-card">
+                    <div class="outfit-image">
+                        <div class="outfit-placeholder">
+                            <i class="fas fa-shirt"></i>
+                        </div>
+                        <span class="confidence-badge">
+                            <i class="fas fa-check-circle"></i> 72% 추천도
+                        </span>
+                    </div>
+                    <div class="outfit-info">
+                        <h3>트렌디 컬러풀</h3>
+                        <div class="outfit-items">
+                            <p><i class="fas fa-check"></i> 터라코타 니트</p>
+                            <p><i class="fas fa-check"></i> 에크루 팬츠</p>
+                            <p><i class="fas fa-check"></i> 초콜릿 부츠</p>
+                            <p><i class="fas fa-check"></i> 선글라스</p>
+                        </div>
+                        <div class="outfit-reason">
+                            <strong>추천 이유:</strong> 따뜻한 색상의 터라코타가 당신의 퍼스널 컬러와 완벽하게 매칭되고, 현재 날씨 조건에 적합합니다.
+                        </div>
+                        <button class="btn btn-outfit">자세히 보기</button>
+                    </div>
+                </div>
+
+                <!-- Outfit 4 -->
+                <div class="outfit-card">
+                    <div class="outfit-image">
+                        <div class="outfit-placeholder">
+                            <i class="fas fa-shirt"></i>
+                        </div>
+                        <span class="confidence-badge">
+                            <i class="fas fa-check-circle"></i> 70% 추천도
+                        </span>
+                    </div>
+                    <div class="outfit-info">
+                        <h3>캐주얼 걸리시</h3>
+                        <div class="outfit-items">
+                            <p><i class="fas fa-check"></i> 화이트 크롭 스웨터</p>
+                            <p><i class="fas fa-check"></i> 하이웨이스트 진</p>
+                            <p><i class="fas fa-check"></i> 카키 파카</p>
+                            <p><i class="fas fa-check"></i> 화이트 런닝화</p>
+                        </div>
+                        <div class="outfit-reason">
+                            <strong>추천 이유:</strong> 청춘스럽고 활동적인 스타일로, 기온 변화에 대응할 수 있는 레이어링 코디입니다.
+                        </div>
+                        <button class="btn btn-outfit">자세히 보기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis & Explanation -->
+        <section class="section">
+            <h2>추천 분석 정보</h2>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h3><i class="fas fa-lightbulb"></i> 색상 분석</h3>
+                    <p>오늘의 날씨는 맑고 밝으므로 당신의 따뜻한 톤(Warm)에 어울리는 터라코타, 카멜, 카키색이 좋습니다. 차가운 톤의 색상은 피하는 것이 좋습니다.</p>
+                </div>
+                <div class="analysis-card">
+                    <h3><i class="fas fa-wind"></i> 기온 & 레이어링</h3>
+                    <p>18도 기온에서는 얇은 니트나 셔츠 위에 라이트 아우터를 입는 것이 최적입니다. 오버핏 재킷이나 파카는 오늘 조건에 완벽한 선택입니다.</p>
+                </div>
+                <div class="analysis-card">
+                    <h3><i class="fas fa-head-side-virus"></i> 얼굴형 매칭</h3>
+                    <p>원형 얼굴형이므로 각진 반팔 티셔츠나 오버사이즈 아우터로 선의 강조가 필요합니다. 둥근 네크라인보다는 V넥이나 스퀘어넥이 유리합니다.</p>
+                </div>
+                <div class="analysis-card">
+                    <h3><i class="fas fa-shoe-prints"></i> 신발 추천</h3>
+                    <p>오늘 코디에는 스니커즈, 로퍼, 부츠 모두 어울립니다. 캐주얼하면 스니커즈, 포멀하면 로퍼나 부츠를 선택하세요. 베이지나 카키색 신발이 추천됩니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tips Section -->
+        <section class="section">
+            <h2>오늘의 코디 팁</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">1</div>
+                    <div class="tip-content">
+                        <h4>액세서리링</h4>
+                        <p>비타민 색상의 액세서리보다는 따뜻한 톤의 금색 액세서리나 투톤 시계를 추천합니다.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">2</div>
+                    <div class="tip-content">
+                        <h4>미세먼지 대비</h4>
+                        <p>오늘은 미세먼지가 좋으므로 야외 활동이 최적입니다. 하지만 마스크를 가져가는 것도 좋은 선택입니다.</p>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">3</div>
+                    <div class="tip-content">
+                        <h4>토토 선택</h4>
+                        <p>이너 위에 경량 아우터를 입어 따뜻한 실내에서도 답답함 없이 코디할 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-main">
+            <div class="footer-content">
+                <p><strong>Team TRION</strong></p>
+                <p>OOTD-Logic Project 2026</p>
+                <div class="footer-links">
+                    <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                    <a href="mailto:contact@ootd-logic.com"><i class="fas fa-envelope"></i> Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/recommend.js"></script>
+
+    <!-- Force load weather on page ready -->
+    <script>
+        // Direct weather update function
+        async function updateWeatherDirectly() {
+            try {
+                console.log('🌍 Fetching weather data directly...');
+                const response = await fetch('http://localhost:8080/api/environment/weather');
+                const weatherData = await response.json();
+                console.log('✅ Data received:', weatherData);
+
+                // Update temperature
+                document.querySelector('.temp-value').textContent = weatherData.temperature + '°C';
+                // Update weather
+                document.querySelector('.weather-value').textContent = weatherData.weatherCondition;
+                // Update humidity
+                document.querySelector('.humidity-value').textContent = weatherData.humidity + '%';
+                // Update dust
+                const dustStatus = weatherData.pm25 <= 30 ? '좋음' : weatherData.pm25 <= 80 ? '보통' : weatherData.pm25 <= 150 ? '나쁨' : '매우 나쁨';
+                document.querySelector('.dust-value').textContent = dustStatus;
+
+                console.log('✅ All values updated!');
+            } catch (error) {
+                console.error('❌ Error:', error);
+            }
+        }
+
+        // Run after page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', updateWeatherDirectly);
+        } else {
+            setTimeout(updateWeatherDirectly, 1000);
+        }
+    </script>
+</body>
+</html>
