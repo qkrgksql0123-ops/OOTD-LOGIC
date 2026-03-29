@@ -2,10 +2,14 @@ package com.trion.ootd.controller;
 
 import com.trion.ootd.entity.EnvironmentData;
 import com.trion.ootd.service.EnvironmentService;
+import com.trion.ootd.util.WeatherParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @RestController
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class EnvironmentController {
 
     private final EnvironmentService environmentService;
+    private final WeatherParser weatherParser;
 
     @PostMapping("/data")
     public ResponseEntity<EnvironmentData> createEnvironmentData(
@@ -47,5 +52,38 @@ public class EnvironmentController {
         log.info("Getting weather warning: condition={}, pm25={}, pm10={}", weatherCondition, pm25, pm10);
         String warning = environmentService.getWeatherWarning(weatherCondition, pm25, pm10);
         return ResponseEntity.ok(warning);
+    }
+
+    @GetMapping("/weather")
+    public ResponseEntity<EnvironmentData> getWeatherFromKMA(
+            @RequestParam(required = false) String date) {
+        try {
+            if (date == null || date.isEmpty()) {
+                date = LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE);
+            }
+            log.info("Fetching weather from KMA for date: {}", date);
+            EnvironmentData weatherData = weatherParser.getWeatherData(date);
+            return ResponseEntity.ok(weatherData);
+        } catch (Exception e) {
+            log.error("Error fetching weather data", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/weather/{region}")
+    public ResponseEntity<EnvironmentData> getWeatherByRegion(
+            @PathVariable String region,
+            @RequestParam(required = false) String date) {
+        try {
+            if (date == null || date.isEmpty()) {
+                date = LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE);
+            }
+            log.info("Fetching weather for region: {}, date: {}", region, date);
+            EnvironmentData weatherData = weatherParser.getWeatherDataByRegion(date, region);
+            return ResponseEntity.ok(weatherData);
+        } catch (Exception e) {
+            log.error("Error fetching weather data for region: {}", region, e);
+            return ResponseEntity.status(500).build();
+        }
     }
 }

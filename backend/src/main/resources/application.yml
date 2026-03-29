@@ -6,6 +6,17 @@ gemini:
   api:
     key: ${GEMINI_API_KEY:test-api-key}
 
+weather:
+  api:
+    url: http://apis.data.go.kr/1360000/AsosDalyInfoService/getWthrDataList
+    key: ${WEATHER_API_KEY:4fcae2c8428ca24acdcb51607fa7baaf53dcfa139aa65e35ded46cf0cc4ea4d8}
+    station-id: 108
+
+air-quality:
+  api:
+    url: http://apis.data.go.kr/B552584/ArpltnInforInqireSvc
+    key: ${AIR_QUALITY_API_KEY:}
+
 aws:
   dynamodb:
     region: ap-northeast-2

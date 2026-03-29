@@ -16,9 +16,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const userId = getCurrentUserId();
     if (userId) {
         loadRecommendationHistory(userId);
+        loadWeatherForRecommend();
     }
     initializeRecommendPage();
 });
+
+// Fetch Weather Data from KMA API
+async function fetchWeatherData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/environment/weather`);
+        if (!response.ok) {
+            throw new Error('날씨 데이터 조회 실패');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+        return null;
+    }
+}
+
+// Load weather data for recommendation page
+async function loadWeatherForRecommend() {
+    try {
+        const weatherData = await fetchWeatherData();
+        if (weatherData) {
+            // Update conditions grid
+            const conditionCards = document.querySelectorAll('.condition-card');
+            if (conditionCards.length >= 4) {
+                // Update temperature
+                conditionCards[0].querySelector('.value').textContent = `${weatherData.temperature}°C`;
+
+                // Update weather condition
+                conditionCards[1].querySelector('.value').textContent = weatherData.weatherCondition || '정보 없음';
+
+                // Update PM2.5 (미세먼지)
+                const pm25Status = getPm25Status(weatherData.pm25);
+                conditionCards[2].querySelector('.value').textContent = pm25Status;
+
+                // Update humidity
+                conditionCards[3].querySelector('.value').textContent = `${weatherData.humidity}%`;
+            }
+
+            // Add weather data to page for use by recommendation engine
+            window.currentWeatherData = weatherData;
+        }
+    } catch (error) {
+        console.error('Error loading weather for recommend page:', error);
+    }
+}
+
+// Get PM2.5 status
+function getPm25Status(pm25) {
+    if (!pm25) return '정보 없음';
+    if (pm25 <= 30) return '좋음';
+    if (pm25 <= 80) return '보통';
+    if (pm25 <= 150) return '나쁨';
+    return '매우 나쁨';
+}
 
 // Load recommendation history
 async function loadRecommendationHistory(userId) {

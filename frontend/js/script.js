@@ -14,7 +14,8 @@ function getCurrentUserId() {
 // ===== Main Page Navigation =====
 document.addEventListener('DOMContentLoaded', function() {
     initializeMainPage();
-    
+    getWeatherInfo(); // Load weather data
+
     // 기존 함수들 초기화
     const tempSlider = document.getElementById('tempSensitivity');
     if (tempSlider) {
@@ -196,23 +197,76 @@ async function getRecommendation() {
     }
 }
 
+// Fetch Real Weather Data from KMA API
+async function fetchWeatherData() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/environment/weather`);
+        if (!response.ok) {
+            throw new Error('날씨 데이터 조회 실패');
+        }
+        const weatherData = await response.json();
+        return weatherData;
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+        return null;
+    }
+}
+
 // Get Weather Info
 async function getWeatherInfo() {
     try {
-        const response = await fetch(`${API_BASE_URL}/environment/weather-description?temperature=20&weatherCondition=맑음`);
-        const weather = await response.json();
+        const weatherData = await fetchWeatherData();
 
         const weatherInfo = document.getElementById('weather-info');
-        if (weather) {
-            weatherInfo.innerHTML = `
-                <p>기온: ${weather.temperature}°C</p>
-                <p>날씨: ${weather.weatherCondition}</p>
-                <p>습도: ${weather.humidity}%</p>
+        const weatherDisplay = document.querySelector('.weather-info');
+        const dashboardWeather = document.querySelector('.dashboard-preview .preview-card:nth-child(2) .weather-info');
+
+        if (weatherData) {
+            const temp = weatherData.temperature || 'N/A';
+            const condition = weatherData.weatherCondition || '정보 없음';
+            const humidity = weatherData.humidity || 'N/A';
+            const minTemp = weatherData.minTemp || 'N/A';
+            const maxTemp = weatherData.maxTemp || 'N/A';
+
+            const weatherHTML = `
+                <p><strong>현재 기온:</strong> ${temp}°C</p>
+                <p><strong>최저/최고:</strong> ${minTemp}°C / ${maxTemp}°C</p>
+                <p><strong>날씨:</strong> ${condition}</p>
+                <p><strong>습도:</strong> ${humidity}%</p>
+                <p style="font-size: 0.85em; color: #999; margin-top: 10px;">기상청 공공 API 연동</p>
             `;
+
+            if (weatherInfo) weatherInfo.innerHTML = weatherHTML;
+            if (weatherDisplay) weatherDisplay.innerHTML = weatherHTML;
+            if (dashboardWeather) dashboardWeather.innerHTML = weatherHTML;
+
+            // Update weather warning
+            updateWeatherWarning(weatherData);
+        } else {
+            const errorHTML = '<p style="color: #e74c3c;">날씨 정보를 불러올 수 없습니다.</p>';
+            if (weatherInfo) weatherInfo.innerHTML = errorHTML;
+            if (weatherDisplay) weatherDisplay.innerHTML = errorHTML;
         }
     } catch (error) {
-        console.error('Error loading weather:', error);
-        document.getElementById('weather-info').innerHTML = '<p>날씨 정보를 불러올 수 없습니다.</p>';
+        console.error('Error in getWeatherInfo:', error);
+    }
+}
+
+// Update weather warning based on conditions
+async function updateWeatherWarning(weatherData) {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/environment/weather-warning?weatherCondition=${encodeURIComponent(weatherData.weatherCondition || '맑음')}&pm25=${weatherData.pm25 || 0}&pm10=${weatherData.pm10 || 0}`
+        );
+        if (response.ok) {
+            const warning = await response.text();
+            const warningElement = document.querySelector('.weather-warning');
+            if (warningElement) {
+                warningElement.innerHTML = `<p>${warning}</p>`;
+            }
+        }
+    } catch (error) {
+        console.error('Error updating weather warning:', error);
     }
 }
 
