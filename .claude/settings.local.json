@@ -5,7 +5,8 @@
       "Bash(git pull:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"feat: Connect frontend and backend APIs for full integration:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
