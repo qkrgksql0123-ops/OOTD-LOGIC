@@ -1,7 +1,7 @@
 // ===== Authentication Check =====
 document.addEventListener('DOMContentLoaded', function() {
-    // 페이지 로드 시 인증 확인
-    checkAuth();
+    // 페이지 로드 시 인증 확인 (api.js에서 이미 호출됨)
+    // checkAuth() - removed to avoid duplicate calls
     updateNavigation();
 
     // 현재 사용자 정보 표시

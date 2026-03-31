@@ -190,10 +190,14 @@ function getCurrentUser() {
 // 페이지 로드 시 인증 확인
 function checkAuth() {
     if (!isAuthenticated()) {
-        const publicPages = ['/login.html', '/signup.html', '/'];
+        // 공개 페이지 (로그인 필요 없음)
         const currentPage = window.location.pathname;
+        const publicPages = ['login.html', 'signup.html', 'index.html', ''];
 
-        if (!publicPages.includes(currentPage)) {
+        // 현재 페이지가 공개 페이지인지 확인
+        const isPublicPage = publicPages.some(page => currentPage.endsWith(page));
+
+        if (!isPublicPage) {
             redirectToLogin();
         }
     }
