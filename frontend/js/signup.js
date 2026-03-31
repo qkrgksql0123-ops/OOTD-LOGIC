@@ -1,17 +1,7 @@
-const API_BASE_URL = 'http://localhost:8090/api';
 const signupForm = document.getElementById('signupForm');
 const signupStatusMessage = document.getElementById('statusMessage');
 const styleError = document.getElementById('styleError');
 const agreeError = document.getElementById('agreeError');
-
-// UUID 생성 함수
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
 
 function setFieldError(input, message) {
   const errorEl = input.parentElement.querySelector('.error-message');
@@ -31,7 +21,6 @@ function validateSignupForm(form) {
   const emailInput = form.elements.email;
   const passwordInput = form.elements.password;
   const confirmPasswordInput = form.elements.confirmPassword;
-  const styleInputs = form.querySelectorAll('input[name="style"]:checked');
   const agreeInput = document.getElementById('agree');
 
   if (!nicknameInput.value.trim() || nicknameInput.value.trim().length < 2) {
@@ -68,13 +57,6 @@ function validateSignupForm(form) {
     clearFieldError(confirmPasswordInput);
   }
 
-  if (styleInputs.length === 0) {
-    styleError.textContent = '최소 1개의 스타일을 선택해주세요.';
-    isValid = false;
-  } else {
-    styleError.textContent = '';
-  }
-
   if (!agreeInput.checked) {
     agreeError.textContent = '약관 동의가 필요합니다.';
     isValid = false;
@@ -85,7 +67,7 @@ function validateSignupForm(form) {
   return isValid;
 }
 
-signupForm?.addEventListener('submit', (event) => {
+signupForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   signupStatusMessage.textContent = '';
@@ -99,36 +81,28 @@ signupForm?.addEventListener('submit', (event) => {
 
   signupStatusMessage.textContent = '회원가입 처리 중입니다...';
 
-  const signupData = {
-    email: signupForm.elements.email.value,
-    password: signupForm.elements.password.value,
-    nickname: signupForm.elements.nickname.value
-  };
+  try {
+    const email = signupForm.elements.email.value;
+    const password = signupForm.elements.password.value;
+    const nickname = signupForm.elements.nickname.value;
 
-  fetch(`${API_BASE_URL}/auth/signup`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(signupData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.userId) {
-      signupStatusMessage.textContent = '회원가입 완료! 로그인 페이지로 이동해 주세요.';
+    const data = await signup(email, password, nickname);
+
+    if (data.userId && data.accessToken && data.refreshToken) {
+      signupStatusMessage.textContent = '회원가입 완료! 메인 페이지로 이동합니다.';
       signupStatusMessage.classList.remove('error');
       signupStatusMessage.classList.add('ok');
+
       setTimeout(() => {
-        window.location.href = 'login.html';
+        window.location.href = 'closet.html';
       }, 1500);
     } else {
       throw new Error(data.message || '회원가입 실패');
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
+  } catch (error) {
+    console.error('Signup error:', error);
     signupStatusMessage.textContent = error.message || '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.';
     signupStatusMessage.classList.remove('ok');
     signupStatusMessage.classList.add('error');
-  });
+  }
 });

@@ -1,4 +1,3 @@
-const API_BASE_URL = 'http://localhost:8090/api';
 const loginForm = document.getElementById('loginForm');
 const statusMessage = document.getElementById('statusMessage');
 
@@ -36,7 +35,7 @@ function validateLoginForm(form) {
   return isValid;
 }
 
-loginForm?.addEventListener('submit', (event) => {
+loginForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   statusMessage.textContent = '';
@@ -50,37 +49,27 @@ loginForm?.addEventListener('submit', (event) => {
 
   statusMessage.textContent = '로그인 중입니다...';
 
-  const loginData = {
-    email: loginForm.elements.email.value,
-    password: loginForm.elements.password.value
-  };
+  try {
+    const email = loginForm.elements.email.value;
+    const password = loginForm.elements.password.value;
 
-  fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(loginData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.userId) {
-      localStorage.setItem('userId', data.userId);
-      localStorage.setItem('nickname', data.nickname || '');
+    const data = await login(email, password);
+
+    if (data.userId && data.accessToken && data.refreshToken) {
       statusMessage.textContent = '로그인 성공! 메인 페이지로 이동합니다.';
       statusMessage.classList.remove('error');
       statusMessage.classList.add('ok');
+
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = 'closet.html';
       }, 1500);
     } else {
       throw new Error(data.message || '로그인 실패');
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
+  } catch (error) {
+    console.error('Login error:', error);
     statusMessage.textContent = error.message || '로그인 중 오류가 발생했습니다.';
     statusMessage.classList.remove('ok');
     statusMessage.classList.add('error');
-  });
+  }
 });

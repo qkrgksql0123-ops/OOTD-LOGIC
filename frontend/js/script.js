@@ -1,18 +1,24 @@
-// ===== API Configuration =====
-const API_BASE_URL = 'http://localhost:8090/api';
-
-// ===== Authentication Utility =====
-function getCurrentUserId() {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-        window.location.href = 'login.html';
-        return null;
-    }
-    return userId;
-}
-
-// ===== Main Page Navigation =====
+// ===== Authentication Check =====
 document.addEventListener('DOMContentLoaded', function() {
+    // 페이지 로드 시 인증 확인
+    checkAuth();
+
+    // 현재 사용자 정보 표시
+    const user = getCurrentUser();
+    if (user) {
+        updateUserDisplay(user);
+    }
+
+    // 로그아웃 버튼 처리
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            if (confirm('정말 로그아웃하시겠습니까?')) {
+                await logout();
+            }
+        });
+    }
+
     initializeMainPage();
     getWeatherInfo(); // Load weather data
 
@@ -25,6 +31,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// 사용자 정보 화면에 표시
+function updateUserDisplay(user) {
+    const userNameEl = document.getElementById('userName');
+    const userNicknameEl = document.getElementById('userNickname');
+    const userEmailEl = document.getElementById('userEmail');
+
+    if (userNameEl) {
+        userNameEl.textContent = user.nickname || '사용자';
+    }
+    if (userNicknameEl) {
+        userNicknameEl.textContent = user.nickname || '';
+    }
+    if (userEmailEl) {
+        userEmailEl.textContent = user.email || '';
+    }
+
+    // 로그인 상태 표시
+    const loginStatus = document.getElementById('loginStatus');
+    if (loginStatus) {
+        loginStatus.textContent = `${user.nickname || '사용자'}님 로그인됨`;
+        loginStatus.classList.add('logged-in');
+    }
+}
 
 function initializeMainPage() {
     // Navigation toggle for mobile
