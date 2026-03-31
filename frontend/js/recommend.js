@@ -1,6 +1,5 @@
 // ===== Recommend Page JavaScript =====
-// API_BASE_URL is defined in script.js
-// getCurrentUserId() is defined in script.js
+// API_BASE_URL is defined in api.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const userId = localStorage.getItem('userId');

@@ -1,6 +1,5 @@
 /* ===== MyPage Scripts ===== */
-
-const API_BASE_URL = 'http://localhost:8090/api';
+// API_BASE_URL is defined in api.js
 
 // ===== Authentication Utility =====
 function getCurrentUserId() {
