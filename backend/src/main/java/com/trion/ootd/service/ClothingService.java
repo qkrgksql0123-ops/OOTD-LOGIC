@@ -23,21 +23,20 @@ public class ClothingService {
     public ClothingDTO addClothing(String userId, ClothingDTO clothingDTO) {
         log.info("Adding clothing for user: {}", userId);
 
-        Clothing clothing = Clothing.builder()
-                .id(UUID.randomUUID().toString())
-                .userId(userId)
-                .category(clothingDTO.getCategory())
-                .subcategory(clothingDTO.getSubcategory())
-                .color(clothingDTO.getColor())
-                .material(clothingDTO.getMaterial())
-                .season(clothingDTO.getSeason())
-                .thickness(clothingDTO.getThickness())
-                .imageUrl(clothingDTO.getImageUrl())
-                .tags(clothingDTO.getTags())
-                .isInLaundry(clothingDTO.getIsInLaundry() != null ? clothingDTO.getIsInLaundry() : false)
-                .createdAt(LocalDateTime.now().toString())
-                .wearCount(0)
-                .build();
+        Clothing clothing = new Clothing();
+        clothing.setId(UUID.randomUUID().toString());
+        clothing.setUserId(userId);
+        clothing.setCategory(clothingDTO.getCategory());
+        clothing.setSubcategory(clothingDTO.getSubcategory());
+        clothing.setColor(clothingDTO.getColor());
+        clothing.setMaterial(clothingDTO.getMaterial());
+        clothing.setSeason(clothingDTO.getSeason());
+        clothing.setThickness(clothingDTO.getThickness());
+        clothing.setImageUrl(clothingDTO.getImageUrl());
+        clothing.setTags(clothingDTO.getTags());
+        clothing.setIsInLaundry(clothingDTO.getIsInLaundry() != null ? clothingDTO.getIsInLaundry() : false);
+        clothing.setCreatedAt(LocalDateTime.now().toString());
+        clothing.setWearCount(0);
 
         clothingRepository.save(clothing);
         log.info("Clothing added successfully: {}", clothing.getId());
