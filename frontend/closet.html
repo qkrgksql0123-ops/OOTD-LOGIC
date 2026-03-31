@@ -104,27 +104,43 @@
                             <label>카테고리 *</label>
                             <select id="clothingCategory" required>
                                 <option value="">선택하세요</option>
-                                <option value="상의">상의 (셔츠, 티셔츠, 니트)</option>
-                                <option value="하의">하의 (바지, 스커트)</option>
-                                <option value="아우터">아우터 (자켓, 코트)</option>
-                                <option value="원피스">원피스 / 투피스</option>
+                                <option value="상의">상의</option>
+                                <option value="하의">하의</option>
+                                <option value="아우터">아우터</option>
+                                <option value="원피스">원피스</option>
                                 <option value="신발">신발</option>
                                 <option value="악세사리">악세사리</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>브랜드</label>
-                            <input type="text" id="clothingBrand" placeholder="브랜드명">
+                            <label>세부 분류</label>
+                            <input type="text" id="clothingSubcategory" placeholder="예: 셔츠, 청바지">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>이름 *</label>
-                            <input type="text" id="clothingName" placeholder="의류 이름" required>
-                        </div>
-                        <div class="form-group">
                             <label>색상</label>
                             <input type="text" id="clothingColor" placeholder="예: 검정, 흰색">
+                        </div>
+                        <div class="form-group">
+                            <label>소재</label>
+                            <input type="text" id="clothingMaterial" placeholder="예: 면, 울">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>계절</label>
+                            <select id="clothingSeason">
+                                <option value="">선택</option>
+                                <option value="봄">봄</option>
+                                <option value="여름">여름</option>
+                                <option value="가을">가을</option>
+                                <option value="겨울">겨울</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>두께 (1-5)</label>
+                            <input type="number" id="clothingThickness" placeholder="1" min="1" max="5">
                         </div>
                     </div>
                     <div class="form-row">

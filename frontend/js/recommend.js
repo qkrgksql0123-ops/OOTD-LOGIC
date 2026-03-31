@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const userId = localStorage.getItem('userId');
     if (userId) {
         loadRecommendationHistory(userId);
+        // Load user's closet data and generate AI recommendations
+        loadClothingData(userId).then(clothings => {
+            if (clothings && clothings.length > 0) {
+                generateAIRecommendation(userId, clothings);
+            }
+        });
     }
     loadWeatherForRecommend();
     initializeRecommendPage();
@@ -395,4 +401,151 @@ function initializeRecommendPage() {
             }
         });
     });
+}
+
+// ===== AI Recommendation Integration =====
+
+// Load user's clothing data
+async function loadClothingData(userId) {
+    try {
+        console.log('📂 Loading clothing data for user:', userId);
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const clothings = await response.json();
+            console.log('✅ Clothing data loaded:', clothings);
+            return clothings;
+        } else {
+            console.warn('⚠️ Failed to load clothing data');
+            return [];
+        }
+    } catch (error) {
+        console.error('❌ Error loading clothing data:', error);
+        return [];
+    }
+}
+
+// Format clothing data for AI
+function formatClothingForAI(clothings) {
+    if (!clothings || clothings.length === 0) {
+        return '사용자의 옷장에 등록된 의류가 없습니다.';
+    }
+
+    let clothingText = '사용자의 옷장 정보:\n\n';
+    const categories = {};
+
+    clothings.forEach(clothing => {
+        const category = clothing.category || '미분류';
+        if (!categories[category]) {
+            categories[category] = [];
+        }
+
+        let itemDesc = `${clothing.subcategory || '상세불명'}`;
+        if (clothing.color) itemDesc += ` (${clothing.color})`;
+        if (clothing.material) itemDesc += `, 소재: ${clothing.material}`;
+        if (clothing.season) itemDesc += `, 계절: ${clothing.season}`;
+
+        categories[category].push(itemDesc);
+    });
+
+    // Format categories
+    for (const [category, items] of Object.entries(categories)) {
+        clothingText += `${category}:\n`;
+        items.forEach(item => {
+            clothingText += `  - ${item}\n`;
+        });
+        clothingText += '\n';
+    }
+
+    return clothingText;
+}
+
+// Generate AI recommendation using OpenRouter
+async function generateAIRecommendation(userId, clothings) {
+    try {
+        const weatherData = window.currentWeatherData;
+        if (!weatherData) {
+            console.warn('⚠️ No weather data available for AI recommendation');
+            return;
+        }
+
+        console.log('🤖 Generating AI recommendation...');
+
+        const clothingData = formatClothingForAI(clothings);
+        const prompt = `다음 사용자의 옷장 정보와 오늘의 날씨를 고려해서 최적의 코디를 추천해주세요:
+
+${clothingData}
+
+오늘의 날씨:
+- 기온: ${weatherData.temperature}°C
+- 날씨: ${weatherData.weatherCondition}
+- 습도: ${weatherData.humidity}%
+- 미세먼지: ${getPm25Status(weatherData.pm25)}
+
+추천할 때는 다음 형식으로 제시해주세요:
+1. 추천 코디명
+2. 추천 의류 목록 (상의, 하의, 아우터, 신발 등)
+3. 추천 이유 (날씨와 온도 고려)
+4. 스타일링 팁`;
+
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/recommendations/ai-recommend-quick`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(prompt)
+        });
+
+        if (response.ok) {
+            const recommendation = await response.text();
+            console.log('✅ AI Recommendation received:', recommendation);
+            displayAIRecommendation(recommendation);
+        } else {
+            console.warn('⚠️ Failed to get AI recommendation');
+        }
+    } catch (error) {
+        console.error('❌ Error generating AI recommendation:', error);
+    }
+}
+
+// Display AI recommendation on the page
+function displayAIRecommendation(recommendation) {
+    const outfitsGrid = document.querySelector('.outfits-grid');
+    if (!outfitsGrid) return;
+
+    // Add AI recommendation as first card
+    const aiCard = document.createElement('div');
+    aiCard.className = 'outfit-card ai-recommendation-card';
+    aiCard.innerHTML = `
+        <div class="outfit-image">
+            <div class="outfit-placeholder">
+                <i class="fas fa-robot"></i>
+            </div>
+            <span class="confidence-badge ai-badge">
+                <i class="fas fa-sparkles"></i> AI 추천
+            </span>
+        </div>
+        <div class="outfit-info">
+            <h3>🤖 AI 기반 코디 추천</h3>
+            <div class="ai-recommendation-text">
+                ${recommendation.split('\n').map(line => {
+                    if (line.trim() === '') return '';
+                    return `<p>${line}</p>`;
+                }).join('')}
+            </div>
+            <button class="btn btn-outfit">이 코디 저장</button>
+        </div>
+    `;
+
+    // Insert at the beginning of the grid
+    if (outfitsGrid.firstChild) {
+        outfitsGrid.insertBefore(aiCard, outfitsGrid.firstChild);
+    } else {
+        outfitsGrid.appendChild(aiCard);
+    }
 }

@@ -166,12 +166,23 @@ function initializeClosetPage() {
             e.preventDefault();
             const userId = getCurrentUserId();
 
+            const tagsInput = document.getElementById('clothingTags').value;
+            const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+
             const clothing = {
                 category: document.getElementById('clothingCategory').value,
+                subcategory: document.getElementById('clothingSubcategory').value || null,
+                color: document.getElementById('clothingColor').value || null,
+                material: document.getElementById('clothingMaterial').value || null,
+                season: document.getElementById('clothingSeason').value || null,
+                thickness: document.getElementById('clothingThickness').value ?
+                    parseInt(document.getElementById('clothingThickness').value) : null,
                 imageUrl: '',
-                color: document.getElementById('clothingColor').value,
-                tags: document.getElementById('clothingTags').value.split(',').map(tag => tag.trim())
+                tags: tags,
+                isInLaundry: false
             };
+
+            console.log('Sending clothing data:', clothing);
 
             fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
                 method: 'POST',
@@ -181,18 +192,25 @@ function initializeClosetPage() {
                 body: JSON.stringify(clothing)
             })
             .then(response => {
+                console.log('Response status:', response.status);
                 if (response.ok) {
-                    alert('의류가 등록되었습니다!');
-                    addClothingForm.style.display = 'none';
-                    clothingForm.reset();
-                    loadClothingList(userId);
+                    return response.json().then(data => {
+                        console.log('Clothing added:', data);
+                        alert('의류가 등록되었습니다!');
+                        addClothingForm.style.display = 'none';
+                        clothingForm.reset();
+                        loadClothingList(userId);
+                    });
                 } else {
-                    alert('의류 등록에 실패했습니다.');
+                    return response.text().then(text => {
+                        console.error('Error response:', text);
+                        alert('의류 등록에 실패했습니다. 콘솔을 확인하세요.');
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('오류가 발생했습니다.');
+                alert('오류가 발생했습니다: ' + error.message);
             });
         });
     }

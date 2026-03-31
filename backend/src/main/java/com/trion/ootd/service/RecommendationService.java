@@ -145,9 +145,8 @@ public class RecommendationService {
      */
     private String getWeatherInfoForRecommendation() {
         try {
-            // EnvironmentService에서 현재 날씨 정보 조회
-            // 실제 구현은 EnvironmentService의 메서드에 따라 조정
-            return "오늘의 기온: 약 15-20°C, 날씨: 맑음, 습도: 60%";
+            // 기본값 반환 (클라이언트가 날씨 정보를 함께 전달함)
+            return "기온: 20°C, 날씨: 맑음, 습도: 60%";
         } catch (Exception e) {
             log.warn("Failed to get weather info, using default", e);
             return "날씨 정보를 조회할 수 없습니다. 기본 코디 추천을 제공합니다.";
