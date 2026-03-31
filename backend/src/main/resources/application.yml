@@ -17,13 +17,18 @@ air-quality:
     url: http://apis.data.go.kr/B552584/ArpltnInforInqireSvc
     key: ${AIR_QUALITY_API_KEY:}
 
+jwt:
+  secret: ${JWT_SECRET_KEY:your-secret-key-minimum-256-bits-long-change-in-production}
+  expiration: 3600000
+  refreshExpiration: 604800000
+
 aws:
   dynamodb:
     region: ap-northeast-2
     endpoint: http://localhost:8000
 
 server:
-  port: 8081
+  port: 8090
 
 logging:
   level:

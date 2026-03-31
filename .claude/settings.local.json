@@ -6,7 +6,16 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"feat: Connect frontend and backend APIs for full integration:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(python -m http.server 3000)",
+      "Bash(curl:*)",
+      "Bash(mkdir -p ../backend/src/main/resources/static)",
+      "Bash(cp -r ./* ../backend/src/main/resources/static/)",
+      "Bash(./gradlew bootRun)",
+      "Bash(./gradlew clean:*)",
+      "Bash(for f:*)",
+      "Bash(do sed:*)",
+      "Bash(done)"
     ]
   }
 }
