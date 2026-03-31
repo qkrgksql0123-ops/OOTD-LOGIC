@@ -20,10 +20,17 @@ public class Clothing {
     private String id;
     private String userId;
     private String category;
+    private String subcategory;
+    private String color;
+    private String material;
+    private String season;
+    private Integer thickness;
     private String imageUrl;
     private List<String> tags;
     private String createdAt;
     private Boolean isInLaundry;
+    private String lastWornDate;
+    private Integer wearCount;
 
     @DynamoDbSortKey
     @DynamoDbAttribute("id")
@@ -52,6 +59,51 @@ public class Clothing {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @DynamoDbAttribute("subcategory")
+    public String getSubcategory() {
+        return subcategory;
+    }
+
+    public void setSubcategory(String subcategory) {
+        this.subcategory = subcategory;
+    }
+
+    @DynamoDbAttribute("color")
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    @DynamoDbAttribute("material")
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
+
+    @DynamoDbAttribute("season")
+    public String getSeason() {
+        return season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+    }
+
+    @DynamoDbAttribute("thickness")
+    public Integer getThickness() {
+        return thickness;
+    }
+
+    public void setThickness(Integer thickness) {
+        this.thickness = thickness;
     }
 
     @DynamoDbAttribute("imageUrl")
@@ -96,5 +148,23 @@ public class Clothing {
 
     public void setIsInLaundry(Boolean isInLaundry) {
         this.isInLaundry = isInLaundry;
+    }
+
+    @DynamoDbAttribute("lastWornDate")
+    public String getLastWornDate() {
+        return lastWornDate;
+    }
+
+    public void setLastWornDate(String lastWornDate) {
+        this.lastWornDate = lastWornDate;
+    }
+
+    @DynamoDbAttribute("wearCount")
+    public Integer getWearCount() {
+        return wearCount != null ? wearCount : 0;
+    }
+
+    public void setWearCount(Integer wearCount) {
+        this.wearCount = wearCount;
     }
 }

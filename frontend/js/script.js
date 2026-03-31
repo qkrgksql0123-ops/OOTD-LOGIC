@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 페이지 로드 시 인증 확인
     checkAuth();
+    updateNavigation();
 
     // 현재 사용자 정보 표시
     const user = getCurrentUser();
@@ -32,6 +33,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// 네비게이션 바 업데이트 (로그인/로그아웃 버튼)
+function updateNavigation() {
+    const navMenu = document.querySelector('.navbar-menu ul');
+    if (!navMenu) return;
+
+    const loginBtn = navMenu.querySelector('.btn-login');
+    const isAuthenticated = localStorage.getItem('accessToken') !== null;
+
+    if (isAuthenticated) {
+        // 로그인 상태 → 로그아웃 버튼으로 변경
+        if (loginBtn) {
+            loginBtn.textContent = '로그아웃';
+            loginBtn.classList.remove('btn-login');
+            loginBtn.classList.add('btn-logout');
+            loginBtn.href = '#';
+
+            // 클릭 이벤트 추가
+            loginBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (confirm('정말 로그아웃하시겠습니까?')) {
+                    await logout();
+                }
+            });
+        }
+    } else {
+        // 비로그인 상태 → 로그인 버튼 유지
+        if (loginBtn) {
+            loginBtn.textContent = '로그인';
+            loginBtn.classList.add('btn-login');
+            loginBtn.classList.remove('btn-logout');
+            loginBtn.href = 'login.html';
+        }
+    }
+}
+
 // 사용자 정보 화면에 표시
 function updateUserDisplay(user) {
     const userNameEl = document.getElementById('userName');
@@ -53,6 +89,35 @@ function updateUserDisplay(user) {
     if (loginStatus) {
         loginStatus.textContent = `${user.nickname || '사용자'}님 로그인됨`;
         loginStatus.classList.add('logged-in');
+    }
+
+    // 마이페이지 프로필 정보 표시
+    loadMyPageProfile(user);
+}
+
+// 마이페이지 프로필 정보 로드
+function loadMyPageProfile(user) {
+    // 프로필 카드 정보 업데이트
+    const profileNickname = document.getElementById('profileNickname');
+    const profileEmail = document.getElementById('profileEmail');
+    const profileJoined = document.getElementById('profileJoined');
+    const nicknameInput = document.getElementById('nickname');
+
+    if (profileNickname) {
+        profileNickname.textContent = user.nickname || '사용자';
+    }
+    if (profileEmail) {
+        profileEmail.textContent = user.email || '이메일 없음';
+    }
+    if (profileJoined) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        profileJoined.textContent = `가입일: ${year}년 ${month}월 ${day}일`;
+    }
+    if (nicknameInput) {
+        nicknameInput.value = user.nickname || '';
     }
 }
 

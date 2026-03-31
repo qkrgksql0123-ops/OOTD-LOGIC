@@ -92,4 +92,51 @@ public class RecommendationController {
         String recommendation = geminiService.generateOutfitRecommendation(temp, weatherCond, pref);
         return ResponseEntity.ok(recommendation);
     }
+
+    /**
+     * OpenRouter AI를 사용하여 맞춤형 코디 추천 생성
+     *
+     * @param userId 사용자 ID
+     * @param clothingData 사용자의 옷장 데이터 (JSON 또는 텍스트)
+     * @return 저장된 AI 코디 추천
+     */
+    @PostMapping("/ai-recommend")
+    public ResponseEntity<Recommendation> generateAIRecommendation(
+            @PathVariable String userId,
+            @RequestBody String clothingData) {
+        log.info("Generating AI outfit recommendation for user: {} using OpenRouter", userId);
+
+        try {
+            Recommendation recommendation = recommendationService.generateAIRecommendation(
+                    userId,
+                    clothingData
+            );
+            return ResponseEntity.ok(recommendation);
+        } catch (Exception e) {
+            log.error("Error generating AI recommendation", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * 빠른 AI 코디 추천 (저장하지 않음)
+     *
+     * @param userId 사용자 ID
+     * @param clothingData 사용자의 옷장 데이터
+     * @return AI 코디 추천 문장
+     */
+    @PostMapping("/ai-recommend-quick")
+    public ResponseEntity<String> quickAIRecommendation(
+            @PathVariable String userId,
+            @RequestBody String clothingData) {
+        log.info("Quick AI outfit recommendation for user: {}", userId);
+
+        try {
+            String recommendation = recommendationService.quickAIRecommendation(clothingData);
+            return ResponseEntity.ok(recommendation);
+        } catch (Exception e) {
+            log.error("Error in quick AI recommendation", e);
+            return ResponseEntity.internalServerError().body("코디 추천 생성에 실패했습니다.");
+        }
+    }
 }

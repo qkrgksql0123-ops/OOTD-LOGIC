@@ -103,10 +103,13 @@ public class DynamoDbUserRepository implements UserRepository {
         return User.builder()
                 .userId(item.get("userId").s())
                 .email(item.getOrDefault("email", AttributeValue.builder().s("").build()).s())
+                .passwordHash(item.getOrDefault("passwordHash", AttributeValue.builder().s("").build()).s())
+                .nickname(item.getOrDefault("nickname", AttributeValue.builder().s("").build()).s())
                 .tempSensitivity(Integer.parseInt(item.getOrDefault("tempSensitivity", AttributeValue.builder().n("5").build()).n()))
                 .skinTone(item.getOrDefault("skinTone", AttributeValue.builder().s("").build()).s())
                 .createdAt(item.getOrDefault("createdAt", AttributeValue.builder().s("").build()).s())
                 .updatedAt(item.getOrDefault("updatedAt", AttributeValue.builder().s("").build()).s())
+                .lastLoginAt(item.getOrDefault("lastLoginAt", AttributeValue.builder().s("").build()).s())
                 .deactivated(Boolean.parseBoolean(item.getOrDefault("deactivated", AttributeValue.builder().bool(false).build()).bool().toString()))
                 .build();
     }

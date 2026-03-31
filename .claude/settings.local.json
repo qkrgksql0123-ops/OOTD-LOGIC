@@ -15,7 +15,8 @@
       "Bash(./gradlew clean:*)",
       "Bash(for f:*)",
       "Bash(do sed:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(grep -r \"script.js\" frontend/*.html)"
     ]
   }
 }

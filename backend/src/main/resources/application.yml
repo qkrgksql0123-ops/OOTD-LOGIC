@@ -6,6 +6,12 @@ gemini:
   api:
     key: ${GEMINI_API_KEY:test-api-key}
 
+openrouter:
+  api:
+    key: ${OPENROUTER_API_KEY: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}
+    url: https://openrouter.ai/api/v1/chat/completions
+    model: mistralai/mistral-7b-instruct
+
 weather:
   api:
     url: http://apis.data.go.kr/1360000/AsosDalyInfoService/getWthrDataList

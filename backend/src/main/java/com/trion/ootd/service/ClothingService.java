@@ -27,9 +27,16 @@ public class ClothingService {
                 .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .category(clothingDTO.getCategory())
+                .subcategory(clothingDTO.getSubcategory())
+                .color(clothingDTO.getColor())
+                .material(clothingDTO.getMaterial())
+                .season(clothingDTO.getSeason())
+                .thickness(clothingDTO.getThickness())
                 .imageUrl(clothingDTO.getImageUrl())
                 .tags(clothingDTO.getTags())
+                .isInLaundry(clothingDTO.getIsInLaundry() != null ? clothingDTO.getIsInLaundry() : false)
                 .createdAt(LocalDateTime.now().toString())
+                .wearCount(0)
                 .build();
 
         clothingRepository.save(clothing);
@@ -87,10 +94,17 @@ public class ClothingService {
                 .id(clothing.getId())
                 .userId(clothing.getUserId())
                 .category(clothing.getCategory())
+                .subcategory(clothing.getSubcategory())
+                .color(clothing.getColor())
+                .material(clothing.getMaterial())
+                .season(clothing.getSeason())
+                .thickness(clothing.getThickness())
                 .imageUrl(clothing.getImageUrl())
                 .tags(clothing.getTags())
                 .createdAt(clothing.getCreatedAt())
                 .isInLaundry(clothing.getIsInLaundry())
+                .lastWornDate(clothing.getLastWornDate())
+                .wearCount(clothing.getWearCount())
                 .build();
     }
 }

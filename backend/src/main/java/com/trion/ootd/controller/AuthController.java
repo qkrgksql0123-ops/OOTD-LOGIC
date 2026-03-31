@@ -107,7 +107,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthResponse> logout(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<AuthResponse> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         log.info("Logout request received");
 
         return ResponseEntity.ok(new AuthResponse(
