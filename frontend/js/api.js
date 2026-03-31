@@ -72,6 +72,7 @@ async function signup(email, password, nickname) {
     if (data.accessToken && data.refreshToken) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('userId', data.userId);
         localStorage.setItem('user', JSON.stringify({
             userId: data.userId,
             email: data.email,
@@ -106,6 +107,7 @@ async function login(email, password) {
     if (data.accessToken && data.refreshToken) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('userId', data.userId);
         localStorage.setItem('user', JSON.stringify({
             userId: data.userId,
             email: data.email,
