@@ -88,6 +88,30 @@ public class ClothingService {
         }
     }
 
+    public ClothingDTO updateClothing(String userId, String clothingId, ClothingDTO clothingDTO) {
+        log.info("Updating clothing: {} for user: {}", clothingId, userId);
+        Optional<Clothing> optionalClothing = clothingRepository.findById(userId, clothingId);
+        if (optionalClothing.isPresent()) {
+            Clothing clothing = optionalClothing.get();
+            clothing.setCategory(clothingDTO.getCategory());
+            clothing.setSubcategory(clothingDTO.getSubcategory());
+            clothing.setColor(clothingDTO.getColor());
+            clothing.setMaterial(clothingDTO.getMaterial());
+            clothing.setSeason(clothingDTO.getSeason());
+            clothing.setThickness(clothingDTO.getThickness());
+            clothing.setImageUrl(clothingDTO.getImageUrl());
+            clothing.setTags(clothingDTO.getTags());
+            clothing.setIsInLaundry(clothingDTO.getIsInLaundry() != null ? clothingDTO.getIsInLaundry() : false);
+
+            clothingRepository.save(clothing);
+            log.info("Clothing updated successfully");
+            return convertToDTO(clothing);
+        } else {
+            log.warn("Clothing not found: {}", clothingId);
+            return null;
+        }
+    }
+
     private ClothingDTO convertToDTO(Clothing clothing) {
         return ClothingDTO.builder()
                 .id(clothing.getId())

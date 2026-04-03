@@ -22,7 +22,13 @@ public class DynamoDbClothingRepository implements ClothingRepository {
     public void save(Clothing clothing) {
         log.info("Saving clothing: {}", clothing.getId());
         String userId = clothing.getUserId();
-        clothingStore.computeIfAbsent(userId, k -> new ArrayList<>()).add(clothing);
+        List<Clothing> userClothings = clothingStore.computeIfAbsent(userId, k -> new ArrayList<>());
+
+        // 같은 ID의 기존 항목이 있으면 제거 (업데이트 처리)
+        userClothings.removeIf(c -> c.getId().equals(clothing.getId()));
+
+        // 새 항목 추가
+        userClothings.add(clothing);
     }
 
     @Override

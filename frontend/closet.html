@@ -155,6 +155,13 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group full">
+                            <label>사진</label>
+                            <input type="file" id="clothingImage" accept="image/*">
+                            <small style="color: #666;">사진을 올리지 않으면 기본 이미지가 사용됩니다</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full">
                             <label>태그 (쉼표로 구분)</label>
                             <input type="text" id="clothingTags" placeholder="예: 데일리, 출근, 편함">
                         </div>
@@ -179,7 +186,7 @@
                 <button class="tab-btn" data-category="악세사리">악세사리</button>
             </div>
 
-            <div class="closet-grid" id="closetGrid">
+            <div class="clothing-grid" id="closetGrid">
                 <!-- Sample Clothing Items -->
                 <div class="clothing-item" data-category="상의">
                     <div class="item-image">
@@ -196,8 +203,8 @@
                             <span><i class="fas fa-calendar"></i> 3일전</span>
                         </div>
                         <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
+                            <button class="btn-small btn-edit"><i class="fas fa-edit"></i>수정</button>
+                            <button class="btn-small btn-delete"><i class="fas fa-trash"></i>삭제</button>
                         </div>
                     </div>
                 </div>
@@ -217,8 +224,8 @@
                             <span><i class="fas fa-calendar"></i> 5일전</span>
                         </div>
                         <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
+                            <button class="btn-small btn-edit"><i class="fas fa-edit"></i>수정</button>
+                            <button class="btn-small btn-delete"><i class="fas fa-trash"></i>삭제</button>
                         </div>
                     </div>
                 </div>
@@ -238,8 +245,8 @@
                             <span><i class="fas fa-calendar"></i> 1일전</span>
                         </div>
                         <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
+                            <button class="btn-small btn-edit"><i class="fas fa-edit"></i>수정</button>
+                            <button class="btn-small btn-delete"><i class="fas fa-trash"></i>삭제</button>
                         </div>
                     </div>
                 </div>
@@ -259,8 +266,8 @@
                             <span><i class="fas fa-calendar"></i> 1주전</span>
                         </div>
                         <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
+                            <button class="btn-small btn-edit"><i class="fas fa-edit"></i>수정</button>
+                            <button class="btn-small btn-delete"><i class="fas fa-trash"></i>삭제</button>
                         </div>
                     </div>
                 </div>
@@ -280,8 +287,8 @@
                             <span><i class="fas fa-calendar"></i> 어제</span>
                         </div>
                         <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
+                            <button class="btn-small btn-edit"><i class="fas fa-edit"></i>수정</button>
+                            <button class="btn-small btn-delete"><i class="fas fa-trash"></i>삭제</button>
                         </div>
                     </div>
                 </div>
@@ -469,7 +476,6 @@
     </div>
 
     <script src="js/api.js"></script>
-    <script src="js/script.js"></script>
     <script src="js/closet.js"></script>
 </body>
 </html>

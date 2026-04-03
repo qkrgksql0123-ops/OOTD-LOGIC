@@ -90,4 +90,18 @@ public class ClothingController {
         clothingService.updateLaundryStatus(userId, clothingId, clothingDTO.getIsInLaundry());
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{clothingId}")
+    public ResponseEntity<ClothingDTO> updateClothing(
+            @PathVariable String userId,
+            @PathVariable String clothingId,
+            @RequestBody ClothingDTO clothingDTO) {
+        log.info("Updating clothing: {} for user: {}", clothingId, userId);
+        ClothingDTO updatedClothing = clothingService.updateClothing(userId, clothingId, clothingDTO);
+        if (updatedClothing != null) {
+            return ResponseEntity.ok(updatedClothing);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

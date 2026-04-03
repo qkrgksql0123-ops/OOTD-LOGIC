@@ -55,16 +55,35 @@ function renderClothingItems(clothings) {
         clothingItem.className = 'clothing-item';
         clothingItem.setAttribute('data-category', clothing.category);
         clothingItem.setAttribute('data-clothing-id', clothing.id);
+
+        let detailsHtml = '';
+        if (clothing.subcategory) detailsHtml += `<p><strong>분류:</strong> ${clothing.subcategory}</p>`;
+        if (clothing.color) detailsHtml += `<p><strong>색상:</strong> ${clothing.color}</p>`;
+        if (clothing.material) detailsHtml += `<p><strong>소재:</strong> ${clothing.material}</p>`;
+        if (clothing.season) detailsHtml += `<p><strong>계절:</strong> ${clothing.season}</p>`;
+        if (clothing.thickness) detailsHtml += `<p><strong>두께:</strong> ${clothing.thickness}</p>`;
+
+        // 이미지 또는 아이콘 표시
+        let imageHtml = '';
+        if (clothing.imageUrl && clothing.imageUrl.startsWith('data:')) {
+            // Base64 인코딩된 실제 사진
+            imageHtml = `<img src="${clothing.imageUrl}" alt="${clothing.category}">`;
+        } else {
+            // 사진 없으면 아이콘 표시
+            imageHtml = `<div class="item-placeholder"><i class="fas fa-shirt"></i></div>`;
+        }
+
         clothingItem.innerHTML = `
             <div class="clothing-image">
-                <img src="${clothing.imageUrl || 'https://via.placeholder.com/200'}" alt="${clothing.category}">
+                ${imageHtml}
             </div>
             <div class="clothing-info">
                 <h3>${clothing.category}</h3>
+                ${detailsHtml}
                 ${clothing.tags ? `<p class="tags">${clothing.tags.join(', ')}</p>` : ''}
                 <div class="clothing-actions">
-                    <button class="btn-edit">수정</button>
-                    <button class="btn-delete">삭제</button>
+                    <button class="btn-small btn-edit"><i class="fas fa-edit"></i>수정</button>
+                    <button class="btn-small btn-delete"><i class="fas fa-trash"></i>삭제</button>
                 </div>
             </div>
         `;
@@ -82,8 +101,50 @@ function attachClothingEventListeners() {
     const deleteBtns = document.querySelectorAll('.btn-delete');
 
     editBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            alert('의류 정보를 수정하는 기능은 추후 업데이트됩니다.');
+        btn.addEventListener('click', async function() {
+            const clothingItem = this.closest('.clothing-item');
+            const clothingId = clothingItem.getAttribute('data-clothing-id');
+
+            try {
+                // 의류 데이터 가져오기
+                const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing/${clothingId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const clothing = await response.json();
+
+                    // 폼에 데이터 채우기
+                    document.getElementById('clothingCategory').value = clothing.category || '';
+                    document.getElementById('clothingSubcategory').value = clothing.subcategory || '';
+                    document.getElementById('clothingColor').value = clothing.color || '';
+                    document.getElementById('clothingMaterial').value = clothing.material || '';
+                    document.getElementById('clothingSeason').value = clothing.season || '';
+                    document.getElementById('clothingThickness').value = clothing.thickness || '';
+                    document.getElementById('clothingTags').value = clothing.tags ? clothing.tags.join(', ') : '';
+
+                    // 폼을 수정 모드로 설정
+                    document.getElementById('clothingForm').dataset.clothingId = clothingId;
+                    document.getElementById('clothingForm').dataset.isEdit = 'true';
+
+                    // 제출 버튼 텍스트 변경
+                    const submitBtn = document.querySelector('#clothingForm button[type="submit"]');
+                    submitBtn.textContent = '수정하기';
+
+                    // 폼 열기
+                    const addClothingForm = document.getElementById('addClothingForm');
+                    addClothingForm.style.display = 'block';
+                    addClothingForm.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('의류 정보를 불러올 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('Error fetching clothing:', error);
+                alert('오류가 발생했습니다.');
+            }
         });
     });
 
@@ -154,19 +215,39 @@ function initializeClosetPage() {
     if (cancelAddBtn && addClothingForm) {
         cancelAddBtn.addEventListener('click', function() {
             addClothingForm.style.display = 'none';
-            document.getElementById('clothingForm').reset();
+            const form = document.getElementById('clothingForm');
+            form.reset();
+
+            // 수정 모드 초기화
+            form.dataset.isEdit = 'false';
+            document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
         });
     }
     
     // Clothing Form Submission
     const clothingForm = document.getElementById('clothingForm');
     if (clothingForm) {
-        clothingForm.addEventListener('submit', function(e) {
+        clothingForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const userId = getCurrentUserId();
 
             const tagsInput = document.getElementById('clothingTags').value;
             const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()) : [];
+
+            // 이미지 처리
+            let imageUrl = 'https://via.placeholder.com/200';
+            const imageInput = document.getElementById('clothingImage');
+
+            if (imageInput && imageInput.files && imageInput.files[0]) {
+                const file = imageInput.files[0];
+                imageUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        resolve(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
 
             const clothing = {
                 category: document.getElementById('clothingCategory').value,
@@ -176,17 +257,25 @@ function initializeClosetPage() {
                 season: document.getElementById('clothingSeason').value || null,
                 thickness: document.getElementById('clothingThickness').value ?
                     parseInt(document.getElementById('clothingThickness').value) : null,
-                imageUrl: '',
+                imageUrl: imageUrl,
                 tags: tags,
                 isInLaundry: false
             };
 
-            console.log('Sending clothing data:', clothing);
+            // 수정 모드 확인
+            const isEdit = clothingForm.dataset.isEdit === 'true';
+            const clothingId = clothingForm.dataset.clothingId;
+            const method = isEdit ? 'PUT' : 'POST';
+            const endpoint = isEdit
+                ? `${API_BASE_URL}/users/${userId}/clothing/${clothingId}`
+                : `${API_BASE_URL}/users/${userId}/clothing`;
 
-            fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
-                method: 'POST',
+            console.log(`${isEdit ? 'Updating' : 'Adding'} clothing data:`, clothing);
+
+            fetch(endpoint, {
+                method: method,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json; charset=utf-8'
                 },
                 body: JSON.stringify(clothing)
             })
@@ -194,16 +283,21 @@ function initializeClosetPage() {
                 console.log('Response status:', response.status);
                 if (response.ok) {
                     return response.json().then(data => {
-                        console.log('Clothing added:', data);
-                        alert('의류가 등록되었습니다!');
+                        console.log(`Clothing ${isEdit ? 'updated' : 'added'}:`, data);
+                        alert(`의류가 ${isEdit ? '수정' : '등록'}되었습니다!`);
                         addClothingForm.style.display = 'none';
                         clothingForm.reset();
+
+                        // 수정 모드 초기화
+                        clothingForm.dataset.isEdit = 'false';
+                        document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
+
                         loadClothingList(userId);
                     });
                 } else {
                     return response.text().then(text => {
                         console.error('Error response:', text);
-                        alert('의류 등록에 실패했습니다. 콘솔을 확인하세요.');
+                        alert(`의류 ${isEdit ? '수정' : '등록'}에 실패했습니다. 콘솔을 확인하세요.`);
                     });
                 }
             })
