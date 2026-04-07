@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8090/api';
+const API_BASE_URL = 'http://localhost:8093/api';
 const signupForm = document.getElementById('signupForm');
 const signupStatusMessage = document.getElementById('statusMessage');
 const styleError = document.getElementById('styleError');
@@ -115,11 +115,16 @@ signupForm?.addEventListener('submit', (event) => {
   .then(response => response.json())
   .then(data => {
     if (data.userId) {
-      signupStatusMessage.textContent = '회원가입 완료! 로그인 페이지로 이동해 주세요.';
+      // localStorage에 사용자 정보 저장
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('nickname', data.nickname || '');
+      localStorage.setItem('accessToken', data.accessToken || '');
+
+      signupStatusMessage.textContent = '회원가입 완료! 옷장으로 이동합니다.';
       signupStatusMessage.classList.remove('error');
       signupStatusMessage.classList.add('ok');
       setTimeout(() => {
-        window.location.href = 'login.html';
+        window.location.href = 'closet.html';
       }, 1500);
     } else {
       throw new Error(data.message || '회원가입 실패');

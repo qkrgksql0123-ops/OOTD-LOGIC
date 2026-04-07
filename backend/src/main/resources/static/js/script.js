@@ -1,5 +1,5 @@
 // ===== API Configuration =====
-const API_BASE_URL = 'http://localhost:8090/api';
+const API_BASE_URL = 'http://localhost:8093/api';
 
 // ===== Authentication Utility =====
 function getCurrentUserId() {
@@ -13,6 +13,7 @@ function getCurrentUserId() {
 
 // ===== Main Page Navigation =====
 document.addEventListener('DOMContentLoaded', function() {
+    updateAuthenticationUI();
     initializeMainPage();
     getWeatherInfo(); // Load weather data
 
@@ -25,6 +26,57 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ===== Authentication UI Update =====
+function updateAuthenticationUI() {
+    const userId = localStorage.getItem('userId');
+    const nickname = localStorage.getItem('nickname');
+    const loginBtn = document.querySelector('.btn-login');
+    const navMenu = document.querySelector('.navbar-menu');
+
+    if (userId && loginBtn && navMenu) {
+        // 로그인 상태: 로그인 버튼 제거 및 로그아웃 버튼 추가
+        loginBtn.style.display = 'none';
+
+        // 사용자 정보 표시
+        const li = loginBtn.parentElement;
+
+        // 닉네임 표시
+        const nicknameEl = document.createElement('li');
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-user-circle"></i>
+            ${nickname || '사용자'}
+        </span>`;
+        li.parentElement.insertBefore(nicknameEl, li);
+
+        // 로그아웃 버튼으로 변경
+        loginBtn.textContent = '로그아웃';
+        loginBtn.className = 'nav-link btn-logout';
+        loginBtn.style.display = 'block';
+        loginBtn.href = '#';
+        loginBtn.onclick = function(e) {
+            e.preventDefault();
+            logout();
+        };
+    } else if (!userId) {
+        // 비로그인 상태: 기본 로그인 버튼 유지
+        if (loginBtn) {
+            loginBtn.href = 'login.html';
+            loginBtn.textContent = '로그인';
+            loginBtn.className = 'nav-link btn-login';
+        }
+    }
+}
+
+function logout() {
+    // localStorage에서 사용자 정보 제거
+    localStorage.removeItem('userId');
+    localStorage.removeItem('nickname');
+    localStorage.removeItem('accessToken');
+
+    alert('로그아웃되었습니다.');
+    window.location.href = 'index.html';
+}
 
 function initializeMainPage() {
     // Navigation toggle for mobile
@@ -62,23 +114,7 @@ function initializeMainPage() {
     });
 }
 
-// ===== Modal Functions =====
-function openAddClothingModal() {
-    document.getElementById('addClothingModal').classList.add('show');
-}
-
-function closeAddClothingModal() {
-    document.getElementById('addClothingModal').classList.remove('show');
-    document.getElementById('clothingForm').reset();
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('addClothingModal');
-    if (event.target == modal) {
-        closeAddClothingModal();
-    }
-}
+// ===== Note: Page-specific modal functions are in closet.js =====
 
 // ===== Temperature Sensitivity Slider =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,77 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ===== Form Submission =====
-document.getElementById('clothingForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    addClothing();
-});
-
-// ===== API Functions =====
-
-// Add Clothing
-async function addClothing() {
-    const userId = getCurrentUserId();
-    const clothing = {
-        category: document.getElementById('clothingCategory').value,
-        imageUrl: '', // 이미지 업로드는 나중에 추가
-        tags: document.getElementById('clothingTags').value.split(',').map(tag => tag.trim())
-    };
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(clothing)
-        });
-
-        if (response.ok) {
-            alert('의류가 추가되었습니다!');
-            closeAddClothingModal();
-            loadClothing();
-        } else {
-            alert('의류 추가에 실패했습니다.');
-        }
-    } catch (error) {
-        console.error('Error adding clothing:', error);
-        alert('오류가 발생했습니다.');
-    }
-}
-
-// Load Clothing List
-async function loadClothing() {
-    const userId = getCurrentUserId();
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
-        const clothings = await response.json();
-
-        const clothingItems = document.getElementById('clothing-items');
-
-        if (clothings.length === 0) {
-            clothingItems.innerHTML = '<p>아직 등록된 의류가 없습니다.</p>';
-            return;
-        }
-
-        let html = '<div class="clothing-grid">';
-        clothings.forEach(clothing => {
-            html += `
-                <div class="clothing-item">
-                    <div class="category">${clothing.category}</div>
-                    <h4>${clothing.id}</h4>
-                    ${clothing.tags ? `<p class="tags">${clothing.tags.join(', ')}</p>` : ''}
-                </div>
-            `;
-        });
-        html += '</div>';
-
-        clothingItems.innerHTML = html;
-    } catch (error) {
-        console.error('Error loading clothing:', error);
-        document.getElementById('clothing-items').innerHTML = '<p>의류 목록을 불러올 수 없습니다.</p>';
-    }
-}
+// ===== Note: Form submission and clothing API functions are in closet.js =====
 
 // Get Recommendation
 async function getRecommendation() {

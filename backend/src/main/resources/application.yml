@@ -32,9 +32,10 @@ aws:
   dynamodb:
     region: ap-northeast-2
     endpoint: http://localhost:8000
+    init-tables: true
 
 server:
-  port: 8090
+  port: 8093
 
 logging:
   level:

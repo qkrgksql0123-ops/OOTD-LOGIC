@@ -1,6 +1,5 @@
 /* ===== Laundry Page Scripts ===== */
-
-const API_BASE_URL = 'http://localhost:8090/api';
+// API_BASE_URL is defined in script.js
 
 // ===== Authentication Utility =====
 function getCurrentUserId() {
@@ -12,7 +11,45 @@ function getCurrentUserId() {
     return userId;
 }
 
+// ===== Authentication UI Update =====
+function updateAuthenticationUI() {
+    const userId = localStorage.getItem('userId');
+    const nickname = localStorage.getItem('nickname');
+    const loginBtn = document.querySelector('.btn-login');
+    const navMenu = document.querySelector('.navbar-menu');
+
+    if (userId && loginBtn && navMenu) {
+        loginBtn.style.display = 'none';
+        const li = loginBtn.parentElement;
+
+        const nicknameEl = document.createElement('li');
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-user-circle"></i>
+            ${nickname || '사용자'}
+        </span>`;
+        li.parentElement.insertBefore(nicknameEl, li);
+
+        loginBtn.textContent = '로그아웃';
+        loginBtn.className = 'nav-link btn-logout';
+        loginBtn.style.display = 'block';
+        loginBtn.href = '#';
+        loginBtn.onclick = function(e) {
+            e.preventDefault();
+            logout();
+        };
+    }
+}
+
+function logout() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('nickname');
+    localStorage.removeItem('accessToken');
+    alert('로그아웃되었습니다.');
+    window.location.href = 'index.html';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    updateAuthenticationUI();
     const userId = getCurrentUserId();
     if (userId) {
         loadLaundryList(userId);
@@ -41,183 +78,47 @@ async function loadLaundryList(userId) {
 
 // Render laundry items
 function renderLaundryItems(clothings) {
-    const laundryGrid = document.querySelector('.laundry-items');
+    const laundryGrid = document.querySelector('.laundry-grid');
     if (!laundryGrid) return;
 
     laundryGrid.innerHTML = '';
 
-    // Filter only items in laundry
-    const laundryItems = clothings.filter(c => c.isInLaundry === true);
-
-    if (laundryItems.length === 0) {
-        laundryGrid.innerHTML = '<p>세탁 중인 의류가 없습니다.</p>';
-        return;
-    }
-
-    laundryItems.forEach(clothing => {
-        const card = document.createElement('div');
-        card.className = 'laundry-card in-laundry';
-        card.setAttribute('data-clothing-id', clothing.id);
-        card.innerHTML = `
-            <div class="laundry-image">
-                <img src="${clothing.imageUrl || 'https://via.placeholder.com/200'}" alt="${clothing.category}">
+    clothings.forEach(clothing => {
+        const laundryCard = document.createElement('div');
+        laundryCard.className = clothing.isInLaundry ? 'laundry-card urgent' : 'laundry-card clean';
+        laundryCard.innerHTML = `
+            <div class="laundry-header">
+                <h3>${clothing.subcategory || clothing.category}</h3>
+                <span class="urgency-badge">${clothing.isInLaundry ? '세탁중' : '안심'}</span>
             </div>
             <div class="laundry-info">
-                <h3>${clothing.category}</h3>
-                ${clothing.tags ? `<p class="tags">${clothing.tags.join(', ')}</p>` : ''}
-                <div class="laundry-actions">
-                    <button class="btn-mark-clean">세탁 완료</button>
-                    <button class="btn-laundry-record">세탁 기록</button>
-                </div>
+                <p><strong>카테고리:</strong> ${clothing.category}</p>
+                <p><strong>색상:</strong> ${clothing.color}</p>
+                <p><strong>소재:</strong> ${clothing.material}</p>
             </div>
         `;
-        laundryGrid.appendChild(card);
-    });
-
-    // Re-attach event listeners to new elements
-    attachLaundryEventListeners();
-}
-
-// Attach event listeners to laundry items
-function attachLaundryEventListeners() {
-    const userId = getCurrentUserId();
-    const markCleanBtns = document.querySelectorAll('.btn-mark-clean');
-
-    markCleanBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('세탁이 완료되었습니까?')) {
-                const card = this.closest('.laundry-card');
-                const clothingId = card.getAttribute('data-clothing-id');
-                const itemName = card.querySelector('h3').textContent;
-
-                fetch(`${API_BASE_URL}/users/${userId}/clothing/${clothingId}/laundry-status`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ isInLaundry: false })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert(`"${itemName}"을(를) 세탁 완료로 표시했습니다.`);
-                        card.style.animation = 'slideUp 0.5s ease forwards';
-                        setTimeout(() => {
-                            card.remove();
-                        }, 500);
-                    } else {
-                        alert('업데이트 실패');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('오류가 발생했습니다.');
-                });
-            }
-        });
+        laundryGrid.appendChild(laundryCard);
     });
 }
 
-// Initialize laundry page
 function initializeLaundryPage() {
     // Navigation
-    const menuToggle = document.getElementById('menuToggle');
-    const navMenu = document.getElementById('navMenu');
+    const menuToggle = document.querySelector('.navbar-toggle');
+    const navMenu = document.querySelector('.navbar-menu');
 
     if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', function() {
             navMenu.classList.toggle('active');
         });
-
-        navMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function() {
-                navMenu.classList.remove('active');
-            });
-        });
     }
 
-    // Laundry tabs
-    setupLaundryTabs();
-
-    // Smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href !== '#') {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+    // Close menu when link is clicked
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (navMenu) {
+                navMenu.classList.remove('active');
             }
         });
     });
-
 }
-
-// Setup laundry tabs
-function setupLaundryTabs() {
-    const tabs = document.querySelectorAll('.laundry-tab');
-    const cards = document.querySelectorAll('.laundry-card');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Remove active class from all tabs
-            tabs.forEach(t => t.classList.remove('active'));
-            
-            // Add active class to clicked tab
-            this.classList.add('active');
-
-            // Get status filter from data-status attribute
-            const filter = this.dataset.status || this.dataset.filter;
-
-            // Filter cards
-            cards.forEach(card => {
-                if (filter === 'all') {
-                    // Show all cards
-                    card.style.display = 'block';
-                    // Trigger animation
-                    card.style.animation = 'none';
-                    setTimeout(() => {
-                        card.style.animation = 'riseIn 0.6s ease';
-                    }, 10);
-                } else {
-                    // Show only cards with matching class
-                    if (card.classList.contains(filter)) {
-                        card.style.display = 'block';
-                        // Trigger animation
-                        card.style.animation = 'none';
-                        setTimeout(() => {
-                            card.style.animation = 'riseIn 0.6s ease';
-                        }, 10);
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }
-            });
-        });
-    });
-
-    // Set first tab as active by default
-    if (tabs.length > 0) {
-        tabs[0].classList.add('active');
-    }
-}
-
-// Add slideUp animation to stylesheet
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideUp {
-        from {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-    }
-`;
-document.head.appendChild(style);

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
@@ -16,6 +17,7 @@ public class DynamoDbTableInitializer {
     private final DynamoDbClient dynamoDbClient;
 
     @Bean
+    @ConditionalOnProperty(name = "aws.dynamodb.init-tables", havingValue = "true", matchIfMissing = true)
     public ApplicationRunner initializeDynamoDbTables() {
         return args -> {
             try {
@@ -23,6 +25,7 @@ public class DynamoDbTableInitializer {
                 log.info("DynamoDB tables initialized successfully");
             } catch (Exception e) {
                 log.error("Failed to initialize DynamoDB tables", e);
+                log.warn("Continuing startup despite DynamoDB initialization failure");
             }
         };
     }

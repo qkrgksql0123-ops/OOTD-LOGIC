@@ -100,41 +100,72 @@
             <div class="add-clothing-form" id="addClothingForm" style="display: none;">
                 <form id="clothingForm">
                     <div class="form-row">
+                        <div class="form-group full">
+                            <label>옷 사진 *</label>
+                            <div class="image-upload-area" id="imageUploadArea">
+                                <input type="file" id="clothingImage" name="clothingImage" accept="image/*" required>
+                                <div class="upload-placeholder">
+                                    <i class="fas fa-image"></i>
+                                    <p>사진을 클릭하여 업로드</p>
+                                    <p class="upload-hint">또는 드래그하여 놓기</p>
+                                </div>
+                                <img id="imagePreview" style="display: none; max-width: 300px; margin-top: 10px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label>카테고리 *</label>
                             <select id="clothingCategory" required>
                                 <option value="">선택하세요</option>
-                                <option value="상의">상의 (셔츠, 티셔츠, 니트)</option>
-                                <option value="하의">하의 (바지, 스커트)</option>
-                                <option value="아우터">아우터 (자켓, 코트)</option>
-                                <option value="원피스">원피스 / 투피스</option>
-                                <option value="신발">신발</option>
-                                <option value="악세사리">악세사리</option>
+                                <option value="top">상의 (셔츠, 티셔츠, 니트)</option>
+                                <option value="bottom">하의 (바지, 스커트)</option>
+                                <option value="outer">아우터 (자켓, 코트)</option>
+                                <option value="dress">원피스 / 투피스</option>
+                                <option value="shoes">신발</option>
+                                <option value="accessory">악세사리</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label>세부 카테고리</label>
+                            <input type="text" id="clothingSubcategory" placeholder="예: 셔츠, 바지, 자켓">
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label>브랜드</label>
                             <input type="text" id="clothingBrand" placeholder="브랜드명">
                         </div>
-                    </div>
-                    <div class="form-row">
                         <div class="form-group">
-                            <label>이름 *</label>
-                            <input type="text" id="clothingName" placeholder="의류 이름" required>
-                        </div>
-                        <div class="form-group">
-                            <label>색상</label>
-                            <input type="text" id="clothingColor" placeholder="예: 검정, 흰색">
+                            <label>색상 *</label>
+                            <input type="text" id="clothingColor" placeholder="예: 검정, 흰색" required>
                         </div>
                     </div>
                     <div class="form-row">
+                        <div class="form-group">
+                            <label>소재</label>
+                            <input type="text" id="clothingMaterial" placeholder="예: 면, 폴리에스터">
+                        </div>
+                        <div class="form-group">
+                            <label>시즌</label>
+                            <select id="clothingSeason">
+                                <option value="">선택하세요</option>
+                                <option value="봄">봄</option>
+                                <option value="여름">여름</option>
+                                <option value="가을">가을</option>
+                                <option value="겨울">겨울</option>
+                                <option value="사계절">사계절</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>두께</label>
+                            <input type="number" id="clothingThickness" placeholder="1-5" min="1" max="5">
+                        </div>
                         <div class="form-group">
                             <label>구매가격</label>
                             <input type="number" id="clothingPrice" placeholder="금액" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>구매날짜</label>
-                            <input type="date" id="clothingPurchaseDate">
                         </div>
                     </div>
                     <div class="form-row">
@@ -156,11 +187,11 @@
             <h2>카테고리별 관리</h2>
             <div class="category-tabs">
                 <button class="tab-btn active" data-category="all">전체</button>
-                <button class="tab-btn" data-category="상의">상의</button>
-                <button class="tab-btn" data-category="하의">하의</button>
-                <button class="tab-btn" data-category="아우터">아우터</button>
-                <button class="tab-btn" data-category="신발">신발</button>
-                <button class="tab-btn" data-category="악세사리">악세사리</button>
+                <button class="tab-btn" data-category="top">상의</button>
+                <button class="tab-btn" data-category="bottom">하의</button>
+                <button class="tab-btn" data-category="outer">아우터</button>
+                <button class="tab-btn" data-category="shoes">신발</button>
+                <button class="tab-btn" data-category="accessory">악세사리</button>
             </div>
 
             <div class="closet-grid" id="closetGrid">

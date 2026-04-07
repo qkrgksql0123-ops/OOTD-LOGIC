@@ -1,6 +1,5 @@
 /* ===== MyPage Scripts ===== */
-
-const API_BASE_URL = 'http://localhost:8090/api';
+// API_BASE_URL is defined in script.js
 
 // ===== Authentication Utility =====
 function getCurrentUserId() {
@@ -12,7 +11,45 @@ function getCurrentUserId() {
     return userId;
 }
 
+// ===== Authentication UI Update =====
+function updateAuthenticationUI() {
+    const userId = localStorage.getItem('userId');
+    const nickname = localStorage.getItem('nickname');
+    const loginBtn = document.querySelector('.btn-login');
+    const navMenu = document.querySelector('.navbar-menu');
+
+    if (userId && loginBtn && navMenu) {
+        loginBtn.style.display = 'none';
+        const li = loginBtn.parentElement;
+
+        const nicknameEl = document.createElement('li');
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-user-circle"></i>
+            ${nickname || '사용자'}
+        </span>`;
+        li.parentElement.insertBefore(nicknameEl, li);
+
+        loginBtn.textContent = '로그아웃';
+        loginBtn.className = 'nav-link btn-logout';
+        loginBtn.style.display = 'block';
+        loginBtn.href = '#';
+        loginBtn.onclick = function(e) {
+            e.preventDefault();
+            logout();
+        };
+    }
+}
+
+function logout() {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('nickname');
+    localStorage.removeItem('accessToken');
+    alert('로그아웃되었습니다.');
+    window.location.href = 'index.html';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    updateAuthenticationUI();
     const userId = getCurrentUserId();
     if (userId) {
         loadUserProfile(userId);
