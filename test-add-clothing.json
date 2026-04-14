@@ -1,0 +1,11 @@
+{
+  "category": "top",
+  "subcategory": "셔츠",
+  "color": "파란색",
+  "material": "면",
+  "season": "여름",
+  "thickness": 1,
+  "imageUrl": "https://via.placeholder.com/200?text=BlueShirt",
+  "tags": ["캐주얼", "여름"],
+  "isInLaundry": false
+}

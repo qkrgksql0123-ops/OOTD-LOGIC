@@ -1,0 +1,11 @@
+{
+  "category": "top",
+  "subcategory": "shirt",
+  "color": "black",
+  "material": "cotton",
+  "season": "summer",
+  "thickness": 1,
+  "imageUrl": "https://example.com/shirt.jpg",
+  "tags": ["casual", "comfortable"],
+  "isInLaundry": false
+}
