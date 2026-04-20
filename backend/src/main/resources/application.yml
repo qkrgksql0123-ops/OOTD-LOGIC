@@ -35,9 +35,10 @@ aws:
     init-tables: true
 
 server:
-  port: 8093
+  port: 8095
 
 logging:
   level:
-    com.trion.ootd: INFO
+    com.trion.ootd: DEBUG
     org.springframework: WARN
+    software.amazon.awssdk: DEBUG

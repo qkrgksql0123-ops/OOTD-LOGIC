@@ -22,6 +22,7 @@ public class DynamoDbTableInitializer {
         return args -> {
             try {
                 createUserTableIfNotExists();
+                createClothingTableIfNotExists();
                 log.info("DynamoDB tables initialized successfully");
             } catch (Exception e) {
                 log.error("Failed to initialize DynamoDB tables", e);
@@ -91,6 +92,56 @@ public class DynamoDbTableInitializer {
             log.info("User table already exists");
         } catch (Exception e) {
             log.error("Error creating User table", e);
+        }
+    }
+
+    private void createClothingTableIfNotExists() {
+        try {
+            ListTablesResponse listTablesResponse = dynamoDbClient.listTables();
+
+            if (!listTablesResponse.tableNames().contains("Clothing")) {
+                log.info("Creating Clothing table...");
+
+                CreateTableRequest createTableRequest = CreateTableRequest.builder()
+                        .tableName("Clothing")
+                        .keySchema(
+                                KeySchemaElement.builder()
+                                        .attributeName("userId")
+                                        .keyType(KeyType.HASH)
+                                        .build(),
+                                KeySchemaElement.builder()
+                                        .attributeName("id")
+                                        .keyType(KeyType.RANGE)
+                                        .build()
+                        )
+                        .attributeDefinitions(
+                                AttributeDefinition.builder()
+                                        .attributeName("userId")
+                                        .attributeType(ScalarAttributeType.S)
+                                        .build(),
+                                AttributeDefinition.builder()
+                                        .attributeName("id")
+                                        .attributeType(ScalarAttributeType.S)
+                                        .build()
+                        )
+                        .billingMode(BillingMode.PROVISIONED)
+                        .provisionedThroughput(ProvisionedThroughput.builder()
+                                .readCapacityUnits(5L)
+                                .writeCapacityUnits(5L)
+                                .build())
+                        .build();
+
+                dynamoDbClient.createTable(createTableRequest);
+                log.info("Clothing table created successfully");
+
+                Thread.sleep(2000);
+            } else {
+                log.info("Clothing table already exists");
+            }
+        } catch (ResourceInUseException e) {
+            log.info("Clothing table already exists");
+        } catch (Exception e) {
+            log.error("Error creating Clothing table", e);
         }
     }
 }
