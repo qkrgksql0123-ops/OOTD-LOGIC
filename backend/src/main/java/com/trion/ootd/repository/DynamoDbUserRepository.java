@@ -59,12 +59,14 @@ public class DynamoDbUserRepository implements UserRepository {
             if (response.items() != null && !response.items().isEmpty()) {
                 Map<String, AttributeValue> item = response.items().get(0);
                 User user = convertToUser(item);
+                log.info("User found by email: {}", email);
                 return Optional.of(user);
             }
+            log.warn("User not found by email: {}", email);
             return Optional.empty();
         } catch (Exception e) {
             log.error("Error finding user by email: {}", email, e);
-            return Optional.empty();
+            throw new RuntimeException("Failed to find user by email", e);
         }
     }
 
@@ -77,6 +79,7 @@ public class DynamoDbUserRepository implements UserRepository {
             log.info("User saved successfully: {}", user.getUserId());
         } catch (Exception e) {
             log.error("Error saving user: {}", user.getUserId(), e);
+            throw new RuntimeException("Failed to save user to DynamoDB", e);
         }
     }
 
