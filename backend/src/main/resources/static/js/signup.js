@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8093/api';
+const API_BASE_URL = 'http://52.78.72.193:8095/api';
 const signupForm = document.getElementById('signupForm');
 const signupStatusMessage = document.getElementById('statusMessage');
 const styleError = document.getElementById('styleError');
