@@ -159,7 +159,7 @@ public class DynamoDbRecommendationRepository implements RecommendationRepositor
             key.put("recommendDate", AttributeValue.builder().s(date).build());
 
             DeleteItemRequest deleteRequest = DeleteItemRequest.builder()
-                    .tableName(TABLE_NAME)
+                    .tableName(TABLE_NAME)1
                     .key(key)
                     .build();
 
