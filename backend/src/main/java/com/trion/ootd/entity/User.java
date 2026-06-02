@@ -158,7 +158,7 @@ public class User {
         this.lastLoginAt = lastLoginAt;
     }
 
-    @DynamoDbAttribute("isDeactivated")
+    @DynamoDbAttribute("deactivated")
     public Boolean getDeactivated() {
         return deactivated;
     }
