@@ -87,28 +87,20 @@ function renderClothingItems(clothings) {
     const closetGrid = document.getElementById('closetGrid');
     if (!closetGrid) return;
 
-    // 기존 샘플 아이템 제거 (처음 로드할 때만)
-    if (closetGrid.querySelectorAll('[data-clothing-id]').length === 0) {
-        closetGrid.innerHTML = '';
-    }
+    closetGrid.innerHTML = '';
 
     if (clothings.length === 0) {
-        if (closetGrid.innerHTML === '') {
-            closetGrid.innerHTML = '<p>등록된 의류가 없습니다.</p>';
-        }
+        closetGrid.innerHTML = '<p>등록된 의류가 없습니다.</p>';
         return;
     }
 
     clothings.forEach(clothing => {
-        // 중복 확인
-        if (document.querySelector(`[data-clothing-id="${clothing.id}"]`)) {
-            return;
-        }
-
         const clothingItem = document.createElement('div');
         clothingItem.className = 'clothing-item';
         clothingItem.setAttribute('data-category', clothing.category);
         clothingItem.setAttribute('data-clothing-id', clothing.id);
+        clothingItem.setAttribute('data-season', clothing.season || '');
+        clothingItem.setAttribute('data-thickness', clothing.thickness || '');
 
         clothingItem.innerHTML = `
             <div class="item-image">
@@ -132,7 +124,8 @@ function renderClothingItems(clothings) {
         closetGrid.appendChild(clothingItem);
     });
 
-    // 이벤트 리스너 다시 연결
+    const tc = document.getElementById('totalCount');
+    if (tc) tc.textContent = clothings.length;
     attachClothingEventListeners();
 }
 
@@ -172,6 +165,8 @@ function openEditForm(userId, clothingId) {
     const info = {
         id: clothingId,
         category: clothingItem.getAttribute('data-category'),
+        season: clothingItem.getAttribute('data-season'),
+        thickness: clothingItem.getAttribute('data-thickness'),
         subcategory: clothingItem.querySelector('h3').textContent,
         color: clothingItem.querySelector('.color').textContent.replace('색상: ', ''),
         material: clothingItem.querySelector('.brand').textContent,
@@ -185,6 +180,8 @@ function openEditForm(userId, clothingId) {
     document.getElementById('clothingSubcategory').value = info.subcategory;
     document.getElementById('clothingColor').value = info.color;
     document.getElementById('clothingMaterial').value = info.material;
+    document.getElementById('clothingSeason').value = info.season || '';
+    document.getElementById('clothingThickness').value = info.thickness || '';
     document.getElementById('clothingTags').value = info.tags.join(', ');
 
     // 이미지 미리보기

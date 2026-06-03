@@ -35,7 +35,7 @@ public class Clothing {
     private Integer wearCount;
 
     @DynamoDbSortKey
-    @DynamoDbAttribute("id")
+    @DynamoDbAttribute("clothingId")
     public String getId() {
         return id;
     }

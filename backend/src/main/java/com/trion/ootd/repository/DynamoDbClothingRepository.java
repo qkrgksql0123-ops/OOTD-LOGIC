@@ -35,13 +35,9 @@ public class DynamoDbClothingRepository implements ClothingRepository {
     @Override
     public void save(Clothing clothing) {
         log.info("Saving clothing: {}", clothing.getId());
-        try {
-            DynamoDbTable<Clothing> table = enhancedClient.table(TABLE_NAME, TableSchema.fromClass(Clothing.class));
-            table.putItem(clothing);
-            log.info("Clothing saved successfully: {}", clothing.getId());
-        } catch (Exception e) {
-            log.error("Error saving clothing: {}", clothing.getId(), e);
-        }
+        DynamoDbTable<Clothing> table = enhancedClient.table(TABLE_NAME, TableSchema.fromClass(Clothing.class));
+        table.putItem(clothing);
+        log.info("Clothing saved successfully: {}", clothing.getId());
     }
 
     @Override
@@ -116,7 +112,7 @@ public class DynamoDbClothingRepository implements ClothingRepository {
         try {
             Map<String, AttributeValue> key = new HashMap<>();
             key.put("userId", AttributeValue.builder().s(userId).build());
-            key.put("id", AttributeValue.builder().s(id).build());
+            key.put("clothingId", AttributeValue.builder().s(id).build());
 
             DeleteItemRequest deleteRequest = DeleteItemRequest.builder()
                     .tableName(TABLE_NAME)

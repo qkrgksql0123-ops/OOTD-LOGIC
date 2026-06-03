@@ -52,8 +52,8 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">총 의류</p>
-                        <p class="stat-value">125</p>
-                        <p class="stat-desc">추가</p>
+                        <p class="stat-value" id="totalCount">-</p>
+                        <p class="stat-desc">개</p>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">이번 달 착용</p>
-                        <p class="stat-value">42</p>
+                        <p class="stat-value">-</p>
                         <p class="stat-desc">회</p>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">세탁 예정</p>
-                        <p class="stat-value">12</p>
+                        <p class="stat-value">-</p>
                         <p class="stat-desc">개</p>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">활용도</p>
-                        <p class="stat-value">78%</p>
+                        <p class="stat-value">-</p>
                         <p class="stat-desc">이달</p>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                         <div class="form-group full">
                             <label>옷 사진 *</label>
                             <div class="image-upload-area" id="imageUploadArea">
-                                <input type="file" id="clothingImage" name="clothingImage" accept="image/*" required>
+                                <input type="file" id="clothingImage" name="clothingImage" accept="image/*">
                                 <div class="upload-placeholder">
                                     <i class="fas fa-image"></i>
                                     <p>사진을 클릭하여 업로드</p>
@@ -195,111 +195,6 @@
             </div>
 
             <div class="closet-grid" id="closetGrid">
-                <!-- Sample Clothing Items -->
-                <div class="clothing-item" data-category="상의">
-                    <div class="item-image">
-                        <div class="item-placeholder">
-                            <i class="fas fa-shirt"></i>
-                        </div>
-                    </div>
-                    <div class="item-info">
-                        <h3>화이트 베이직 티셔츠</h3>
-                        <p class="brand">MY BRAND</p>
-                        <p class="color">흰색</p>
-                        <div class="item-stats">
-                            <span><i class="fas fa-redo"></i> 23회</span>
-                            <span><i class="fas fa-calendar"></i> 3일전</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="clothing-item" data-category="상의">
-                    <div class="item-image">
-                        <div class="item-placeholder">
-                            <i class="fas fa-shirt"></i>
-                        </div>
-                    </div>
-                    <div class="item-info">
-                        <h3>캐주얼 체크 셔츠</h3>
-                        <p class="brand">STYLISH</p>
-                        <p class="color">파란색</p>
-                        <div class="item-stats">
-                            <span><i class="fas fa-redo"></i> 18회</span>
-                            <span><i class="fas fa-calendar"></i> 5일전</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="clothing-item" data-category="하의">
-                    <div class="item-image">
-                        <div class="item-placeholder">
-                            <i class="fas fa-shirt"></i>
-                        </div>
-                    </div>
-                    <div class="item-info">
-                        <h3>스키니 데님 팬츠</h3>
-                        <p class="brand">DENIM CO</p>
-                        <p class="color">진파랑</p>
-                        <div class="item-stats">
-                            <span><i class="fas fa-redo"></i> 31회</span>
-                            <span><i class="fas fa-calendar"></i> 1일전</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="clothing-item" data-category="아우터">
-                    <div class="item-image">
-                        <div class="item-placeholder">
-                            <i class="fas fa-shirt"></i>
-                        </div>
-                    </div>
-                    <div class="item-info">
-                        <h3>검정 무스탕 자켓</h3>
-                        <p class="brand">JACKET PRO</p>
-                        <p class="color">검정</p>
-                        <div class="item-stats">
-                            <span><i class="fas fa-redo"></i> 12회</span>
-                            <span><i class="fas fa-calendar"></i> 1주전</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="clothing-item" data-category="신발">
-                    <div class="item-image">
-                        <div class="item-placeholder">
-                            <i class="fas fa-shoe-prints"></i>
-                        </div>
-                    </div>
-                    <div class="item-info">
-                        <h3>화이트 스니커즈</h3>
-                        <p class="brand">SHOE STAR</p>
-                        <p class="color">흰색</p>
-                        <div class="item-stats">
-                            <span><i class="fas fa-redo"></i> 35회</span>
-                            <span><i class="fas fa-calendar"></i> 어제</span>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn-small btn-edit">수정</button>
-                            <button class="btn-small btn-delete">삭제</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -315,64 +210,6 @@
             </div>
 
             <div class="laundry-grid">
-                <!-- Urgent Laundry -->
-                <div class="laundry-card urgent">
-                    <div class="laundry-header">
-                        <h3>스키니 데님 팬츠</h3>
-                        <span class="urgency-badge">긴급</span>
-                    </div>
-                    <div class="laundry-info">
-                        <p><strong>카테고리:</strong> 하의</p>
-                        <p><strong>마지막 세탁:</strong> 15일 전</p>
-                        <p><strong>권장 세탁주기:</strong> 10일마다</p>
-                        <p><strong>세탁 방법:</strong> 중성 세제로 손세탁 (냉수)</p>
-                    </div>
-                    <button class="btn btn-laundry">세탁 완료 표시</button>
-                </div>
-
-                <div class="laundry-card urgent">
-                    <div class="laundry-header">
-                        <h3>화이트 스니커즈</h3>
-                        <span class="urgency-badge">긴급</span>
-                    </div>
-                    <div class="laundry-info">
-                        <p><strong>카테고리:</strong> 신발</p>
-                        <p><strong>마지막 세탁:</strong> 12일 전</p>
-                        <p><strong>권장 세탁주기:</strong> 7일마다</p>
-                        <p><strong>세탁 방법:</strong> 부드러운 브러시로 물세탁</p>
-                    </div>
-                    <button class="btn btn-laundry">세탁 완료 표시</button>
-                </div>
-
-                <!-- Scheduled Laundry -->
-                <div class="laundry-card scheduled">
-                    <div class="laundry-header">
-                        <h3>화이트 베이직 티셔츠</h3>
-                        <span class="urgency-badge">예정</span>
-                    </div>
-                    <div class="laundry-info">
-                        <p><strong>카테고리:</strong> 상의</p>
-                        <p><strong>마지막 세탁:</strong> 5일 전</p>
-                        <p><strong>권장 세탁주기:</strong> 7일마다</p>
-                        <p><strong>세탁 방법:</strong> 일반 세제로 세탁기 사용 가능</p>
-                    </div>
-                    <button class="btn btn-laundry">세탁 완료 표시</button>
-                </div>
-
-                <!-- Clean Items -->
-                <div class="laundry-card clean">
-                    <div class="laundry-header">
-                        <h3>검정 무스탕 자켓</h3>
-                        <span class="urgency-badge">안심</span>
-                    </div>
-                    <div class="laundry-info">
-                        <p><strong>카테고리:</strong> 아우터</p>
-                        <p><strong>마지막 세탁:</strong> 2일 전</p>
-                        <p><strong>권장 세탁주기:</strong> 30일마다</p>
-                        <p><strong>세탁 방법:</strong> 드라이클리닝 권장</p>
-                    </div>
-                    <button class="btn btn-laundry">세탁 기록</button>
-                </div>
             </div>
         </section>
 
@@ -382,51 +219,7 @@
             <p class="section-desc">자주 입는 의류를 파악하고 AI 코디 추천 데이터로 활용됩니다</p>
             
             <div class="wearing-stats">
-                <div class="stat-box">
-                    <h4>이번 달 가장 많이 입은 의류</h4>
-                    <div class="top-items">
-                        <div class="top-item">
-                            <span class="rank">1위</span>
-                            <div class="item-detail">
-                                <p>화이트 스니커즈</p>
-                                <p class="count">35회 착용</p>
-                            </div>
-                        </div>
-                        <div class="top-item">
-                            <span class="rank">2위</span>
-                            <div class="item-detail">
-                                <p>스키니 데님 팬츠</p>
-                                <p class="count">31회 착용</p>
-                            </div>
-                        </div>
-                        <div class="top-item">
-                            <span class="rank">3위</span>
-                            <div class="item-detail">
-                                <p>화이트 베이직 티셔츠</p>
-                                <p class="count">23회 착용</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-box">
-                    <h4>미착용 의류 (30일이상)</h4>
-                    <p class="notice">이 의류들은 최근 30일 동안 착용되지 않았습니다</p>
-                    <div class="unused-items">
-                        <div class="unused-item">
-                            <i class="fas fa-shirt"></i>
-                            <p>캐멀 롱 코트 (56일)</p>
-                        </div>
-                        <div class="unused-item">
-                            <i class="fas fa-shirt"></i>
-                            <p>플로럴 원피스 (43일)</p>
-                        </div>
-                        <div class="unused-item">
-                            <i class="fas fa-shirt"></i>
-                            <p>레오파드 스커트 (38일)</p>
-                        </div>
-                    </div>
-                </div>
+                <p style="color:#999; text-align:center; padding:20px;">의류를 등록하면 착용 기록이 표시됩니다.</p>
             </div>
         </section>
 
