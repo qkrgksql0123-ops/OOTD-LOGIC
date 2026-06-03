@@ -14,6 +14,7 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +69,11 @@ public class DynamoDbClothingRepository implements ClothingRepository {
             Key key = Key.builder()
                     .partitionValue(userId)
                     .build();
-            List<Clothing> clothings = table.query(QueryConditional.keyEqualTo(key))
+            QueryEnhancedRequest request = QueryEnhancedRequest.builder()
+                    .queryConditional(QueryConditional.keyEqualTo(key))
+                    .consistentRead(true)
+                    .build();
+            List<Clothing> clothings = table.query(request)
                     .stream()
                     .flatMap(page -> page.items().stream())
                     .collect(Collectors.toList());
@@ -88,7 +93,11 @@ public class DynamoDbClothingRepository implements ClothingRepository {
             Key key = Key.builder()
                     .partitionValue(userId)
                     .build();
-            List<Clothing> clothings = table.query(QueryConditional.keyEqualTo(key))
+            QueryEnhancedRequest request = QueryEnhancedRequest.builder()
+                    .queryConditional(QueryConditional.keyEqualTo(key))
+                    .consistentRead(true)
+                    .build();
+            List<Clothing> clothings = table.query(request)
                     .stream()
                     .flatMap(page -> page.items().stream())
                     .filter(c -> category.equals(c.getCategory()))
