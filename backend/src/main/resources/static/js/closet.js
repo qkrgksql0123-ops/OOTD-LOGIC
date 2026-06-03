@@ -62,10 +62,12 @@ function logout() {
 // Load clothing list from API
 async function loadClothingList(userId) {
     try {
+        const token = localStorage.getItem('accessToken');
         const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
 
@@ -73,7 +75,7 @@ async function loadClothingList(userId) {
             const clothings = await response.json();
             renderClothingItems(clothings);
         } else {
-            console.error('Failed to load clothing list');
+            console.error('Failed to load clothing list:', response.status);
         }
     } catch (error) {
         console.error('Error loading clothing list:', error);
@@ -204,10 +206,12 @@ function openEditForm(userId, clothingId) {
 
 // Delete clothing
 function deleteClothing(userId, clothingId, clothingItem) {
+    const token = localStorage.getItem('accessToken');
     fetch(`${API_BASE_URL}/users/${userId}/clothing/${clothingId}`, {
         method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         }
     })
     .then(response => {
