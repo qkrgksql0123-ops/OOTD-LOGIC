@@ -13,6 +13,7 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ public class DynamoDbClothingRepository implements ClothingRepository {
             Key key = Key.builder()
                     .partitionValue(userId)
                     .build();
-            List<Clothing> clothings = table.query(key).items().stream().collect(Collectors.toList());
+            List<Clothing> clothings = table.query(QueryConditional.keyEqualTo(key)).items().stream().collect(Collectors.toList());
             log.info("Found {} clothing items for user: {}", clothings.size(), userId);
             return clothings;
         } catch (Exception e) {
@@ -84,7 +85,7 @@ public class DynamoDbClothingRepository implements ClothingRepository {
             Key key = Key.builder()
                     .partitionValue(userId)
                     .build();
-            List<Clothing> clothings = table.query(key).items().stream()
+            List<Clothing> clothings = table.query(QueryConditional.keyEqualTo(key)).items().stream()
                     .filter(c -> category.equals(c.getCategory()))
                     .collect(Collectors.toList());
             log.info("Found {} clothing items in category: {} for user: {}", clothings.size(), category, userId);
