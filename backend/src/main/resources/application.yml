@@ -35,6 +35,12 @@ aws:
 
 server:
   port: 8095
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  compression:
+    enabled: true
 
 logging:
   level:
