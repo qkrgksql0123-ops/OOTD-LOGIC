@@ -63,22 +63,13 @@ public class DynamoDbClothingRepository implements ClothingRepository {
     public List<Clothing> findByUserId(String userId) {
         log.info("Finding all clothing for user: {}", userId);
         try {
-            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-            expressionAttributeValues.put(":userId", AttributeValue.builder().s(userId).build());
-
-            QueryRequest queryRequest = QueryRequest.builder()
-                    .tableName(TABLE_NAME)
-                    .keyConditionExpression("userId = :userId")
-                    .expressionAttributeValues(expressionAttributeValues)
+            DynamoDbTable<Clothing> table = enhancedClient.table(TABLE_NAME, TableSchema.fromClass(Clothing.class));
+            Key key = Key.builder()
+                    .partitionValue(userId)
                     .build();
-
-            QueryResponse response = dynamoDbClient.query(queryRequest);
-            if (response.items() != null) {
-                return response.items().stream()
-                        .map(this::convertToClothing)
-                        .collect(Collectors.toList());
-            }
-            return List.of();
+            List<Clothing> clothings = table.query(key).items().stream().collect(Collectors.toList());
+            log.info("Found {} clothing items for user: {}", clothings.size(), userId);
+            return clothings;
         } catch (Exception e) {
             log.error("Error finding all clothing for user", e);
             return List.of();
@@ -89,24 +80,15 @@ public class DynamoDbClothingRepository implements ClothingRepository {
     public List<Clothing> findByUserIdAndCategory(String userId, String category) {
         log.info("Finding clothing by category: {} for user: {}", category, userId);
         try {
-            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-            expressionAttributeValues.put(":userId", AttributeValue.builder().s(userId).build());
-            expressionAttributeValues.put(":category", AttributeValue.builder().s(category).build());
-
-            QueryRequest queryRequest = QueryRequest.builder()
-                    .tableName(TABLE_NAME)
-                    .keyConditionExpression("userId = :userId")
-                    .filterExpression("category = :category")
-                    .expressionAttributeValues(expressionAttributeValues)
+            DynamoDbTable<Clothing> table = enhancedClient.table(TABLE_NAME, TableSchema.fromClass(Clothing.class));
+            Key key = Key.builder()
+                    .partitionValue(userId)
                     .build();
-
-            QueryResponse response = dynamoDbClient.query(queryRequest);
-            if (response.items() != null) {
-                return response.items().stream()
-                        .map(this::convertToClothing)
-                        .collect(Collectors.toList());
-            }
-            return List.of();
+            List<Clothing> clothings = table.query(key).items().stream()
+                    .filter(c -> category.equals(c.getCategory()))
+                    .collect(Collectors.toList());
+            log.info("Found {} clothing items in category: {} for user: {}", clothings.size(), category, userId);
+            return clothings;
         } catch (Exception e) {
             log.error("Error finding clothing by category", e);
             return List.of();
@@ -154,18 +136,7 @@ public class DynamoDbClothingRepository implements ClothingRepository {
     public long countByUserId(String userId) {
         log.info("Counting clothing for user: {}", userId);
         try {
-            Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-            expressionAttributeValues.put(":userId", AttributeValue.builder().s(userId).build());
-
-            QueryRequest queryRequest = QueryRequest.builder()
-                    .tableName(TABLE_NAME)
-                    .keyConditionExpression("userId = :userId")
-                    .expressionAttributeValues(expressionAttributeValues)
-                    .select("COUNT")
-                    .build();
-
-            QueryResponse response = dynamoDbClient.query(queryRequest);
-            return response.count();
+            return findByUserId(userId).size();
         } catch (Exception e) {
             log.error("Error counting clothing for user", e);
             return 0;
