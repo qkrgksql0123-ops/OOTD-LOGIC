@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -28,15 +27,13 @@ public class DynamoDbConfig {
 
     /**
      * DynamoDbClient Bean 생성
-     * - AWS 자격증명은 DefaultCredentialsProvider로 자동 로드
+     * - AWS 자격증명은 DefaultCredentialsProvider로 자동 로드 (EC2 IAM 역할 사용)
      * - endpoint가 설정되면 로컬 DynamoDB Local 사용, 없으면 AWS 서비스에 연결
      */
     @Bean
     public DynamoDbClient dynamoDbClient() {
         DynamoDbClientBuilder builder = DynamoDbClient.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("test", "test")
-                ))
+                .credentialsProvider(DefaultCredentialsProvider.create())
                 .region(Region.of(region));
 
         if (endpoint != null && !endpoint.isBlank()) {
