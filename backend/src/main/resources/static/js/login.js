@@ -67,6 +67,7 @@ loginForm?.addEventListener('submit', (event) => {
     if (data.userId) {
       localStorage.setItem('userId', data.userId);
       localStorage.setItem('nickname', data.nickname || '');
+      localStorage.setItem('accessToken', data.accessToken || '');
       statusMessage.textContent = '로그인 성공! 메인 페이지로 이동합니다.';
       statusMessage.classList.remove('error');
       statusMessage.classList.add('ok');

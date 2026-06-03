@@ -462,19 +462,25 @@ function submitClothingForm(userId, imageUrl) {
         body: JSON.stringify(clothing)
     })
     .then(response => {
-        console.log('응답 받음:', response.status);
+        console.log('응답 받음:', response.status, response);
         if (response.ok) {
-            const message = currentEditingClothingId ? '의류가 수정되었습니다!' : '의류가 등록되었습니다!';
-            alert(message);
-            document.getElementById('addClothingForm').style.display = 'none';
-            document.getElementById('clothingForm').reset();
-            document.getElementById('imagePreview').style.display = 'none';
-            currentEditingClothingId = null;
-            document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
-            loadClothingList(userId);
+            return response.json().then(data => {
+                console.log('응답 데이터:', data);
+                const message = currentEditingClothingId ? '의류가 수정되었습니다!' : '의류가 등록되었습니다!';
+                alert(message);
+                document.getElementById('addClothingForm').style.display = 'none';
+                document.getElementById('clothingForm').reset();
+                document.getElementById('imagePreview').style.display = 'none';
+                currentEditingClothingId = null;
+                document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
+                console.log('옷 목록 재로드 시작');
+                loadClothingList(userId);
+            });
         } else {
-            response.json().then(err => console.error('에러:', err));
-            alert('작업에 실패했습니다.');
+            return response.json().then(err => {
+                console.error('서버 에러:', response.status, err);
+                alert('작업에 실패했습니다: ' + (err.message || response.status));
+            });
         }
     })
     .catch(error => {
