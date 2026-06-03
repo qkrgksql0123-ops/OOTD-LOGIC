@@ -330,8 +330,12 @@ function initializeClosetPage() {
     if (clothingForm) {
         clothingForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            console.log('✅ 폼 제출 이벤트 작동!');
             const userId = getCurrentUserId();
             const imageInput = document.getElementById('clothingImage');
+
+            console.log('이미지 파일 개수:', imageInput.files.length);
+            console.log('currentEditingClothingId:', currentEditingClothingId);
 
             // 이미지 파일 처리
             if (!currentEditingClothingId && !imageInput.files.length) {
@@ -343,15 +347,23 @@ function initializeClosetPage() {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const imageUrl = event.target.result; // Base64
+                    console.log('이미지 Base64 변환 완료');
                     submitClothingForm(userId, imageUrl);
+                };
+                reader.onerror = function() {
+                    console.error('이미지 읽기 오류');
+                    alert('이미지를 읽을 수 없습니다.');
                 };
                 reader.readAsDataURL(imageInput.files[0]);
             } else {
                 // 수정 시 기존 이미지 사용
                 const imagePreview = document.getElementById('imagePreview');
+                console.log('기존 이미지 사용:', imagePreview.src);
                 submitClothingForm(userId, imagePreview.src);
             }
         });
+    } else {
+        console.error('❌ clothingForm을 찾을 수 없습니다!');
     }
 
     // Category Tab Filtering
@@ -409,6 +421,8 @@ function initializeClosetPage() {
 }
 
 function submitClothingForm(userId, imageUrl) {
+    console.log('submitClothingForm 호출됨');
+
     const tags = document.getElementById('clothingTags').value
         ? document.getElementById('clothingTags').value.split(',').map(tag => tag.trim())
         : [];
@@ -431,6 +445,12 @@ function submitClothingForm(userId, imageUrl) {
 
     const method = currentEditingClothingId ? 'PUT' : 'POST';
 
+    console.log('API 요청:', {
+        method: method,
+        url: url,
+        clothing: clothing
+    });
+
     fetch(url, {
         method: method,
         headers: {
@@ -439,6 +459,7 @@ function submitClothingForm(userId, imageUrl) {
         body: JSON.stringify(clothing)
     })
     .then(response => {
+        console.log('응답 받음:', response.status);
         if (response.ok) {
             const message = currentEditingClothingId ? '의류가 수정되었습니다!' : '의류가 등록되었습니다!';
             alert(message);
@@ -449,12 +470,13 @@ function submitClothingForm(userId, imageUrl) {
             document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
             loadClothingList(userId);
         } else {
+            response.json().then(err => console.error('에러:', err));
             alert('작업에 실패했습니다.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('오류가 발생했습니다.');
+        console.error('❌ 네트워크 에러:', error);
+        alert('오류가 발생했습니다: ' + error.message);
     });
 }
 
