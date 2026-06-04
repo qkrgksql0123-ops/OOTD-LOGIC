@@ -146,87 +146,99 @@ function setupSidebarNavigation() {
 
 // Load user profile
 async function loadUserProfile(userId) {
+    // localStorage에서 즉시 표시 (API 로딩 전)
+    const cachedNickname = localStorage.getItem('nickname');
+    if (cachedNickname) {
+        const profileName = document.getElementById('profile-name');
+        const nicknameInput = document.getElementById('nickname');
+        if (profileName) profileName.textContent = cachedNickname;
+        if (nicknameInput) nicknameInput.value = cachedNickname;
+    }
+
     try {
         const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-            method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
 
         if (response.ok) {
             const user = await response.json();
 
-            // 프로필 카드
             const profileName = document.getElementById('profile-name');
             const profileEmail = document.getElementById('profile-email');
             const profileJoined = document.getElementById('profile-joined');
-            if (profileName) profileName.textContent = user.nickname || '-';
-            if (profileEmail) profileEmail.textContent = user.email || '-';
-            if (profileJoined && user.createdAt) {
-                const date = new Date(user.createdAt);
-                profileJoined.textContent = `가입일: ${date.getFullYear()}년 ${date.getMonth()+1}월 ${date.getDate()}일`;
-            }
-
-            // 폼 입력
             const nicknameInput = document.getElementById('nickname');
-            if (nicknameInput) nicknameInput.value = user.nickname || '';
+
+            if (profileName) profileName.textContent = user.nickname || cachedNickname || '-';
+            if (profileEmail) profileEmail.textContent = user.email || '-';
+            if (nicknameInput) nicknameInput.value = user.nickname || cachedNickname || '';
+            if (profileJoined && user.createdAt) {
+                const d = new Date(user.createdAt);
+                if (!isNaN(d.getTime())) {
+                    profileJoined.textContent = `가입일: ${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+                }
+            }
         }
     } catch (error) {
         console.error('Error loading user profile:', error);
     }
 }
 
+// 닉네임 저장
+async function saveProfile(userId) {
+    const nicknameInput = document.getElementById('nickname');
+    const newNickname = nicknameInput ? nicknameInput.value.trim() : '';
+    if (!newNickname) {
+        showNotification('닉네임을 입력해주세요.', 'error');
+        return;
+    }
+
+    try {
+        // 기존 유저 데이터 먼저 조회 (다른 필드 덮어쓰기 방지)
+        const getRes = await fetch(`${API_BASE_URL}/users/${userId}`);
+        if (!getRes.ok) throw new Error();
+        const user = await getRes.json();
+
+        user.nickname = newNickname;
+
+        const putRes = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
+
+        if (!putRes.ok) throw new Error();
+
+        localStorage.setItem('nickname', newNickname);
+        const profileName = document.getElementById('profile-name');
+        if (profileName) profileName.textContent = newNickname;
+        showNotification('프로필이 저장되었습니다!', 'success');
+    } catch (e) {
+        showNotification('저장에 실패했습니다.', 'error');
+    }
+}
+
 // Setup button handlers
 function setupButtonHandlers() {
-    const saveButtons = document.querySelectorAll('.btn-primary');
     const logoutButton = document.querySelector('.btn-logout');
     const deleteAccountButton = document.querySelector('.btn-danger');
     const editPasswordButton = document.querySelectorAll('.btn-secondary')[0];
 
-    // Save buttons
-    saveButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
+    // 프로필 저장 버튼
+    const profileSaveBtn = document.getElementById('profile-save-btn');
+    if (profileSaveBtn) {
+        profileSaveBtn.addEventListener('click', function(e) {
             e.preventDefault();
-
-            const sectionContent = this.closest('.section-content');
-            const sectionTitle = sectionContent ? sectionContent.querySelector('h2').textContent : '정보';
             const userId = getCurrentUserId();
-
             if (!userId) return;
-
-            // Get form data
-            const tempSensitivity = document.getElementById('tempSensitivity').value;
-            const skinTone = document.getElementById('skinTone').value;
-
-            // Send to API
-            fetch(`${API_BASE_URL}/users/${userId}/settings?tempSensitivity=${tempSensitivity}&skinTone=${skinTone}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    showNotification(`${sectionTitle}가 저장되었습니다!`, 'success');
-
-                    // Animate button
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check"></i> 저장 완료!';
-                    this.style.background = 'linear-gradient(138deg, #27ae60, #229954)';
-
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                        this.style.background = '';
-                    }, 2000);
-                } else {
-                    showNotification('저장에 실패했습니다.', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('오류가 발생했습니다.', 'error');
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
+            saveProfile(userId).finally(() => {
+                this.disabled = false;
+                this.innerHTML = originalText;
             });
         });
-    });
+    }
 
     // Logout button
     if (logoutButton) {
