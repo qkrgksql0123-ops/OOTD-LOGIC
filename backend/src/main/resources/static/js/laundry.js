@@ -68,6 +68,21 @@ function getThreshold(c) {
     return 1;
 }
 
+// 세탁 상태 판별: needed / caution / safe
+function getStatus(c) {
+    if (c.isInLaundry) return 'needed';
+    const threshold = getThreshold(c);
+    const worn = c.wearCount || 0;
+    if (worn >= Math.ceil(threshold * 0.5)) return 'caution';
+    return 'safe';
+}
+
+const STATUS_CONFIG = {
+    needed:  { label: '세탁 필요', color: '#e74c3c', icon: 'exclamation-circle',   bg: '#ffeaea' },
+    caution: { label: '주의',      color: '#e67e22', icon: 'exclamation-triangle', bg: '#fff4e5' },
+    safe:    { label: '안전',      color: '#27ae60', icon: 'check-circle',          bg: '#eafaf1' }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     updateAuthenticationUI();
     const userId = getCurrentUserId();
@@ -90,18 +105,16 @@ async function loadLaundryList(userId) {
 }
 
 function updateStats(list) {
-    const needed = list.filter(c => c.isInLaundry).length;
-    const clean  = list.filter(c => !c.isInLaundry).length;
     const el = id => document.getElementById(id);
-    if (el('laundry-needed-count')) el('laundry-needed-count').textContent = needed;
-    if (el('laundry-clean-count'))  el('laundry-clean-count').textContent  = clean;
-    if (el('laundry-total-count'))  el('laundry-total-count').textContent  = list.length;
+    if (el('laundry-needed-count'))  el('laundry-needed-count').textContent  = list.filter(c => getStatus(c) === 'needed').length;
+    if (el('laundry-caution-count')) el('laundry-caution-count').textContent = list.filter(c => getStatus(c) === 'caution').length;
+    if (el('laundry-safe-count'))    el('laundry-safe-count').textContent    = list.filter(c => getStatus(c) === 'safe').length;
+    if (el('laundry-total-count'))   el('laundry-total-count').textContent   = list.length;
 }
 
 function renderByFilter(filter, userId) {
-    const filtered = filter === 'needed' ? allClothings.filter(c => c.isInLaundry)
-                   : filter === 'clean'  ? allClothings.filter(c => !c.isInLaundry)
-                   : allClothings;
+    const filtered = filter === 'all' ? allClothings
+                   : allClothings.filter(c => getStatus(c) === filter);
     renderLaundryItems(filtered, userId);
 }
 
@@ -111,15 +124,20 @@ function renderLaundryItems(list, userId) {
     grid.innerHTML = '';
 
     if (list.length === 0) {
-        grid.innerHTML = `<p style="padding:24px;color:#666;grid-column:1/-1;">
-            ${currentFilter === 'needed' ? '세탁이 필요한 옷이 없어요! 🎉' : '등록된 의류가 없습니다.'}</p>`;
+        const msgs = { needed: '세탁이 필요한 옷이 없어요! 🎉', caution: '주의 단계 의류가 없어요!', safe: '안전한 의류가 없어요.', all: '등록된 의류가 없습니다.' };
+        grid.innerHTML = `<p style="padding:24px;color:#666;grid-column:1/-1;">${msgs[currentFilter] || '등록된 의류가 없습니다.'}</p>`;
         return;
     }
 
     list.forEach(c => {
-        const isNeeded = c.isInLaundry;
+        const status = getStatus(c);
+        const cfg = STATUS_CONFIG[status];
+        const threshold = getThreshold(c);
+        const worn = c.wearCount || 0;
         const card = document.createElement('div');
-        card.className = `laundry-card ${isNeeded ? 'urgent' : 'clean'}`;
+        card.className = 'laundry-card';
+        card.style.borderLeft = `4px solid ${cfg.color}`;
+        card.style.background = cfg.bg;
         card.dataset.id = c.id;
 
         const imgHtml = c.imageUrl
@@ -127,26 +145,31 @@ function renderLaundryItems(list, userId) {
             : `<div style="height:120px;background:#f0f4f8;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
                    <i class="fas fa-shirt" style="font-size:36px;color:#aaa;"></i></div>`;
 
+        // 진행도 바
+        const pct = Math.min(100, Math.round((worn / threshold) * 100));
+        const barColor = cfg.color;
+
         card.innerHTML = `
             ${imgHtml}
             <div class="laundry-header">
                 <h3>${c.color ? c.color + ' ' : ''}${c.subcategory || c.category}</h3>
-                <span class="urgency-badge">
-                    <i class="fas fa-${isNeeded ? 'exclamation' : 'shield-alt'}"></i>
-                    ${isNeeded ? '세탁 필요' : '깨끗함'}
+                <span class="urgency-badge" style="background:${cfg.color};color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">
+                    <i class="fas fa-${cfg.icon}"></i> ${cfg.label}
                 </span>
             </div>
-            <div class="laundry-info">
+            <div class="laundry-info" style="margin:10px 0;">
                 <div class="info-row"><strong>카테고리:</strong> <span>${c.category || '-'}</span></div>
                 ${c.material ? `<div class="info-row"><strong>소재:</strong> <span>${c.material}</span></div>` : ''}
                 ${c.lastWornDate ? `<div class="info-row"><strong>마지막 착용:</strong> <span>${c.lastWornDate}</span></div>` : ''}
-                <div class="info-row"><strong>착용 횟수:</strong>
-                    <span>${c.wearCount || 0}회 / 기준 ${getThreshold(c)}회</span>
-                </div>
+                <div class="info-row"><strong>착용 횟수:</strong> <span>${worn}회 / 기준 ${threshold}회</span></div>
             </div>
-            ${isNeeded ? `
+            <div style="background:#e0e0e0;border-radius:4px;height:8px;margin:8px 0;">
+                <div style="width:${pct}%;height:100%;background:${barColor};border-radius:4px;transition:width 0.4s;"></div>
+            </div>
+            <p style="font-size:11px;color:#888;margin-bottom:8px;text-align:right;">${pct}%</p>
+            ${status === 'needed' ? `
             <button class="btn btn-mark-clean" data-id="${c.id}"
-                style="width:100%;margin-top:12px;background:#27ae60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">
+                style="width:100%;background:#27ae60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">
                 <i class="fas fa-check"></i> 세탁 완료
             </button>` : ''}`;
 

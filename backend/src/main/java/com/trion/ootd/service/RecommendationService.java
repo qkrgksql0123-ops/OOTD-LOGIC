@@ -152,8 +152,10 @@ public class RecommendationService {
     public String generateFullAIRecommendation(String userId) {
         log.info("Generating full AI recommendation for user: {}", userId);
 
-        // 1. 옷장 데이터
-        List<ClothingDTO> clothingList = clothingService.getAllClothing(userId);
+        // 1. 옷장 데이터 (세탁 필요 제외)
+        List<ClothingDTO> clothingList = clothingService.getAllClothing(userId).stream()
+                .filter(c -> !Boolean.TRUE.equals(c.getIsInLaundry()))
+                .collect(java.util.stream.Collectors.toList());
         String clothingData = formatClothingData(clothingList);
 
         // 2. 스타일 프로필

@@ -47,17 +47,22 @@
             <h2>세탁 현황</h2>
             <div class="laundry-overview">
                 <div class="overview-card urgent-count">
-                    <h3><i class="fas fa-exclamation-circle"></i> 세탁 필요</h3>
+                    <h3 style="color:#e74c3c;"><i class="fas fa-exclamation-circle"></i> 세탁 필요</h3>
                     <p class="count" id="laundry-needed-count">-</p>
-                    <p class="desc">세탁이 필요한 의류</p>
+                    <p class="desc">지금 세탁해야 할 의류</p>
+                </div>
+                <div class="overview-card scheduled-count">
+                    <h3 style="color:#e67e22;"><i class="fas fa-exclamation-triangle"></i> 주의</h3>
+                    <p class="count" id="laundry-caution-count">-</p>
+                    <p class="desc">세탁 예정 의류</p>
                 </div>
                 <div class="overview-card clean-count">
-                    <h3><i class="fas fa-check-circle"></i> 깨끗함</h3>
-                    <p class="count" id="laundry-clean-count">-</p>
-                    <p class="desc">세탁된 의류</p>
+                    <h3 style="color:#27ae60;"><i class="fas fa-check-circle"></i> 안전</h3>
+                    <p class="count" id="laundry-safe-count">-</p>
+                    <p class="desc">세탁 걱정 없는 의류</p>
                 </div>
                 <div class="overview-card total-count">
-                    <h3><i class="fas fa-chart-bar"></i> 총 의류</h3>
+                    <h3><i class="fas fa-chart-bar"></i> 전체</h3>
                     <p class="count" id="laundry-total-count">-</p>
                     <p class="desc">관리 중인 전체 의류</p>
                 </div>
@@ -68,11 +73,14 @@
         <section class="section">
             <h2>세탁 상태별 의류</h2>
             <div class="laundry-tabs">
-                <button class="laundry-tab active" data-filter="needed">
+                <button class="laundry-tab active" data-filter="needed" style="color:#e74c3c;">
                     <i class="fas fa-exclamation-circle"></i> 세탁 필요
                 </button>
-                <button class="laundry-tab" data-filter="clean">
-                    <i class="fas fa-shield-alt"></i> 깨끗함
+                <button class="laundry-tab" data-filter="caution" style="color:#e67e22;">
+                    <i class="fas fa-exclamation-triangle"></i> 주의
+                </button>
+                <button class="laundry-tab" data-filter="safe" style="color:#27ae60;">
+                    <i class="fas fa-shield-alt"></i> 안전
                 </button>
                 <button class="laundry-tab" data-filter="all">
                     <i class="fas fa-list"></i> 전체
