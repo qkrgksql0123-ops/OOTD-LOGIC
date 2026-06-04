@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://3.36.77.116:8095/api';
+const API_BASE_URL = '/api';
 const loginForm = document.getElementById('loginForm');
 const statusMessage = document.getElementById('statusMessage');
 

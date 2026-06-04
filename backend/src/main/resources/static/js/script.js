@@ -1,5 +1,5 @@
 // ===== API Configuration =====
-const API_BASE_URL = 'http://3.36.77.116:8095/api';
+const API_BASE_URL = '/api';
 
 // ===== Authentication Utility =====
 function getCurrentUserId() {

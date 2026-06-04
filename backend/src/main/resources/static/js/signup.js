@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://3.36.77.116:8095/api';
+const API_BASE_URL = '/api';
 const signupForm = document.getElementById('signupForm');
 const signupStatusMessage = document.getElementById('statusMessage');
 const styleError = document.getElementById('styleError');
