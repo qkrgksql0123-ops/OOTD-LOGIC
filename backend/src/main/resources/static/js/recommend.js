@@ -186,6 +186,23 @@ async function loadUserStyleProfile(userId) {
         if (!res.ok) return;
         const user = await res.json();
 
+        const isEmpty = !user.personalTone && !user.faceShape && !user.styleTypes;
+
+        if (isEmpty) {
+            // 프로필 미설정 안내
+            const profileGrid = document.querySelector('.profile-grid');
+            if (profileGrid) {
+                profileGrid.innerHTML = `
+                    <div style="grid-column:1/-1;text-align:center;padding:24px;background:#f8f9fa;border-radius:12px;border:1px dashed #ccc;">
+                        <p style="color:#666;margin-bottom:12px;"><i class="fas fa-user-edit"></i> 스타일 프로필이 아직 설정되지 않았어요.</p>
+                        <a href="mypage.html" style="background:#004f60;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">
+                            마이페이지에서 설정하기 →
+                        </a>
+                    </div>`;
+            }
+            return;
+        }
+
         if (user.personalTone) {
             const tone = user.toneSeason ? `${user.personalTone} (${user.toneSeason})` : user.personalTone;
             const el = document.getElementById('r-tone');
@@ -201,6 +218,10 @@ async function loadUserStyleProfile(userId) {
                 el.innerHTML = user.styleTypes.split(',')
                     .map(s => `<span class="tag">${s.trim()}</span>`).join(' ');
             }
+        }
+        if (user.fitPreference) {
+            const el = document.querySelector('.fit-bar');
+            if (el) el.innerHTML = `<p style="font-weight:600;color:#004f60;">${user.fitPreference}</p>`;
         }
     } catch (e) {
         console.error('스타일 프로필 로드 실패:', e);
