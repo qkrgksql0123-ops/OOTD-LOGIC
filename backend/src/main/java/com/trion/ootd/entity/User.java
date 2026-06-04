@@ -31,6 +31,12 @@ public class User {
     private String phone;
     private String birthdate;
     private String location;
+    private String preferredColors;
+    private String styleTypes;
+    private Integer height;
+    private String fitPreference;
+    private String personalTone;
+    private String toneSeason;
     private String createdAt;
     private String updatedAt;
     private String lastLoginAt;
@@ -151,6 +157,30 @@ public class User {
     @DynamoDbAttribute("location")
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+
+    @DynamoDbAttribute("preferredColors")
+    public String getPreferredColors() { return preferredColors; }
+    public void setPreferredColors(String preferredColors) { this.preferredColors = preferredColors; }
+
+    @DynamoDbAttribute("styleTypes")
+    public String getStyleTypes() { return styleTypes; }
+    public void setStyleTypes(String styleTypes) { this.styleTypes = styleTypes; }
+
+    @DynamoDbAttribute("height")
+    public Integer getHeight() { return height; }
+    public void setHeight(Integer height) { this.height = height; }
+
+    @DynamoDbAttribute("fitPreference")
+    public String getFitPreference() { return fitPreference; }
+    public void setFitPreference(String fitPreference) { this.fitPreference = fitPreference; }
+
+    @DynamoDbAttribute("personalTone")
+    public String getPersonalTone() { return personalTone; }
+    public void setPersonalTone(String personalTone) { this.personalTone = personalTone; }
+
+    @DynamoDbAttribute("toneSeason")
+    public String getToneSeason() { return toneSeason; }
+    public void setToneSeason(String toneSeason) { this.toneSeason = toneSeason; }
 
     @DynamoDbAttribute("createdAt")
     public String getCreatedAt() {

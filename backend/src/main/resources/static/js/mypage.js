@@ -78,6 +78,9 @@ function initializeMypagePage() {
     // Sidebar navigation
     setupSidebarNavigation();
 
+    // 색상 팔레트 클릭 토글
+    initColorPalette();
+
     // Button handlers
     setupButtonHandlers();
 
@@ -176,6 +179,7 @@ async function loadUserProfile(userId) {
                 }
             }
 
+            // 프로필 폼 필드
             const fields = {
                 nickname: user.nickname || cachedNickname || '',
                 phone:     user.phone     || '',
@@ -186,6 +190,26 @@ async function loadUserProfile(userId) {
             Object.entries(fields).forEach(([id, val]) => {
                 const el = document.getElementById(id);
                 if (el) el.value = val;
+            });
+
+            // 스타일 프로필 필드
+            if (user.preferredColors) applySelectedColors(user.preferredColors);
+            if (user.styleTypes) {
+                const saved = user.styleTypes.split(',').map(s => s.trim());
+                document.querySelectorAll('input[name="style"]').forEach(cb => {
+                    cb.checked = saved.includes(cb.value);
+                });
+            }
+            const styleFields = {
+                'height':          user.height          || '',
+                'fit-preference':  user.fitPreference   || '',
+                'face-shape':      user.faceShape        || '',
+                'personal-tone':   user.personalTone    || '',
+                'tone-season':     user.toneSeason      || ''
+            };
+            Object.entries(styleFields).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el && val) el.value = val;
             });
         }
     } catch (error) {
@@ -230,6 +254,67 @@ async function saveProfile(userId) {
     }
 }
 
+// 색상 선택 토글 초기화
+function initColorPalette() {
+    document.querySelectorAll('.color-item[data-color]').forEach(item => {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', function() {
+            this.classList.toggle('selected');
+            this.style.outline = this.classList.contains('selected')
+                ? '3px solid #004f60' : '';
+            this.style.transform = this.classList.contains('selected')
+                ? 'scale(1.2)' : '';
+        });
+    });
+}
+
+// 색상 선택 상태 적용 (불러오기용)
+function applySelectedColors(colorStr) {
+    const selected = colorStr ? colorStr.split(',').map(c => c.trim()) : [];
+    document.querySelectorAll('.color-item[data-color]').forEach(item => {
+        const isSelected = selected.includes(item.dataset.color);
+        item.classList.toggle('selected', isSelected);
+        item.style.outline = isSelected ? '3px solid #004f60' : '';
+        item.style.transform = isSelected ? 'scale(1.2)' : '';
+    });
+}
+
+// 스타일 프로필 저장
+async function saveStyleProfile(userId) {
+    try {
+        const getRes = await fetch(`${API_BASE_URL}/users/${userId}`);
+        if (!getRes.ok) throw new Error();
+        const user = await getRes.json();
+
+        // 선호 색상 (선택된 것들)
+        const selectedColors = [...document.querySelectorAll('.color-item.selected')]
+            .map(el => el.dataset.color).join(',');
+
+        // 스타일 타입 (체크된 것들)
+        const selectedStyles = [...document.querySelectorAll('input[name="style"]:checked')]
+            .map(el => el.value).join(',');
+
+        user.preferredColors = selectedColors;
+        user.styleTypes      = selectedStyles;
+        user.height          = parseInt(document.getElementById('height')?.value) || user.height || null;
+        user.fitPreference   = document.getElementById('fit-preference')?.value   || user.fitPreference || '';
+        user.faceShape       = document.getElementById('face-shape')?.value       || user.faceShape    || '';
+        user.personalTone    = document.getElementById('personal-tone')?.value    || user.personalTone || '';
+        user.toneSeason      = document.getElementById('tone-season')?.value      || user.toneSeason   || '';
+
+        const putRes = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
+
+        if (!putRes.ok) throw new Error();
+        showNotification('스타일 프로필이 저장되었습니다!', 'success');
+    } catch (e) {
+        showNotification('저장에 실패했습니다.', 'error');
+    }
+}
+
 // Setup button handlers
 function setupButtonHandlers() {
     const logoutButton = document.querySelector('.btn-logout');
@@ -247,6 +332,23 @@ function setupButtonHandlers() {
             this.disabled = true;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
             saveProfile(userId).finally(() => {
+                this.disabled = false;
+                this.innerHTML = originalText;
+            });
+        });
+    }
+
+    // 스타일 프로필 저장 버튼
+    const styleSaveBtn = document.getElementById('style-save-btn');
+    if (styleSaveBtn) {
+        styleSaveBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const userId = getCurrentUserId();
+            if (!userId) return;
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
+            saveStyleProfile(userId).finally(() => {
                 this.disabled = false;
                 this.innerHTML = originalText;
             });
