@@ -337,7 +337,7 @@
         async function updateWeatherDirectly() {
             try {
                 console.log('🌍 Fetching weather data directly...');
-                const response = await fetch('http://localhost:8080/api/environment/weather');
+                const response = await fetch('/api/environment/weather');
                 const weatherData = await response.json();
                 console.log('✅ Data received:', weatherData);
 

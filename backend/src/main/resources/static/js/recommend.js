@@ -51,26 +51,26 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeRecommendPage();
 });
 
-// ===== 카테고리 키워드 매핑 =====
+// ===== AI 텍스트 키워드 → DB 카테고리 매핑 =====
 const CATEGORY_KEYWORDS = {
-    '상의': ['티셔츠','셔츠','블라우스','니트','스웨터','맨투맨','탑','크롭','긴소매','반팔'],
-    '하의': ['팬츠','진','청바지','슬렉스','스커트','반바지','데님','레깅스'],
-    '아우터': ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치']
+    'top':    ['티셔츠','셔츠','블라우스','니트','스웨터','맨투맨','탑','크롭','긴소매','반팔','상의'],
+    'bottom': ['팬츠','진','청바지','슬렉스','스커트','반바지','데님','레깅스','하의'],
+    'outer':  ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치','아우터']
 };
 
-// AI 텍스트에서 카테고리별 키워드 추출
+// AI 텍스트에서 DB 카테고리 키 추출
 function extractCategories(aiText) {
     const found = [];
-    for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-        if (keywords.some(kw => aiText.includes(kw))) found.push(cat);
+    for (const [dbCat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some(kw => aiText.includes(kw))) found.push(dbCat);
     }
-    // 기본으로 상의/하의 없으면 추가
-    if (!found.includes('상의')) found.unshift('상의');
-    if (!found.includes('하의') && found.length < 2) found.push('하의');
+    // 기본값: top / bottom 없으면 추가
+    if (!found.includes('top'))    found.unshift('top');
+    if (!found.includes('bottom') && found.length < 2) found.push('bottom');
     return found;
 }
 
-// 옷장에서 카테고리 매칭
+// 옷장에서 카테고리 매칭 (DB 카테고리명 기준)
 function matchClothingByCategory(clothingList, categories) {
     const result = [];
     for (const cat of categories) {
