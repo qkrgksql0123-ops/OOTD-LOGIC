@@ -119,11 +119,22 @@ public class RecommendationController {
     }
 
     /**
+     * 옷장 + 스타일 프로필 기반 AI 추천 (저장 안 함)
+     */
+    @GetMapping("/ai-full")
+    public ResponseEntity<String> generateFullAIRecommendation(@PathVariable String userId) {
+        log.info("Generating full AI recommendation for user: {}", userId);
+        try {
+            String recommendation = recommendationService.generateFullAIRecommendation(userId);
+            return ResponseEntity.ok(recommendation);
+        } catch (Exception e) {
+            log.error("Error generating full AI recommendation", e);
+            return ResponseEntity.internalServerError().body("추천 생성에 실패했습니다.");
+        }
+    }
+
+    /**
      * 빠른 AI 코디 추천 (저장하지 않음)
-     *
-     * @param userId 사용자 ID
-     * @param clothingData 사용자의 옷장 데이터
-     * @return AI 코디 추천 문장
      */
     @PostMapping("/ai-recommend-quick")
     public ResponseEntity<String> quickAIRecommendation(

@@ -97,21 +97,19 @@
                         <div class="color-item" style="background: #DEB887;"></div>
                         <div class="color-item" style="background: #D2691E;"></div>
                     </div>
-                    <p class="profile-desc">따뜻한 톤 (Warm)</p>
+                    <p class="profile-desc" id="r-tone">-</p>
                 </div>
                 <div class="profile-card">
                     <h3>얼굴형</h3>
                     <div class="profile-info">
                         <i class="fas fa-circle"></i>
                     </div>
-                    <p class="profile-desc">원형 얼굴형</p>
+                    <p class="profile-desc" id="r-face">-</p>
                 </div>
                 <div class="profile-card">
                     <h3>스타일</h3>
                     <div class="style-tags">
-                        <span class="tag">캐주얼</span>
-                        <span class="tag">모던</span>
-                        <span class="tag">미니멀</span>
+                        <span id="r-styles">-</span>
                     </div>
                 </div>
                 <div class="profile-card">
@@ -140,9 +138,22 @@
             </div>
         </section>
 
+        <!-- AI 추천 버튼 -->
+        <section class="section" style="text-align:center;">
+            <button id="ai-recommend-btn" class="btn btn-primary" style="font-size:16px; padding:14px 36px;">
+                <i class="fas fa-sparkles"></i> 내 옷장 기반 AI 추천 받기
+            </button>
+            <div id="ai-result-area" style="display:none; margin-top:24px; text-align:left; max-width:600px; margin-left:auto; margin-right:auto;">
+                <div style="background:#f0f8ff; border-left:4px solid #004f60; border-radius:8px; padding:20px;">
+                    <h3 style="color:#004f60; margin-bottom:12px;"><i class="fas fa-sparkles"></i> AI 추천 코디</h3>
+                    <div id="ai-result-text" style="white-space:pre-line; line-height:1.8; font-size:15px;"></div>
+                </div>
+            </div>
+        </section>
+
         <!-- Recommended Outfits -->
         <section class="section">
-            <h2>추천 코디</h2>
+            <h2>날씨 기반 추천 코디</h2>
             <div class="recommendation-tabs">
                 <button class="tab-btn active" data-tab="all">모두 보기</button>
                 <button class="tab-btn" data-tab="casual">캐주얼</button>

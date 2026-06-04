@@ -44,10 +44,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const userId = localStorage.getItem('userId');
     if (userId) {
         loadRecommendationHistory(userId);
+        loadUserStyleProfile(userId);
+        setupAIRecommendButton(userId);
     }
     loadWeatherForRecommend();
     initializeRecommendPage();
 });
+
+// 스타일 프로필 불러와서 표시
+async function loadUserStyleProfile(userId) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/users/${userId}`);
+        if (!res.ok) return;
+        const user = await res.json();
+
+        if (user.personalTone) {
+            const tone = user.toneSeason ? `${user.personalTone} (${user.toneSeason})` : user.personalTone;
+            const el = document.getElementById('r-tone');
+            if (el) el.textContent = tone;
+        }
+        if (user.faceShape) {
+            const el = document.getElementById('r-face');
+            if (el) el.textContent = user.faceShape;
+        }
+        if (user.styleTypes) {
+            const el = document.getElementById('r-styles');
+            if (el) {
+                el.innerHTML = user.styleTypes.split(',')
+                    .map(s => `<span class="tag">${s.trim()}</span>`).join(' ');
+            }
+        }
+    } catch (e) {
+        console.error('스타일 프로필 로드 실패:', e);
+    }
+}
+
+// AI 추천 버튼 핸들러
+function setupAIRecommendButton(userId) {
+    const btn = document.getElementById('ai-recommend-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async function() {
+        const originalText = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI 분석 중...';
+
+        const resultArea = document.getElementById('ai-result-area');
+        const resultText = document.getElementById('ai-result-text');
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/users/${userId}/recommendations/ai-full`);
+            const text = await res.text();
+
+            resultText.textContent = text;
+            resultArea.style.display = 'block';
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (e) {
+            resultText.textContent = '추천 생성에 실패했습니다. 다시 시도해주세요.';
+            resultArea.style.display = 'block';
+        } finally {
+            this.disabled = false;
+            this.innerHTML = originalText;
+        }
+    });
+}
 
 // Fetch Weather Data from KMA API
 async function fetchWeatherData() {

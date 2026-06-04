@@ -1,6 +1,8 @@
 package com.trion.ootd.service;
 
+import com.trion.ootd.dto.ClothingDTO;
 import com.trion.ootd.entity.Recommendation;
+import com.trion.ootd.entity.User;
 import com.trion.ootd.repository.RecommendationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +24,8 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final BedrockService bedrockService;
     private final EnvironmentService environmentService;
+    private final ClothingService clothingService;
+    private final UserService userService;
 
     public Recommendation saveRecommendation(String userId, String recommendedOutfits,
                                            Double temperature, String weatherCondition) {
@@ -141,11 +147,63 @@ public class RecommendationService {
     }
 
     /**
+     * 옷장 + 스타일 프로필 기반 AI 추천 (저장 안 함)
+     */
+    public String generateFullAIRecommendation(String userId) {
+        log.info("Generating full AI recommendation for user: {}", userId);
+
+        // 1. 옷장 데이터
+        List<ClothingDTO> clothingList = clothingService.getAllClothing(userId);
+        String clothingData = formatClothingData(clothingList);
+
+        // 2. 스타일 프로필
+        String styleProfile = "";
+        Optional<User> userOpt = userService.getUserById(userId);
+        if (userOpt.isPresent()) {
+            styleProfile = formatStyleProfile(userOpt.get());
+        }
+
+        // 3. 날씨
+        String weatherInfo = getWeatherInfoForRecommendation();
+
+        return bedrockService.generateOutfitRecommendationWithProfile(clothingData, styleProfile, weatherInfo);
+    }
+
+    private String formatClothingData(List<ClothingDTO> list) {
+        if (list == null || list.isEmpty()) return "등록된 옷이 없습니다.";
+        StringBuilder sb = new StringBuilder();
+        for (ClothingDTO c : list) {
+            sb.append("- ").append(c.getCategory() != null ? c.getCategory() : "기타");
+            if (c.getColor() != null && !c.getColor().isBlank()) sb.append(" ").append(c.getColor());
+            if (c.getSubcategory() != null && !c.getSubcategory().isBlank()) sb.append(" ").append(c.getSubcategory());
+            if (c.getSeason() != null && !c.getSeason().isBlank()) sb.append(" (").append(c.getSeason()).append(")");
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    private String formatStyleProfile(User user) {
+        StringBuilder sb = new StringBuilder();
+        if (str(user.getStyleTypes()))    sb.append("선호 스타일: ").append(user.getStyleTypes()).append("\n");
+        if (str(user.getPreferredColors())) sb.append("선호 색상: ").append(user.getPreferredColors()).append("\n");
+        if (str(user.getPersonalTone())) {
+            sb.append("퍼스널 톤: ").append(user.getPersonalTone());
+            if (str(user.getToneSeason())) sb.append(" (").append(user.getToneSeason()).append(")");
+            sb.append("\n");
+        }
+        if (str(user.getFaceShape()))      sb.append("얼굴형: ").append(user.getFaceShape()).append("\n");
+        if (str(user.getFitPreference()))  sb.append("선호 핏: ").append(user.getFitPreference()).append("\n");
+        if (user.getHeight() != null)      sb.append("키: ").append(user.getHeight()).append("cm\n");
+        return sb.toString();
+    }
+
+    private boolean str(String s) { return s != null && !s.isBlank(); }
+
+    /**
      * 추천용 날씨 정보 조회
      */
     private String getWeatherInfoForRecommendation() {
         try {
-            // 기본값 반환 (클라이언트가 날씨 정보를 함께 전달함)
             return "기온: 20°C, 날씨: 맑음, 습도: 60%";
         } catch (Exception e) {
             log.warn("Failed to get weather info, using default", e);
