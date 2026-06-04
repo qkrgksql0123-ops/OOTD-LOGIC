@@ -166,28 +166,37 @@ async function loadUserProfile(userId) {
             const profileName = document.getElementById('profile-name');
             const profileEmail = document.getElementById('profile-email');
             const profileJoined = document.getElementById('profile-joined');
-            const nicknameInput = document.getElementById('nickname');
 
             if (profileName) profileName.textContent = user.nickname || cachedNickname || '-';
             if (profileEmail) profileEmail.textContent = user.email || '-';
-            if (nicknameInput) nicknameInput.value = user.nickname || cachedNickname || '';
             if (profileJoined && user.createdAt) {
                 const d = new Date(user.createdAt);
                 if (!isNaN(d.getTime())) {
                     profileJoined.textContent = `가입일: ${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
                 }
             }
+
+            const fields = {
+                nickname: user.nickname || cachedNickname || '',
+                phone:     user.phone     || '',
+                birthdate: user.birthdate || '',
+                gender:    user.gender    || '',
+                location:  user.location  || ''
+            };
+            Object.entries(fields).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            });
         }
     } catch (error) {
         console.error('Error loading user profile:', error);
     }
 }
 
-// 닉네임 저장
+// 프로필 저장 (닉네임, 성별, 휴대폰, 생년월일, 지역)
 async function saveProfile(userId) {
-    const nicknameInput = document.getElementById('nickname');
-    const newNickname = nicknameInput ? nicknameInput.value.trim() : '';
-    if (!newNickname) {
+    const nickname = document.getElementById('nickname')?.value.trim();
+    if (!nickname) {
         showNotification('닉네임을 입력해주세요.', 'error');
         return;
     }
@@ -195,10 +204,14 @@ async function saveProfile(userId) {
     try {
         // 기존 유저 데이터 먼저 조회 (다른 필드 덮어쓰기 방지)
         const getRes = await fetch(`${API_BASE_URL}/users/${userId}`);
-        if (!getRes.ok) throw new Error();
+        if (!getRes.ok) throw new Error('사용자 정보를 불러올 수 없습니다.');
         const user = await getRes.json();
 
-        user.nickname = newNickname;
+        user.nickname  = nickname;
+        user.phone     = document.getElementById('phone')?.value.trim()     || user.phone     || '';
+        user.birthdate = document.getElementById('birthdate')?.value         || user.birthdate || '';
+        user.gender    = document.getElementById('gender')?.value            || user.gender    || '';
+        user.location  = document.getElementById('location')?.value.trim()  || user.location  || '';
 
         const putRes = await fetch(`${API_BASE_URL}/users/${userId}`, {
             method: 'PUT',
@@ -206,11 +219,11 @@ async function saveProfile(userId) {
             body: JSON.stringify(user)
         });
 
-        if (!putRes.ok) throw new Error();
+        if (!putRes.ok) throw new Error('저장 실패');
 
-        localStorage.setItem('nickname', newNickname);
+        localStorage.setItem('nickname', nickname);
         const profileName = document.getElementById('profile-name');
-        if (profileName) profileName.textContent = newNickname;
+        if (profileName) profileName.textContent = nickname;
         showNotification('프로필이 저장되었습니다!', 'success');
     } catch (e) {
         showNotification('저장에 실패했습니다.', 'error');

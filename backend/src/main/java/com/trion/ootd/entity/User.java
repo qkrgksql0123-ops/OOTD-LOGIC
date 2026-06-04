@@ -27,6 +27,10 @@ public class User {
     private String googleCalendarToken;
     private String profileImageUrl;
     private String preferredRegion;
+    private String gender;
+    private String phone;
+    private String birthdate;
+    private String location;
     private String createdAt;
     private String updatedAt;
     private String lastLoginAt;
@@ -131,6 +135,22 @@ public class User {
     public void setPreferredRegion(String preferredRegion) {
         this.preferredRegion = preferredRegion;
     }
+
+    @DynamoDbAttribute("gender")
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+
+    @DynamoDbAttribute("phone")
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    @DynamoDbAttribute("birthdate")
+    public String getBirthdate() { return birthdate; }
+    public void setBirthdate(String birthdate) { this.birthdate = birthdate; }
+
+    @DynamoDbAttribute("location")
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
     @DynamoDbAttribute("createdAt")
     public String getCreatedAt() {
