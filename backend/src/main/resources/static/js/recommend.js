@@ -55,7 +55,16 @@ document.addEventListener('DOMContentLoaded', function() {
 const CATEGORY_KEYWORDS = {
     'top':    ['티셔츠','셔츠','블라우스','니트','스웨터','맨투맨','탑','크롭','긴소매','반팔','상의'],
     'bottom': ['팬츠','진','청바지','슬렉스','스커트','반바지','데님','레깅스','하의'],
-    'outer':  ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치','아우터']
+    'outer':  ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치','아우터'],
+    'shoes':  ['신발','운동화','스니커즈','로퍼','부츠','샌들','슬리퍼','힐','구두']
+};
+
+// 카테고리별 세탁 기준 횟수
+const LAUNDRY_THRESHOLD = {
+    'top':    1,
+    'bottom': 3,
+    'outer':  5,
+    'shoes':  15
 };
 
 // AI 텍스트에서 DB 카테고리 키 추출
@@ -67,6 +76,8 @@ function extractCategories(aiText) {
     // 기본값: top / bottom 없으면 추가
     if (!found.includes('top'))    found.unshift('top');
     if (!found.includes('bottom') && found.length < 2) found.push('bottom');
+    // 신발은 항상 포함
+    if (!found.includes('shoes'))  found.push('shoes');
     return found;
 }
 
@@ -99,6 +110,12 @@ function renderMatchedCards(items, userId) {
             ? `<img src="${item.imageUrl}" alt="${item.category}" style="width:100%;height:200px;object-fit:cover;border-radius:8px;">`
             : `<div class="outfit-placeholder" style="height:200px;display:flex;align-items:center;justify-content:center;background:#f0f4f8;border-radius:8px;"><i class="fas fa-shirt" style="font-size:48px;color:#aaa;"></i></div>`;
 
+        const threshold = LAUNDRY_THRESHOLD[item.category] || 1;
+        const wornSoFar = item.wearCount || 0;
+        const laundryHint = item.category === 'shoes'
+            ? `신발은 ${threshold}회 착용 후 세탁`
+            : `${threshold}회 착용 후 세탁 (현재 ${wornSoFar}회)`;
+
         card.innerHTML = `
             <div class="outfit-image">${imgHtml}</div>
             <div class="outfit-info">
@@ -108,8 +125,11 @@ function renderMatchedCards(items, userId) {
                     ${item.season ? `<p><i class="fas fa-leaf"></i> ${item.season}</p>` : ''}
                     ${item.material ? `<p><i class="fas fa-layer-group"></i> ${item.material}</p>` : ''}
                 </div>
+                <p style="font-size:12px;color:#888;margin-top:6px;">
+                    <i class="fas fa-water"></i> ${laundryHint}
+                </p>
                 <button class="btn btn-wear" data-id="${item.id}"
-                    style="margin-top:12px;width:100%;background:#004f60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
+                    style="margin-top:10px;width:100%;background:#004f60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
                     <i class="fas fa-tshirt"></i> 착용 완료
                 </button>
             </div>`;

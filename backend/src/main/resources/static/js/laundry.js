@@ -51,6 +51,23 @@ function logout() {
 let allClothings = [];
 let currentFilter = 'needed';
 
+const LAUNDRY_THRESHOLD = {
+    'top': 1, 'bottom': 3, 'outer': 5, 'shoes': 15
+};
+
+function getThreshold(c) {
+    const sub = (c.subcategory || '').toLowerCase();
+    if (c.category === 'shoes')  return 15;
+    if (c.category === 'outer')  return 5;
+    if (c.category === 'bottom') {
+        if (sub.includes('청바지') || sub.includes('데님')) return 5;
+        if (sub.includes('반바지')) return 2;
+        return 3;
+    }
+    if (sub.includes('니트') || sub.includes('스웨터') || sub.includes('가디건')) return 3;
+    return 1;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     updateAuthenticationUI();
     const userId = getCurrentUserId();
@@ -123,7 +140,9 @@ function renderLaundryItems(list, userId) {
                 <div class="info-row"><strong>카테고리:</strong> <span>${c.category || '-'}</span></div>
                 ${c.material ? `<div class="info-row"><strong>소재:</strong> <span>${c.material}</span></div>` : ''}
                 ${c.lastWornDate ? `<div class="info-row"><strong>마지막 착용:</strong> <span>${c.lastWornDate}</span></div>` : ''}
-                <div class="info-row"><strong>착용 횟수:</strong> <span>${c.wearCount || 0}회</span></div>
+                <div class="info-row"><strong>착용 횟수:</strong>
+                    <span>${c.wearCount || 0}회 / 기준 ${getThreshold(c)}회</span>
+                </div>
             </div>
             ${isNeeded ? `
             <button class="btn btn-mark-clean" data-id="${c.id}"

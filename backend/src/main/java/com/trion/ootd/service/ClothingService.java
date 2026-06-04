@@ -80,12 +80,30 @@ public class ClothingService {
         Optional<Clothing> opt = clothingRepository.findById(userId, clothingId);
         if (opt.isPresent()) {
             Clothing clothing = opt.get();
-            clothing.setWearCount((clothing.getWearCount() != null ? clothing.getWearCount() : 0) + 1);
+            int newCount = (clothing.getWearCount() != null ? clothing.getWearCount() : 0) + 1;
+            clothing.setWearCount(newCount);
             clothing.setLastWornDate(java.time.LocalDate.now().toString());
-            clothing.setIsInLaundry(true);
+            clothing.setIsInLaundry(newCount >= getLaundryThreshold(clothing));
             clothingRepository.save(clothing);
-            log.info("Clothing marked as worn and added to laundry");
+            log.info("Clothing worn {} times (threshold: {}), needsLaundry: {}",
+                    newCount, getLaundryThreshold(clothing), clothing.getIsInLaundry());
         }
+    }
+
+    private int getLaundryThreshold(Clothing c) {
+        String cat = c.getCategory() != null ? c.getCategory().toLowerCase() : "";
+        String sub = c.getSubcategory() != null ? c.getSubcategory().toLowerCase() : "";
+
+        if (cat.equals("shoes"))  return 15;
+        if (cat.equals("outer"))  return 5;
+        if (cat.equals("bottom")) {
+            if (sub.contains("청바지") || sub.contains("데님")) return 5;
+            if (sub.contains("반바지"))                         return 2;
+            return 3;
+        }
+        // top 및 기타
+        if (sub.contains("니트") || sub.contains("스웨터") || sub.contains("가디건")) return 3;
+        return 1;
     }
 
     public void updateLaundryStatus(String userId, String clothingId, Boolean isInLaundry) {
@@ -94,6 +112,10 @@ public class ClothingService {
         if (optionalClothing.isPresent()) {
             Clothing clothing = optionalClothing.get();
             clothing.setIsInLaundry(isInLaundry);
+            // 세탁 완료 시 착용 횟수 초기화
+            if (Boolean.FALSE.equals(isInLaundry)) {
+                clothing.setWearCount(0);
+            }
             clothingRepository.save(clothing);
             log.info("Laundry status updated successfully");
         } else {
