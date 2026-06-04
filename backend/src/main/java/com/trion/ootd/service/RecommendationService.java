@@ -184,9 +184,14 @@ public class RecommendationService {
         if (list == null || list.isEmpty()) return "등록된 옷이 없습니다.";
         StringBuilder sb = new StringBuilder();
         for (ClothingDTO c : list) {
-            sb.append("- ").append(c.getCategory() != null ? c.getCategory() : "기타");
-            if (c.getColor() != null && !c.getColor().isBlank()) sb.append(" ").append(c.getColor());
-            if (c.getSubcategory() != null && !c.getSubcategory().isBlank()) sb.append(" ").append(c.getSubcategory());
+            // 색상과 서브카테고리를 앞에 명확히 표기 (AI 매칭 정확도 향상)
+            sb.append("- ");
+            if (c.getColor() != null && !c.getColor().isBlank()) sb.append(c.getColor()).append(" ");
+            if (c.getSubcategory() != null && !c.getSubcategory().isBlank()) {
+                sb.append(c.getSubcategory());
+            } else {
+                sb.append(c.getCategory() != null ? c.getCategory() : "의류");
+            }
             if (c.getSeason() != null && !c.getSeason().isBlank()) sb.append(" (").append(c.getSeason()).append(")");
             sb.append("\n");
         }

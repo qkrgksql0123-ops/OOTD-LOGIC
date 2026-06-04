@@ -174,14 +174,58 @@ function showLaundryNotice() {
     }
 }
 
+// AI 추천 텍스트에서 "추천 코디:" 줄 파싱
+function parseRecommendLine(aiText) {
+    const line = aiText.split('\n').find(l => l.includes('추천 코디:'));
+    if (!line) return [];
+    return line.replace('추천 코디:', '').split(',')
+        .map(s => s.trim()).filter(s => s && s !== '없음' && s !== '-');
+}
+
+// 색상 + 서브카테고리로 가장 잘 맞는 옷 찾기
+function findBestMatch(clothingList, desc, usedIds) {
+    let best = null;
+    let bestScore = -1;
+    for (const item of clothingList) {
+        if (item.isInLaundry) continue;
+        if (usedIds.has(item.id)) continue;
+        const color = (item.color || '').toLowerCase();
+        const sub   = (item.subcategory || '').toLowerCase();
+        const d = desc.toLowerCase();
+        let score = 0;
+        if (color && d.includes(color)) score += 3;
+        if (sub   && d.includes(sub))   score += 2;
+        if (score > bestScore) { bestScore = score; best = item; }
+    }
+    return best;
+}
+
 // ===== 코디 등록 =====
 async function registerOutfit(userId, aiText) {
     try {
         const res = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
         if (!res.ok) return;
         const clothingList = await res.json();
-        const categories = extractCategories(aiText);
-        const matched = matchClothingByCategory(clothingList, categories);
+
+        const usedIds = new Set();
+        const matched = [];
+
+        // 1차: AI 추천 텍스트의 각 항목을 색상+서브카테고리로 매칭
+        const recommended = parseRecommendLine(aiText);
+        for (const desc of recommended) {
+            const item = findBestMatch(clothingList, desc, usedIds);
+            if (item) { matched.push(item); usedIds.add(item.id); }
+        }
+
+        // 2차 폴백: 매칭 0개면 카테고리 기반으로
+        if (matched.length === 0) {
+            const categories = extractCategories(aiText);
+            for (const cat of categories) {
+                const item = clothingList.find(c => c.category === cat && !c.isInLaundry && !usedIds.has(c.id));
+                if (item) { matched.push(item); usedIds.add(item.id); }
+            }
+        }
+
         renderMatchedCards(matched, userId);
 
         // 섹션 제목 업데이트
