@@ -7,6 +7,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttri
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @DynamoDbBean
@@ -167,10 +168,12 @@ public class User {
         this.deactivated = deactivated;
     }
 
+    @JsonIgnore
     public LocalDateTime getCreatedAtAsLocalDateTime() {
         return createdAt != null ? LocalDateTime.parse(createdAt) : null;
     }
 
+    @JsonIgnore
     public void setCreatedAtFromLocalDateTime(LocalDateTime dateTime) {
         this.createdAt = dateTime != null ? dateTime.toString() : null;
     }
