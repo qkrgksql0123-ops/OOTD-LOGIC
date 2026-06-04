@@ -149,23 +149,26 @@ async function loadUserProfile(userId) {
     try {
         const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
 
         if (response.ok) {
             const user = await response.json();
-            // Fill form fields with user data
-            const nicknameInput = document.querySelector('input[placeholder*="닉네임"]');
-            const emailInput = document.querySelector('input[placeholder*="이메일"]');
-            const tempSlider = document.getElementById('tempSensitivity');
-            const skinToneSelect = document.getElementById('skinTone');
 
+            // 프로필 카드
+            const profileName = document.getElementById('profile-name');
+            const profileEmail = document.getElementById('profile-email');
+            const profileJoined = document.getElementById('profile-joined');
+            if (profileName) profileName.textContent = user.nickname || '-';
+            if (profileEmail) profileEmail.textContent = user.email || '-';
+            if (profileJoined && user.createdAt) {
+                const date = new Date(user.createdAt);
+                profileJoined.textContent = `가입일: ${date.getFullYear()}년 ${date.getMonth()+1}월 ${date.getDate()}일`;
+            }
+
+            // 폼 입력
+            const nicknameInput = document.getElementById('nickname');
             if (nicknameInput) nicknameInput.value = user.nickname || '';
-            if (emailInput) emailInput.value = user.email || '';
-            if (tempSlider) tempSlider.value = user.tempSensitivity || 5;
-            if (skinToneSelect) skinToneSelect.value = user.skinTone || '';
         }
     } catch (error) {
         console.error('Error loading user profile:', error);
