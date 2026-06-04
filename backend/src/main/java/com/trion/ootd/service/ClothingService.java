@@ -75,6 +75,19 @@ public class ClothingService {
         return clothingRepository.countByUserId(userId);
     }
 
+    public void markAsWorn(String userId, String clothingId) {
+        log.info("Marking clothing as worn: {} for user: {}", clothingId, userId);
+        Optional<Clothing> opt = clothingRepository.findById(userId, clothingId);
+        if (opt.isPresent()) {
+            Clothing clothing = opt.get();
+            clothing.setWearCount((clothing.getWearCount() != null ? clothing.getWearCount() : 0) + 1);
+            clothing.setLastWornDate(java.time.LocalDate.now().toString());
+            clothing.setIsInLaundry(true);
+            clothingRepository.save(clothing);
+            log.info("Clothing marked as worn and added to laundry");
+        }
+    }
+
     public void updateLaundryStatus(String userId, String clothingId, Boolean isInLaundry) {
         log.info("Updating laundry status for clothing: {} for user: {}", clothingId, userId);
         Optional<Clothing> optionalClothing = clothingRepository.findById(userId, clothingId);

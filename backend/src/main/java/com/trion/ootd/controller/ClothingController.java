@@ -81,6 +81,15 @@ public class ClothingController {
         return ResponseEntity.ok(analysis);
     }
 
+    @PatchMapping("/{clothingId}/wear")
+    public ResponseEntity<Void> markAsWorn(
+            @PathVariable String userId,
+            @PathVariable String clothingId) {
+        log.info("Marking clothing as worn: {} for user: {}", clothingId, userId);
+        clothingService.markAsWorn(userId, clothingId);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/{clothingId}/laundry-status")
     public ResponseEntity<Void> updateLaundryStatus(
             @PathVariable String userId,

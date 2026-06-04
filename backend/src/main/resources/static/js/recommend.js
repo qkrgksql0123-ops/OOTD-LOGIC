@@ -51,6 +51,134 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeRecommendPage();
 });
 
+// ===== 카테고리 키워드 매핑 =====
+const CATEGORY_KEYWORDS = {
+    '상의': ['티셔츠','셔츠','블라우스','니트','스웨터','맨투맨','탑','크롭','긴소매','반팔'],
+    '하의': ['팬츠','진','청바지','슬렉스','스커트','반바지','데님','레깅스'],
+    '아우터': ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치']
+};
+
+// AI 텍스트에서 카테고리별 키워드 추출
+function extractCategories(aiText) {
+    const found = [];
+    for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some(kw => aiText.includes(kw))) found.push(cat);
+    }
+    // 기본으로 상의/하의 없으면 추가
+    if (!found.includes('상의')) found.unshift('상의');
+    if (!found.includes('하의') && found.length < 2) found.push('하의');
+    return found;
+}
+
+// 옷장에서 카테고리 매칭
+function matchClothingByCategory(clothingList, categories) {
+    const result = [];
+    for (const cat of categories) {
+        const matched = clothingList.filter(c => c.category === cat && !c.isInLaundry);
+        if (matched.length > 0) result.push(matched[0]);
+    }
+    return result;
+}
+
+// 매칭된 옷을 카드로 렌더링
+function renderMatchedCards(items, userId) {
+    const grid = document.querySelector('.outfits-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (items.length === 0) {
+        grid.innerHTML = '<p style="padding:20px;color:#666;">옷장에 등록된 의류가 없습니다. 먼저 옷을 등록해주세요.</p>';
+        return;
+    }
+
+    items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'outfit-card';
+        card.dataset.clothingId = item.id;
+        const imgHtml = item.imageUrl
+            ? `<img src="${item.imageUrl}" alt="${item.category}" style="width:100%;height:200px;object-fit:cover;border-radius:8px;">`
+            : `<div class="outfit-placeholder" style="height:200px;display:flex;align-items:center;justify-content:center;background:#f0f4f8;border-radius:8px;"><i class="fas fa-shirt" style="font-size:48px;color:#aaa;"></i></div>`;
+
+        card.innerHTML = `
+            <div class="outfit-image">${imgHtml}</div>
+            <div class="outfit-info">
+                <h3>${item.color || ''} ${item.subcategory || item.category}</h3>
+                <div class="outfit-items">
+                    <p><i class="fas fa-tag"></i> ${item.category}</p>
+                    ${item.season ? `<p><i class="fas fa-leaf"></i> ${item.season}</p>` : ''}
+                    ${item.material ? `<p><i class="fas fa-layer-group"></i> ${item.material}</p>` : ''}
+                </div>
+                <button class="btn btn-wear" data-id="${item.id}"
+                    style="margin-top:12px;width:100%;background:#004f60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
+                    <i class="fas fa-tshirt"></i> 착용 완료
+                </button>
+            </div>`;
+        grid.appendChild(card);
+    });
+
+    // 착용 완료 버튼 이벤트
+    grid.querySelectorAll('.btn-wear').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const clothingId = this.dataset.id;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
+            try {
+                const res = await fetch(`${API_BASE_URL}/users/${userId}/clothing/${clothingId}/wear`, {
+                    method: 'PATCH'
+                });
+                if (res.ok) {
+                    this.innerHTML = '<i class="fas fa-check"></i> 착용 완료!';
+                    this.style.background = '#27ae60';
+                    this.closest('.outfit-card').style.opacity = '0.6';
+                    showLaundryNotice();
+                }
+            } catch (e) {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-tshirt"></i> 착용 완료';
+            }
+        });
+    });
+}
+
+// 세탁 관리 이동 안내
+function showLaundryNotice() {
+    let notice = document.getElementById('laundry-notice');
+    if (!notice) {
+        notice = document.createElement('div');
+        notice.id = 'laundry-notice';
+        notice.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:14px 20px;margin:12px 0;text-align:center;';
+        notice.innerHTML = `<i class="fas fa-water" style="color:#e67e22;"></i>
+            <strong> 착용한 옷이 세탁 관리에 추가되었어요!</strong>
+            <a href="laundry.html" style="margin-left:12px;color:#004f60;font-weight:700;">세탁 관리로 이동 →</a>`;
+        document.querySelector('.outfits-grid')?.before(notice);
+    }
+}
+
+// ===== 코디 등록 =====
+async function registerOutfit(userId, aiText) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
+        if (!res.ok) return;
+        const clothingList = await res.json();
+        const categories = extractCategories(aiText);
+        const matched = matchClothingByCategory(clothingList, categories);
+        renderMatchedCards(matched, userId);
+
+        // 섹션 제목 업데이트
+        const sectionTitle = document.querySelector('.section h2:last-of-type') ||
+                             document.querySelector('.outfits-grid')?.closest('.section')?.querySelector('h2');
+        if (sectionTitle) sectionTitle.textContent = '내 옷장에서 찾은 추천 코디';
+
+        // 탭 숨기기
+        const tabs = document.querySelector('.recommendation-tabs');
+        if (tabs) tabs.style.display = 'none';
+
+        document.querySelector('.outfits-grid')?.scrollIntoView({ behavior: 'smooth' });
+    } catch (e) {
+        console.error('코디 등록 실패:', e);
+    }
+}
+
 // 스타일 프로필 불러와서 표시
 async function loadUserStyleProfile(userId) {
     try {
@@ -98,6 +226,18 @@ function setupAIRecommendButton(userId) {
 
             resultText.textContent = text;
             resultArea.style.display = 'block';
+
+            // 코디 등록하기 버튼 추가
+            let regBtn = document.getElementById('register-outfit-btn');
+            if (!regBtn) {
+                regBtn = document.createElement('button');
+                regBtn.id = 'register-outfit-btn';
+                regBtn.style.cssText = 'margin-top:14px;width:100%;padding:12px;background:#004f60;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;';
+                regBtn.innerHTML = '<i class="fas fa-plus-circle"></i> 내 옷장에서 코디 찾기';
+                resultArea.querySelector('div').appendChild(regBtn);
+                regBtn.addEventListener('click', () => registerOutfit(userId, text));
+            }
+
             resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (e) {
             resultText.textContent = '추천 생성에 실패했습니다. 다시 시도해주세요.';

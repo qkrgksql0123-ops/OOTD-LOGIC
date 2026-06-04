@@ -48,6 +48,9 @@ function logout() {
     window.location.href = 'index.html';
 }
 
+let allClothings = [];
+let currentFilter = 'needed';
+
 document.addEventListener('DOMContentLoaded', function() {
     updateAuthenticationUI();
     const userId = getCurrentUserId();
@@ -57,68 +60,124 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeLaundryPage();
 });
 
-// Load laundry list from API
 async function loadLaundryList(userId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/clothing`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const clothings = await response.json();
-            renderLaundryItems(clothings);
-        }
-    } catch (error) {
-        console.error('Error loading laundry list:', error);
+        const res = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
+        if (!res.ok) return;
+        allClothings = await res.json();
+        updateStats(allClothings);
+        renderByFilter(currentFilter, userId);
+    } catch (e) {
+        console.error('세탁 목록 로드 실패:', e);
     }
 }
 
-// Render laundry items
-function renderLaundryItems(clothings) {
-    const laundryGrid = document.querySelector('.laundry-grid');
-    if (!laundryGrid) return;
+function updateStats(list) {
+    const needed = list.filter(c => c.isInLaundry).length;
+    const clean  = list.filter(c => !c.isInLaundry).length;
+    const el = id => document.getElementById(id);
+    if (el('laundry-needed-count')) el('laundry-needed-count').textContent = needed;
+    if (el('laundry-clean-count'))  el('laundry-clean-count').textContent  = clean;
+    if (el('laundry-total-count'))  el('laundry-total-count').textContent  = list.length;
+}
 
-    laundryGrid.innerHTML = '';
+function renderByFilter(filter, userId) {
+    const filtered = filter === 'needed' ? allClothings.filter(c => c.isInLaundry)
+                   : filter === 'clean'  ? allClothings.filter(c => !c.isInLaundry)
+                   : allClothings;
+    renderLaundryItems(filtered, userId);
+}
 
-    clothings.forEach(clothing => {
-        const laundryCard = document.createElement('div');
-        laundryCard.className = clothing.isInLaundry ? 'laundry-card urgent' : 'laundry-card clean';
-        laundryCard.innerHTML = `
+function renderLaundryItems(list, userId) {
+    const grid = document.getElementById('laundryGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (list.length === 0) {
+        grid.innerHTML = `<p style="padding:24px;color:#666;grid-column:1/-1;">
+            ${currentFilter === 'needed' ? '세탁이 필요한 옷이 없어요! 🎉' : '등록된 의류가 없습니다.'}</p>`;
+        return;
+    }
+
+    list.forEach(c => {
+        const isNeeded = c.isInLaundry;
+        const card = document.createElement('div');
+        card.className = `laundry-card ${isNeeded ? 'urgent' : 'clean'}`;
+        card.dataset.id = c.id;
+
+        const imgHtml = c.imageUrl
+            ? `<img src="${c.imageUrl}" alt="${c.category}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px;">`
+            : `<div style="height:120px;background:#f0f4f8;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                   <i class="fas fa-shirt" style="font-size:36px;color:#aaa;"></i></div>`;
+
+        card.innerHTML = `
+            ${imgHtml}
             <div class="laundry-header">
-                <h3>${clothing.subcategory || clothing.category}</h3>
-                <span class="urgency-badge">${clothing.isInLaundry ? '세탁중' : '안심'}</span>
+                <h3>${c.color ? c.color + ' ' : ''}${c.subcategory || c.category}</h3>
+                <span class="urgency-badge">
+                    <i class="fas fa-${isNeeded ? 'exclamation' : 'shield-alt'}"></i>
+                    ${isNeeded ? '세탁 필요' : '깨끗함'}
+                </span>
             </div>
             <div class="laundry-info">
-                <p><strong>카테고리:</strong> ${clothing.category}</p>
-                <p><strong>색상:</strong> ${clothing.color}</p>
-                <p><strong>소재:</strong> ${clothing.material}</p>
+                <div class="info-row"><strong>카테고리:</strong> <span>${c.category || '-'}</span></div>
+                ${c.material ? `<div class="info-row"><strong>소재:</strong> <span>${c.material}</span></div>` : ''}
+                ${c.lastWornDate ? `<div class="info-row"><strong>마지막 착용:</strong> <span>${c.lastWornDate}</span></div>` : ''}
+                <div class="info-row"><strong>착용 횟수:</strong> <span>${c.wearCount || 0}회</span></div>
             </div>
-        `;
-        laundryGrid.appendChild(laundryCard);
+            ${isNeeded ? `
+            <button class="btn btn-mark-clean" data-id="${c.id}"
+                style="width:100%;margin-top:12px;background:#27ae60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">
+                <i class="fas fa-check"></i> 세탁 완료
+            </button>` : ''}`;
+
+        grid.appendChild(card);
     });
+
+    // 세탁 완료 버튼 이벤트
+    if (userId) {
+        grid.querySelectorAll('.btn-mark-clean').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const clothingId = this.dataset.id;
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
+                try {
+                    const res = await fetch(
+                        `${API_BASE_URL}/users/${userId}/clothing/${clothingId}/laundry-status`,
+                        { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ isInLaundry: false }) }
+                    );
+                    if (res.ok) {
+                        const item = allClothings.find(c => c.id === clothingId);
+                        if (item) item.isInLaundry = false;
+                        updateStats(allClothings);
+                        renderByFilter(currentFilter, userId);
+                    }
+                } catch (e) {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-check"></i> 세탁 완료';
+                }
+            });
+        });
+    }
 }
 
 function initializeLaundryPage() {
-    // Navigation
     const menuToggle = document.querySelector('.navbar-toggle');
     const navMenu = document.querySelector('.navbar-menu');
-
     if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-        });
+        menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
+        navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('active')));
     }
 
-    // Close menu when link is clicked
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            if (navMenu) {
-                navMenu.classList.remove('active');
-            }
+    // 탭 필터
+    document.querySelectorAll('.laundry-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.laundry-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.filter;
+            const userId = localStorage.getItem('userId');
+            renderByFilter(currentFilter, userId);
         });
     });
 }
