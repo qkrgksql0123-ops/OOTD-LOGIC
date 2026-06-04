@@ -86,6 +86,8 @@ public class BedrockService {
         String styleSection = (styleProfile != null && !styleProfile.isBlank())
                 ? "\n[사용자 스타일 프로필]\n" + styleProfile : "";
 
+        String weatherGuide = buildWeatherGuide(weatherInfo);
+
         return String.format("""
                 당신은 전문 스타일리스트입니다. 사용자의 옷장과 스타일 프로필, 날씨를 분석해 오늘의 최적 코디를 추천해주세요.
 
@@ -95,15 +97,38 @@ public class BedrockService {
                 [오늘의 날씨]
                 %s
 
+                [날씨 착장 규칙 - 반드시 준수]
+                %s
+
                 요청사항:
                 1. 옷장에 있는 옷만 선택해주세요.
-                2. 스타일 프로필(선호 스타일, 퍼스널 톤, 얼굴형, 핏)을 최대한 반영해주세요.
-                3. 날씨에 맞는 옷을 선택해주세요.
-                4. 한국어로 간결하게 답해주세요.
+                2. 위의 날씨 착장 규칙을 반드시 따르세요. 기온에 맞지 않는 옷은 절대 추천하지 마세요.
+                3. 스타일 프로필(선호 스타일, 퍼스널 톤, 얼굴형, 핏)을 반영해주세요.
+                4. 아우터가 필요 없는 날씨면 아우터 없음으로 표시해주세요.
+                5. 한국어로 간결하게 답해주세요.
 
                 형식:
-                추천 코디: [상의], [하의], [아우터]
-                추천 이유: [이유]
-                """, userClothing, styleSection, weatherInfo);
+                추천 코디: [상의], [하의], [아우터 또는 없음]
+                추천 이유: [날씨와 스타일 이유]
+                """, userClothing, styleSection, weatherInfo, weatherGuide);
+    }
+
+    private String buildWeatherGuide(String weatherInfo) {
+        if (weatherInfo == null) return "계절에 맞는 옷을 선택하세요.";
+
+        // 기온 파싱
+        double temp = 20.0;
+        try {
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("기온[:\\s]+(\\d+\\.?\\d*)").matcher(weatherInfo);
+            if (m.find()) temp = Double.parseDouble(m.group(1));
+        } catch (Exception ignored) {}
+
+        if (temp >= 28) return "기온 " + temp + "°C: 매우 더운 날씨. 반팔·반바지 필수. 아우터 절대 불필요. 패딩·코트·두꺼운 니트 추천 금지.";
+        if (temp >= 23) return "기온 " + temp + "°C: 더운 날씨. 반팔·얇은 상의 적합. 두꺼운 아우터(패딩·코트) 추천 금지.";
+        if (temp >= 18) return "기온 " + temp + "°C: 따뜻한 날씨. 긴팔 또는 반팔 적합. 얇은 자켓·가디건 가능. 패딩·두꺼운 코트 추천 금지.";
+        if (temp >= 12) return "기온 " + temp + "°C: 선선한 날씨. 긴팔·가디건·얇은 자켓 필요. 두꺼운 패딩은 불필요.";
+        if (temp >= 5)  return "기온 " + temp + "°C: 쌀쌀한 날씨. 두꺼운 상의·자켓·코트 필요.";
+        return "기온 " + temp + "°C: 추운 날씨. 패딩·두꺼운 코트·레이어링 필수.";
     }
 }

@@ -395,20 +395,91 @@ async function loadRecommendationHistory(userId) {
     }
 }
 
-// Generate AI recommendations based on weather data
+// 날씨 기반 실제 옷장 추천
 async function generateWeatherBasedRecommendations() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
     try {
-        const weatherData = await fetchWeatherData();
-        if (!weatherData) {
-            console.error('No weather data available');
-            return;
+        const [weatherData, clothingRes] = await Promise.all([
+            fetchWeatherData(),
+            fetch(`${API_BASE_URL}/users/${userId}/clothing`)
+        ]);
+
+        if (!weatherData || !clothingRes.ok) return;
+        const clothingList = await clothingRes.json();
+
+        // 세탁 필요 제외
+        const available = clothingList.filter(c => !c.isInLaundry);
+        if (available.length === 0) return;
+
+        // 기온에 맞는 옷 필터링
+        const temp = weatherData.temperature || 20;
+        const season = temp >= 23 ? '여름' : temp >= 13 ? '봄가을' : '겨울';
+        const seasonMap = { '여름': ['여름'], '봄가을': ['봄','가을','봄/가을'], '겨울': ['겨울'] };
+        const validSeasons = seasonMap[season];
+
+        // 계절 맞는 옷 우선, 없으면 전체에서 카테고리별 1개씩
+        function pickBySeason(category) {
+            const bySeason = available.filter(c => c.category === category && validSeasons.some(s => (c.season||'').includes(s)));
+            if (bySeason.length > 0) return bySeason[Math.floor(Math.random() * bySeason.length)];
+            return available.filter(c => c.category === category)[0] || null;
         }
 
-        const recommendations = generateRecommendations(weatherData);
-        renderWeatherBasedRecommendations(recommendations, weatherData);
-    } catch (error) {
-        console.error('Error generating recommendations:', error);
+        const outfitSets = [];
+        for (let i = 0; i < 2; i++) {
+            const top    = pickBySeason('top');
+            const bottom = pickBySeason('bottom');
+            const outer  = temp < 18 ? pickBySeason('outer') : null;
+            const shoes  = pickBySeason('shoes');
+            if (top || bottom) outfitSets.push({ top, bottom, outer, shoes });
+        }
+
+        renderClosetBasedRecommendations(outfitSets, weatherData);
+    } catch (e) {
+        console.error('날씨 기반 추천 오류:', e);
     }
+}
+
+// 실제 옷장 기반 추천 카드 렌더링
+function renderClosetBasedRecommendations(outfitSets, weatherData) {
+    const grid = document.querySelector('.outfits-grid');
+    if (!grid || outfitSets.length === 0) return;
+    grid.innerHTML = '';
+
+    outfitSets.forEach((outfit, idx) => {
+        const items = [outfit.top, outfit.bottom, outfit.outer, outfit.shoes].filter(Boolean);
+        const card = document.createElement('div');
+        card.className = 'outfit-card';
+
+        const itemsHtml = items.map(item => {
+            const imgHtml = item.imageUrl
+                ? `<img src="${item.imageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:8px;vertical-align:middle;">`
+                : `<i class="fas fa-shirt" style="font-size:24px;color:#aaa;margin-right:8px;"></i>`;
+            return `<p style="display:flex;align-items:center;margin:4px 0;">
+                ${imgHtml}<span>${item.color || ''} ${item.subcategory || item.category}</span></p>`;
+        }).join('');
+
+        card.innerHTML = `
+            <div class="outfit-image">
+                <div class="outfit-placeholder" style="background:#f8f9fa;padding:12px;border-radius:8px;">
+                    ${items[0]?.imageUrl
+                        ? `<img src="${items[0].imageUrl}" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">`
+                        : `<i class="fas fa-shirt" style="font-size:48px;color:#aaa;display:block;text-align:center;padding:40px 0;"></i>`}
+                </div>
+                <span class="confidence-badge">
+                    <i class="fas fa-thermometer-half"></i> ${weatherData.temperature}°C 기준
+                </span>
+            </div>
+            <div class="outfit-info">
+                <h3>오늘의 추천 코디 ${idx + 1}</h3>
+                <div class="outfit-items">${itemsHtml}</div>
+                <div class="outfit-reason" style="margin-top:8px;">
+                    <strong>추천 이유:</strong> ${weatherData.temperature}°C ${weatherData.weatherCondition || ''} 날씨에 맞는 내 옷장 코디예요.
+                </div>
+            </div>`;
+        grid.appendChild(card);
+    });
 }
 
 // Generate recommendation objects based on weather
