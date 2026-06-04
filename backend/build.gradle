@@ -34,6 +34,9 @@ dependencies {
 	implementation "software.amazon.awssdk:dynamodb:${awsJavaSDKVersion}"
 	implementation "software.amazon.awssdk:dynamodb-enhanced:${awsJavaSDKVersion}"
 
+	// AWS SDK v2 for Bedrock
+	implementation "software.amazon.awssdk:bedrockruntime:${awsJavaSDKVersion}"
+
 	// HTTP Client for Gemini API (REST calls)
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.3'
 	implementation 'com.google.code.gson:gson:2.10.1'

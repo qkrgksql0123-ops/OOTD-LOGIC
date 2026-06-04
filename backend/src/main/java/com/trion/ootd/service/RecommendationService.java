@@ -18,7 +18,7 @@ import java.util.UUID;
 public class RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
-    private final OpenRouterService openRouterService;
+    private final BedrockService bedrockService;
     private final EnvironmentService environmentService;
 
     public Recommendation saveRecommendation(String userId, String recommendedOutfits,
@@ -93,8 +93,8 @@ public class RecommendationService {
             // 날씨 정보 조회
             String weatherInfo = getWeatherInfoForRecommendation();
 
-            // OpenRouter API를 통한 AI 코디 추천 생성
-            String aiRecommendation = openRouterService.generateOutfitRecommendation(
+            // Bedrock AI를 통한 코디 추천 생성
+            String aiRecommendation = bedrockService.generateOutfitRecommendation(
                     userClothingData,
                     weatherInfo
             );
@@ -104,7 +104,7 @@ public class RecommendationService {
                     .userId(userId)
                     .recommendDate(LocalDate.now().toString())
                     .recommendedOutfits(aiRecommendation)
-                    .generatedByModel("openrouter-mistral-7b")
+                    .generatedByModel("bedrock-claude-3-haiku")
                     .modelVersion("1.0")
                     .createdAt(LocalDateTime.now().toString())
                     .build();
@@ -130,7 +130,7 @@ public class RecommendationService {
 
         try {
             String weatherInfo = getWeatherInfoForRecommendation();
-            return openRouterService.generateOutfitRecommendation(
+            return bedrockService.generateOutfitRecommendation(
                     userClothingData,
                     weatherInfo
             );
