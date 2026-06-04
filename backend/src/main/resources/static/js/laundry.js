@@ -191,7 +191,7 @@ function renderLaundryItems(list, userId) {
                     );
                     if (res.ok) {
                         const item = allClothings.find(c => c.id === clothingId);
-                        if (item) item.isInLaundry = false;
+                        if (item) { item.isInLaundry = false; item.wearCount = 0; }
                         updateStats(allClothings);
                         renderByFilter(currentFilter, userId);
                     }
