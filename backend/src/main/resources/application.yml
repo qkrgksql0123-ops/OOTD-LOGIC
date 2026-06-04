@@ -28,7 +28,7 @@ aws:
     init-tables: true
   bedrock:
     region: us-east-1
-    model-id: anthropic.claude-3-haiku-20240307-v1:0
+    model-id: us.anthropic.claude-3-haiku-20240307-v1:0
 
 server:
   port: 8095
