@@ -147,9 +147,9 @@ public class RecommendationService {
     }
 
     /**
-     * 옷장 + 스타일 프로필 기반 AI 추천 (저장 안 함)
+     * 옷장 + 스타일 프로필 + 실제 날씨 기반 AI 추천
      */
-    public String generateFullAIRecommendation(String userId) {
+    public String generateFullAIRecommendation(String userId, String temp, String weather, String humidity) {
         log.info("Generating full AI recommendation for user: {}", userId);
 
         // 1. 옷장 데이터 (세탁 필요 제외)
@@ -165,10 +165,19 @@ public class RecommendationService {
             styleProfile = formatStyleProfile(userOpt.get());
         }
 
-        // 3. 날씨
-        String weatherInfo = getWeatherInfoForRecommendation();
+        // 3. 날씨 (프론트에서 전달받은 실제 날씨 우선, 없으면 기본값)
+        String weatherInfo = buildWeatherInfo(temp, weather, humidity);
 
         return bedrockService.generateOutfitRecommendationWithProfile(clothingData, styleProfile, weatherInfo);
+    }
+
+    private String buildWeatherInfo(String temp, String weather, String humidity) {
+        if (temp != null && weather != null) {
+            String info = "기온: " + temp + "°C, 날씨: " + weather;
+            if (humidity != null) info += ", 습도: " + humidity + "%";
+            return info;
+        }
+        return "기온: 20°C, 날씨: 맑음, 습도: 60%";
     }
 
     private String formatClothingData(List<ClothingDTO> list) {

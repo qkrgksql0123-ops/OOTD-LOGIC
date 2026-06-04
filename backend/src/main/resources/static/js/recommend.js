@@ -262,7 +262,14 @@ function setupAIRecommendButton(userId) {
         const resultText = document.getElementById('ai-result-text');
 
         try {
-            const res = await fetch(`${API_BASE_URL}/users/${userId}/recommendations/ai-full`);
+            // 현재 날씨 파라미터 구성
+            const wd = window.currentWeatherData;
+            const params = new URLSearchParams();
+            if (wd?.temperature) params.set('temp', wd.temperature);
+            if (wd?.weatherCondition) params.set('weather', wd.weatherCondition);
+            if (wd?.humidity) params.set('humidity', wd.humidity);
+
+            const res = await fetch(`${API_BASE_URL}/users/${userId}/recommendations/ai-full?${params}`);
             const text = await res.text();
 
             resultText.textContent = text;

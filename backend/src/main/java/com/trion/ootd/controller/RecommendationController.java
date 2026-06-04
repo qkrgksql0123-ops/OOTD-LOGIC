@@ -122,10 +122,14 @@ public class RecommendationController {
      * 옷장 + 스타일 프로필 기반 AI 추천 (저장 안 함)
      */
     @GetMapping("/ai-full")
-    public ResponseEntity<String> generateFullAIRecommendation(@PathVariable String userId) {
-        log.info("Generating full AI recommendation for user: {}", userId);
+    public ResponseEntity<String> generateFullAIRecommendation(
+            @PathVariable String userId,
+            @RequestParam(required = false) String temp,
+            @RequestParam(required = false) String weather,
+            @RequestParam(required = false) String humidity) {
+        log.info("Generating full AI recommendation for user: {}, weather: {}°C {}", userId, temp, weather);
         try {
-            String recommendation = recommendationService.generateFullAIRecommendation(userId);
+            String recommendation = recommendationService.generateFullAIRecommendation(userId, temp, weather, humidity);
             return ResponseEntity.ok(recommendation);
         } catch (Exception e) {
             log.error("Error generating full AI recommendation", e);
