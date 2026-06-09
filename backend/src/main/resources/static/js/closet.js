@@ -3,6 +3,20 @@
 
 let currentEditingClothingId = null;
 
+function showImagePreview(src) {
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPlaceholder = document.querySelector('.upload-placeholder');
+    if (imagePreview) { imagePreview.src = src; imagePreview.style.display = 'block'; }
+    if (uploadPlaceholder) uploadPlaceholder.style.display = 'none';
+}
+
+function resetImagePreview() {
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPlaceholder = document.querySelector('.upload-placeholder');
+    if (imagePreview) { imagePreview.src = ''; imagePreview.style.display = 'none'; }
+    if (uploadPlaceholder) uploadPlaceholder.style.display = 'block';
+}
+
 // ===== Authentication Utility =====
 function getCurrentUserId() {
     const userId = localStorage.getItem('userId');
@@ -245,9 +259,7 @@ function openEditForm(userId, clothingId) {
     document.getElementById('clothingTags').value = info.tags.join(', ');
 
     // 이미지 미리보기
-    const preview = document.getElementById('imagePreview');
-    preview.src = info.imageUrl;
-    preview.style.display = 'block';
+    showImagePreview(info.imageUrl);
 
     // 폼 열기
     const addClothingForm = document.getElementById('addClothingForm');
@@ -326,7 +338,7 @@ function initializeClosetPage() {
             addClothingForm.style.display = addClothingForm.style.display === 'none' ? 'block' : 'none';
             if (addClothingForm.style.display === 'block') {
                 document.getElementById('clothingForm').reset();
-                document.getElementById('imagePreview').style.display = 'none';
+                resetImagePreview();
             }
         });
         console.log('✅ 버튼 이벤트 리스너 설정 완료');
@@ -338,7 +350,7 @@ function initializeClosetPage() {
         cancelAddBtn.addEventListener('click', function() {
             addClothingForm.style.display = 'none';
             document.getElementById('clothingForm').reset();
-            document.getElementById('imagePreview').style.display = 'none';
+            resetImagePreview();
             currentEditingClothingId = null;
             document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
         });
@@ -346,7 +358,6 @@ function initializeClosetPage() {
 
     // Image Upload Preview
     const clothingImageInput = document.getElementById('clothingImage');
-    const imagePreview = document.getElementById('imagePreview');
     const imageUploadArea = document.getElementById('imageUploadArea');
 
     if (clothingImageInput) {
@@ -354,29 +365,32 @@ function initializeClosetPage() {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    imagePreview.src = event.target.result;
-                    imagePreview.style.display = 'block';
-                };
+                reader.onload = function(event) { showImagePreview(event.target.result); };
                 reader.readAsDataURL(file);
             }
         });
     }
 
-    // 드래그 앤 드롭
     if (imageUploadArea) {
+        imageUploadArea.addEventListener('click', function(e) {
+            if (e.target !== clothingImageInput) clothingImageInput.click();
+        });
+
         imageUploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
-            this.style.backgroundColor = '#f0f0f0';
+            this.style.borderColor = '#2196F3';
+            this.style.backgroundColor = '#f0f8ff';
         });
 
         imageUploadArea.addEventListener('dragleave', function() {
-            this.style.backgroundColor = 'transparent';
+            this.style.borderColor = '#ccc';
+            this.style.backgroundColor = '#fafafa';
         });
 
         imageUploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
-            this.style.backgroundColor = 'transparent';
+            this.style.borderColor = '#ccc';
+            this.style.backgroundColor = '#fafafa';
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 clothingImageInput.files = files;
@@ -502,7 +516,7 @@ function submitClothingForm(userId, imageUrl) {
                 alert(message);
                 document.getElementById('addClothingForm').style.display = 'none';
                 document.getElementById('clothingForm').reset();
-                document.getElementById('imagePreview').style.display = 'none';
+                resetImagePreview();
                 currentEditingClothingId = null;
                 document.querySelector('#clothingForm button[type="submit"]').textContent = '등록하기';
                 console.log('옷 목록 재로드 시작');
@@ -584,6 +598,17 @@ style.textContent = `
     .upload-hint {
         font-size: 12px;
         color: #999;
+    }
+
+    #imagePreview {
+        display: block;
+        max-width: 100%;
+        max-height: 240px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 8px;
+        margin: 0 auto;
     }
 `;
 document.head.appendChild(style);
