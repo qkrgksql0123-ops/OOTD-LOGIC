@@ -62,7 +62,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">이번 달 착용</p>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value" id="wornThisMonth">-</p>
                         <p class="stat-desc">회</p>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">세탁 예정</p>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value" id="laundryPending">-</p>
                         <p class="stat-desc">개</p>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="stat-info">
                         <p class="stat-label">활용도</p>
-                        <p class="stat-value">-</p>
+                        <p class="stat-value" id="utilization">-</p>
                         <p class="stat-desc">이달</p>
                     </div>
                 </div>
@@ -198,27 +198,11 @@
             </div>
         </section>
 
-        <!-- Laundry-Sync Section -->
-        <section class="section">
-            <h2><i class="fas fa-water"></i> Laundry-Sync - 세탁 주기 관리</h2>
-            <p class="section-desc">의류의 세탁 방법, 빈도, 최근 세탁일을 기록하여 의류의 수명을 연장합니다</p>
-            
-            <div class="laundry-tabs">
-                <button class="laundry-tab active" data-status="urgent">긴급 세탁 (2)</button>
-                <button class="laundry-tab" data-status="scheduled">예정됨 (5)</button>
-                <button class="laundry-tab" data-status="clean">안심 (118)</button>
-            </div>
-
-            <div class="laundry-grid">
-            </div>
-        </section>
-
         <!-- Wearing History -->
         <section class="section">
             <h2><i class="fas fa-history"></i> 착용 기록</h2>
-            <p class="section-desc">자주 입는 의류를 파악하고 AI 코디 추천 데이터로 활용됩니다</p>
-            
-            <div class="wearing-stats">
+            <p class="section-desc">자주 입는 의류 TOP 5 — AI 코디 추천 데이터로 활용됩니다</p>
+            <div id="wearingHistoryList">
                 <p style="color:#999; text-align:center; padding:20px;">의류를 등록하면 착용 기록이 표시됩니다.</p>
             </div>
         </section>

@@ -126,7 +126,67 @@ function renderClothingItems(clothings) {
 
     const tc = document.getElementById('totalCount');
     if (tc) tc.textContent = clothings.length;
+    updateClosetStats(clothings);
+    renderWearingHistory(clothings);
     attachClothingEventListeners();
+}
+
+// 옷장 현황 통계 업데이트
+function updateClosetStats(clothings) {
+    const now = new Date();
+    const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    // 이번달 착용: lastWornDate가 이번달인 항목 수
+    const wornThisMonth = clothings.filter(c => (c.lastWornDate || '').startsWith(thisMonth)).length;
+
+    // 세탁예정: isInLaundry = true 항목 수
+    const laundryPending = clothings.filter(c => c.isInLaundry).length;
+
+    // 활용도: 한 번이라도 착용한 옷 비율
+    const total = clothings.length;
+    const utilization = total > 0
+        ? Math.round(clothings.filter(c => (c.wearCount || 0) > 0).length / total * 100)
+        : 0;
+
+    const el1 = document.getElementById('wornThisMonth');
+    const el2 = document.getElementById('laundryPending');
+    const el3 = document.getElementById('utilization');
+    if (el1) el1.textContent = wornThisMonth;
+    if (el2) el2.textContent = laundryPending;
+    if (el3) el3.textContent = utilization + '%';
+}
+
+// 착용 기록 TOP 5 렌더링
+function renderWearingHistory(clothings) {
+    const container = document.getElementById('wearingHistoryList');
+    if (!container) return;
+
+    const worn = clothings
+        .filter(c => (c.wearCount || 0) > 0)
+        .sort((a, b) => (b.wearCount || 0) - (a.wearCount || 0))
+        .slice(0, 5);
+
+    if (worn.length === 0) {
+        container.innerHTML = '<p style="color:#999;text-align:center;padding:20px;">아직 착용 기록이 없습니다. AI 코디 추천에서 착용 완료를 눌러보세요!</p>';
+        return;
+    }
+
+    container.innerHTML = worn.map((item, i) => {
+        const imgHtml = item.imageUrl
+            ? `<img src="${item.imageUrl}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
+            : `<div style="width:52px;height:52px;background:#f0f4f8;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-shirt" style="color:#aaa;font-size:20px;"></i></div>`;
+        const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+        return `
+        <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:#f8f9fa;border-radius:10px;margin-bottom:8px;">
+            <span style="font-size:20px;min-width:28px;text-align:center;">${medals[i]}</span>
+            ${imgHtml}
+            <div style="flex:1;min-width:0;">
+                <p style="font-weight:600;margin:0;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.color || ''} ${item.subcategory || item.category}</p>
+                <p style="color:#888;font-size:12px;margin:2px 0;">마지막 착용: ${item.lastWornDate || '기록 없음'}</p>
+            </div>
+            <span style="background:#004f60;color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;">${item.wearCount}회</span>
+        </div>`;
+    }).join('');
 }
 
 // Attach event listeners to clothing items
@@ -390,35 +450,6 @@ function initializeClosetPage() {
         });
     });
 
-    // Laundry Tab Filtering
-    const laundryTabs = document.querySelectorAll('.laundry-tab');
-    const laundryCards = document.querySelectorAll('.laundry-card');
-
-    laundryTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            laundryTabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-
-            const selectedStatus = this.getAttribute('data-status');
-            laundryCards.forEach(card => {
-                if (card.classList.contains(selectedStatus)) {
-                    card.style.display = 'block';
-                    card.style.animation = 'riseIn 0.6s ease';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-
-    // Laundry Actions
-    const laundryBtns = document.querySelectorAll('.btn-laundry');
-    laundryBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const action = this.textContent.trim();
-            alert(action + ' 기능은 추후 업데이트됩니다.');
-        });
-    });
 }
 
 function submitClothingForm(userId, imageUrl) {
