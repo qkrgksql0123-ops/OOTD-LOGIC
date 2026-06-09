@@ -1,8 +1,8 @@
 package com.trion.ootd.controller;
 
 import com.trion.ootd.dto.ClothingDTO;
+import com.trion.ootd.service.BedrockService;
 import com.trion.ootd.service.ClothingService;
-import com.trion.ootd.service.GeminiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class ClothingController {
 
     private final ClothingService clothingService;
-    private final GeminiService geminiService;
+    private final BedrockService bedrockService;
 
     @PostMapping
     public ResponseEntity<ClothingDTO> addClothing(
@@ -77,7 +77,7 @@ public class ClothingController {
             @PathVariable String userId,
             @RequestParam String imageUrl) {
         log.info("Analyzing clothing image for user: {}", userId);
-        String analysis = geminiService.analyzeClothingImage(imageUrl);
+        String analysis = bedrockService.analyzeClothingImage(imageUrl);
         return ResponseEntity.ok(analysis);
     }
 

@@ -55,6 +55,54 @@ public class BedrockService {
         }
     }
 
+    // 이미지(Base64) + 텍스트로 의류 분석
+    public String analyzeClothingImage(String imageUrl) {
+        try {
+            // "data:image/jpeg;base64,..." 에서 순수 Base64와 mediaType 분리
+            String mediaType = "image/jpeg";
+            String base64Data = imageUrl;
+            if (imageUrl.startsWith("data:")) {
+                int semicolon = imageUrl.indexOf(';');
+                int comma = imageUrl.indexOf(',');
+                if (semicolon > 0 && comma > semicolon) {
+                    mediaType = imageUrl.substring(5, semicolon);
+                    base64Data = imageUrl.substring(comma + 1);
+                }
+            }
+
+            List<Map<String, Object>> content = List.of(
+                Map.of("type", "image", "source", Map.of(
+                    "type", "base64",
+                    "media_type", mediaType,
+                    "data", base64Data
+                )),
+                Map.of("type", "text", "text",
+                    "이 의류 사진을 분석해주세요. 색상, 소재, 카테고리(top/bottom/outer/shoes/accessory 중 하나), 계절을 JSON으로 답해주세요. " +
+                    "형식: {\"color\":\"색상\",\"material\":\"소재\",\"category\":\"카테고리\",\"season\":\"계절\"}")
+            );
+
+            Map<String, Object> body = Map.of(
+                "anthropic_version", "bedrock-2023-05-31",
+                "max_tokens", 300,
+                "messages", List.of(Map.of("role", "user", "content", content))
+            );
+
+            String bodyJson = objectMapper.writeValueAsString(body);
+            InvokeModelRequest request = InvokeModelRequest.builder()
+                    .modelId(modelId)
+                    .body(SdkBytes.fromString(bodyJson, StandardCharsets.UTF_8))
+                    .contentType("application/json")
+                    .accept("application/json")
+                    .build();
+
+            InvokeModelResponse response = bedrockClient.invokeModel(request);
+            return parseBedrockResponse(response.body().asUtf8String());
+        } catch (Exception e) {
+            log.error("Error analyzing clothing image via Bedrock", e);
+            return "{\"color\":\"미분석\",\"material\":\"미분석\",\"category\":\"top\",\"season\":\"사계절\"}";
+        }
+    }
+
     private String callBedrock(String prompt) throws Exception {
         Map<String, Object> body = Map.of(
                 "anthropic_version", "bedrock-2023-05-31",
