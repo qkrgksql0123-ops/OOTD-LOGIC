@@ -442,22 +442,25 @@ async function loadRecommendationHistory(userId) {
 // ===== 스타일별 키워드 =====
 const STYLE_KEYWORDS = {
     '캐주얼': {
-        top:    ['티셔츠','맨투맨','후드','크롭','반팔','긴팔','스웨트'],
-        bottom: ['청바지','데님','반바지','조거','트레이닝','와이드진'],
-        outer:  ['가디건','집업','아노락','야상','점퍼'],
-        shoes:  ['스니커즈','운동화','슬리퍼','샌들']
+        top:       ['티셔츠','맨투맨','후드','크롭','반팔','긴팔','스웨트'],
+        bottom:    ['청바지','데님','반바지','조거','트레이닝','와이드진'],
+        outer:     ['가디건','집업','아노락','야상','점퍼'],
+        shoes:     ['스니커즈','운동화','슬리퍼','샌들'],
+        accessory: ['볼캡','캡','비니','백팩','크로스백','토트백','벨트','양말']
     },
     '포멀': {
-        top:    ['셔츠','블라우스','폴로','터틀넥','니트','집업니트'],
-        bottom: ['슬렉스','정장','와이드팬츠','테이퍼드','치노'],
-        outer:  ['코트','블레이저','재킷','트렌치'],
-        shoes:  ['구두','로퍼','힐','앵클부츠','부츠']
+        top:       ['셔츠','블라우스','폴로','터틀넥','니트','집업니트'],
+        bottom:    ['슬렉스','정장','와이드팬츠','테이퍼드','치노'],
+        outer:     ['코트','블레이저','재킷','트렌치'],
+        shoes:     ['구두','로퍼','힐','앵클부츠','부츠'],
+        accessory: ['시계','넥타이','스카프','브로치','클러치','토트백','벨트']
     },
     '소프트': {
-        top:    ['니트','블라우스','레이스','플리츠','가디건','리브'],
-        bottom: ['스커트','플리츠스커트','미니스커트','롱스커트','원피스','린넨팬츠'],
-        outer:  ['가디건','숏자켓','볼레로'],
-        shoes:  ['로퍼','플랫','메리제인','뮬','키튼힐']
+        top:       ['니트','블라우스','레이스','플리츠','가디건','리브'],
+        bottom:    ['스커트','플리츠스커트','미니스커트','롱스커트','원피스','린넨팬츠'],
+        outer:     ['가디건','숏자켓','볼레로'],
+        shoes:     ['로퍼','플랫','메리제인','뮬','키튼힐'],
+        accessory: ['귀걸이','목걸이','헤어밴드','리본','버킷햇','숄더백','미니백']
     }
 };
 
@@ -515,12 +518,13 @@ async function generateStyleBasedRecommendations() {
                 return picked;
             }
 
-            const top    = pickForStyle('top');
-            const bottom = pickForStyle('bottom');
-            const outer  = temp < 18 ? pickForStyle('outer') : null;
-            const shoes  = pickForStyle('shoes');
+            const top       = pickForStyle('top');
+            const bottom    = pickForStyle('bottom');
+            const outer     = temp < 18 ? pickForStyle('outer') : null;
+            const shoes     = pickForStyle('shoes');
+            const accessory = pickForStyle('accessory');
 
-            window.styleOutfitCache[style] = [top, bottom, outer, shoes].filter(Boolean);
+            window.styleOutfitCache[style] = [top, bottom, outer, shoes, accessory].filter(Boolean);
         }
 
         // 기본 탭(캐주얼) 표시
