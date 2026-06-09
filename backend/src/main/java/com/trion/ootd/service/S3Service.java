@@ -48,6 +48,35 @@ public class S3Service {
         return url;
     }
 
+    public String uploadBase64Image(String base64DataUrl, String userId) throws Exception {
+        String mediaType = "image/jpeg";
+        String base64Data = base64DataUrl;
+        if (base64DataUrl.startsWith("data:")) {
+            int semicolon = base64DataUrl.indexOf(';');
+            int comma = base64DataUrl.indexOf(',');
+            if (semicolon > 0 && comma > semicolon) {
+                mediaType = base64DataUrl.substring(5, semicolon);
+                base64Data = base64DataUrl.substring(comma + 1);
+            }
+        }
+
+        String ext = "." + mediaType.substring(mediaType.indexOf('/') + 1).replace("jpeg", "jpg");
+        String key = "clothing/" + userId + "/" + UUID.randomUUID() + ext;
+        byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .contentType(mediaType)
+                .build();
+
+        s3Client.putObject(request, RequestBody.fromBytes(imageBytes));
+
+        String url = "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
+        log.info("Uploaded base64 image to S3: {}", url);
+        return url;
+    }
+
     private String getExtension(String filename) {
         if (filename == null || !filename.contains(".")) return ".jpg";
         return filename.substring(filename.lastIndexOf('.'));

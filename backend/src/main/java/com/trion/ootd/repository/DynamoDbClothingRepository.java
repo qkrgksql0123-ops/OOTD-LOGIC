@@ -15,6 +15,7 @@ import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -151,6 +152,20 @@ public class DynamoDbClothingRepository implements ClothingRepository {
         } catch (Exception e) {
             log.error("Error counting clothing for user", e);
             return 0;
+        }
+    }
+
+    public List<Clothing> scanAll() {
+        log.info("Scanning all clothing items in DynamoDB");
+        try {
+            DynamoDbTable<Clothing> table = enhancedClient.table(TABLE_NAME, TableSchema.fromClass(Clothing.class));
+            return table.scan(ScanEnhancedRequest.builder().build())
+                    .stream()
+                    .flatMap(page -> page.items().stream())
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error scanning all clothing", e);
+            return List.of();
         }
     }
 
