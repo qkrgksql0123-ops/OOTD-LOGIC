@@ -30,7 +30,7 @@ aws:
     region: us-east-1
     model-id: us.anthropic.claude-3-haiku-20240307-v1:0
   s3:
-    bucket: ${AWS_S3_BUCKET:ootd-logic-images}
+    bucket: ${AWS_S3_BUCKET:sgu-trion-2-s3}
     region: ap-northeast-2
 
 server:
