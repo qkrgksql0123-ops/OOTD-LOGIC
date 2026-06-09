@@ -3,6 +3,8 @@ package com.trion.ootd.controller;
 import com.trion.ootd.dto.ClothingDTO;
 import com.trion.ootd.service.BedrockService;
 import com.trion.ootd.service.ClothingService;
+import com.trion.ootd.service.S3Service;
+import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ public class ClothingController {
 
     private final ClothingService clothingService;
     private final BedrockService bedrockService;
+    private final S3Service s3Service;
 
     @PostMapping
     public ResponseEntity<ClothingDTO> addClothing(
@@ -70,6 +73,20 @@ public class ClothingController {
         log.info("Getting clothing count for user: {}", userId);
         long count = clothingService.getClothingCount(userId);
         return ResponseEntity.ok(count);
+    }
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<?> uploadImage(
+            @PathVariable String userId,
+            @RequestParam("file") MultipartFile file) {
+        log.info("Uploading image for user: {}", userId);
+        try {
+            String url = s3Service.uploadImage(file, userId);
+            return ResponseEntity.ok(java.util.Map.of("imageUrl", url));
+        } catch (Exception e) {
+            log.error("Image upload failed", e);
+            return ResponseEntity.status(500).body("이미지 업로드 실패: " + e.getMessage());
+        }
     }
 
     @PostMapping("/analyze-image")

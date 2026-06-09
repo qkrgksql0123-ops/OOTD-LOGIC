@@ -419,17 +419,29 @@ function initializeClosetPage() {
             }
 
             if (imageInput.files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imageUrl = event.target.result; // Base64
-                    console.log('이미지 Base64 변환 완료');
-                    submitClothingForm(userId, imageUrl);
-                };
-                reader.onerror = function() {
-                    console.error('이미지 읽기 오류');
-                    alert('이미지를 읽을 수 없습니다.');
-                };
-                reader.readAsDataURL(imageInput.files[0]);
+                const formData = new FormData();
+                formData.append('file', imageInput.files[0]);
+                const btn = clothingForm.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 업로드 중...';
+                fetch(`${API_BASE_URL}/users/${userId}/clothing/upload-image`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('이미지 업로드 실패');
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('S3 업로드 완료:', data.imageUrl);
+                    submitClothingForm(userId, data.imageUrl);
+                })
+                .catch(err => {
+                    console.error('이미지 업로드 오류:', err);
+                    alert('이미지 업로드에 실패했습니다: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = currentEditingClothingId ? '수정하기' : '등록하기';
+                });
             } else {
                 // 수정 시 기존 이미지 사용
                 const imagePreview = document.getElementById('imagePreview');
