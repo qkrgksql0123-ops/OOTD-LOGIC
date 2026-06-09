@@ -53,10 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== AI 텍스트 키워드 → DB 카테고리 매핑 =====
 const CATEGORY_KEYWORDS = {
-    'top':    ['티셔츠','셔츠','블라우스','니트','스웨터','맨투맨','탑','크롭','긴소매','반팔','상의'],
-    'bottom': ['팬츠','진','청바지','슬렉스','스커트','반바지','데님','레깅스','하의'],
-    'outer':  ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치','아우터'],
-    'shoes':  ['신발','운동화','스니커즈','로퍼','부츠','샌들','슬리퍼','힐','구두']
+    'top':       ['티셔츠','셔츠','블라우스','니트','스웨터','맨투맨','탑','크롭','긴소매','반팔','상의'],
+    'bottom':    ['팬츠','진','청바지','슬렉스','스커트','반바지','데님','레깅스','하의'],
+    'outer':     ['자켓','재킷','코트','패딩','가디건','점퍼','집업','블레이저','트렌치','아우터'],
+    'shoes':     ['신발','운동화','스니커즈','로퍼','부츠','샌들','슬리퍼','힐','구두'],
+    'accessory': ['악세사리','가방','백','목걸이','귀걸이','시계','스카프','벨트','모자','캡','비니']
 };
 
 // 카테고리별 세탁 기준 횟수
@@ -221,6 +222,15 @@ async function registerOutfit(userId, aiText) {
         if (matched.length === 0) {
             const categories = extractCategories(aiText);
             for (const cat of categories) {
+                const item = clothingList.find(c => c.category === cat && !c.isInLaundry && !usedIds.has(c.id));
+                if (item) { matched.push(item); usedIds.add(item.id); }
+            }
+        }
+
+        // 신발·악세사리 보완: 매칭됐더라도 없으면 옷장에서 추가
+        for (const cat of ['shoes', 'accessory']) {
+            const alreadyHas = matched.some(i => i.category === cat);
+            if (!alreadyHas) {
                 const item = clothingList.find(c => c.category === cat && !c.isInLaundry && !usedIds.has(c.id));
                 if (item) { matched.push(item); usedIds.add(item.id); }
             }
