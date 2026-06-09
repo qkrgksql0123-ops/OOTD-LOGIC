@@ -55,6 +55,58 @@ public class BedrockService {
         }
     }
 
+    // 셀카 사진으로 퍼스널컬러 + 얼굴형 + 체형 분석
+    public String analyzeUserProfile(String imageUrl) {
+        try {
+            String mediaType = "image/jpeg";
+            String base64Data = imageUrl;
+            if (imageUrl.startsWith("data:")) {
+                int semicolon = imageUrl.indexOf(';');
+                int comma = imageUrl.indexOf(',');
+                if (semicolon > 0 && comma > semicolon) {
+                    mediaType = imageUrl.substring(5, semicolon);
+                    base64Data = imageUrl.substring(comma + 1);
+                }
+            }
+
+            List<Map<String, Object>> content = List.of(
+                Map.of("type", "image", "source", Map.of(
+                    "type", "base64",
+                    "media_type", mediaType,
+                    "data", base64Data
+                )),
+                Map.of("type", "text", "text",
+                    "이 사진을 보고 아래 항목을 분석해주세요.\n" +
+                    "1. 퍼스널 컬러 톤: cool(쿨톤) 또는 warm(웜톤) 또는 neutral(뉴트럴)\n" +
+                    "2. 세부 톤: summer-cool / winter-cool / spring-warm / autumn-warm 중 하나\n" +
+                    "3. 얼굴형: oval(계란형) / round(둥근형) / square(각진형) / heart(하트형) / long(긴형) 중 하나\n" +
+                    "4. 체형별 선호 핏: slim(슬림핏) / regular(레귤러핏) / loose(루즈핏) / oversized(오버사이즈) 중 하나\n" +
+                    "반드시 JSON 형식으로만 답하세요: " +
+                    "{\"personalTone\":\"값\",\"toneSeason\":\"값\",\"faceShape\":\"값\",\"fitPreference\":\"값\"}")
+            );
+
+            Map<String, Object> body = Map.of(
+                "anthropic_version", "bedrock-2023-05-31",
+                "max_tokens", 200,
+                "messages", List.of(Map.of("role", "user", "content", content))
+            );
+
+            String bodyJson = objectMapper.writeValueAsString(body);
+            InvokeModelRequest request = InvokeModelRequest.builder()
+                    .modelId(modelId)
+                    .body(SdkBytes.fromString(bodyJson, StandardCharsets.UTF_8))
+                    .contentType("application/json")
+                    .accept("application/json")
+                    .build();
+
+            InvokeModelResponse response = bedrockClient.invokeModel(request);
+            return parseBedrockResponse(response.body().asUtf8String());
+        } catch (Exception e) {
+            log.error("Error analyzing user profile via Bedrock", e);
+            return "{\"personalTone\":\"neutral\",\"toneSeason\":\"summer-cool\",\"faceShape\":\"oval\",\"fitPreference\":\"regular\"}";
+        }
+    }
+
     // 이미지(Base64) + 텍스트로 의류 분석
     public String analyzeClothingImage(String imageUrl) {
         try {

@@ -205,6 +205,24 @@
                             </div>
                         </div>
 
+                        <!-- AI 분석 카드 -->
+                        <div class="style-card" style="margin-top:16px;">
+                            <h3><i class="fas fa-magic"></i> AI 자동 분석</h3>
+                            <p style="color:#666;font-size:14px;margin-bottom:12px;">셀카 사진을 올리면 AI가 퍼스널컬러·얼굴형·체형별 선호를 자동으로 분석해요.</p>
+                            <div class="form-group">
+                                <input type="file" id="selfieInput" accept="image/*" style="display:none;">
+                                <div id="selfieUploadArea" style="border:2px dashed #ccc;border-radius:8px;padding:20px;text-align:center;cursor:pointer;background:#fafafa;">
+                                    <i class="fas fa-camera" style="font-size:32px;color:#aaa;display:block;margin-bottom:8px;"></i>
+                                    <p style="color:#666;margin:0;">클릭하여 셀카 업로드</p>
+                                </div>
+                                <img id="selfiePreview" style="display:none;max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;object-fit:contain;">
+                            </div>
+                            <button id="ai-analyze-btn" class="btn btn-primary" style="width:100%;margin-top:8px;" disabled>
+                                <i class="fas fa-brain"></i> AI 분석 시작
+                            </button>
+                            <p id="ai-analyze-status" style="display:none;margin-top:8px;font-size:14px;text-align:center;"></p>
+                        </div>
+
                         <button id="style-save-btn" class="btn btn-primary">
                             <i class="fas fa-save"></i> 스타일 프로필 저장
                         </button>

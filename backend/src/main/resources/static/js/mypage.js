@@ -395,6 +395,67 @@ function setupButtonHandlers() {
         });
     }
 
+    // AI 프로필 분석
+    const selfieInput = document.getElementById('selfieInput');
+    const selfieUploadArea = document.getElementById('selfieUploadArea');
+    const selfiePreview = document.getElementById('selfiePreview');
+    const aiAnalyzeBtn = document.getElementById('ai-analyze-btn');
+    const aiStatus = document.getElementById('ai-analyze-status');
+
+    if (selfieUploadArea) {
+        selfieUploadArea.addEventListener('click', () => selfieInput.click());
+    }
+
+    if (selfieInput) {
+        selfieInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                selfiePreview.src = e.target.result;
+                selfiePreview.style.display = 'block';
+                aiAnalyzeBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (aiAnalyzeBtn) {
+        aiAnalyzeBtn.addEventListener('click', async function() {
+            const userId = getCurrentUserId();
+            if (!userId || !selfiePreview.src) return;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 분석 중...';
+            aiStatus.style.display = 'block';
+            aiStatus.style.color = '#004f60';
+            aiStatus.textContent = 'AI가 사진을 분석하고 있어요... (약 10초)';
+            try {
+                const res = await fetch(`${API_BASE_URL}/users/${userId}/analyze-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageUrl: selfiePreview.src })
+                });
+                if (!res.ok) throw new Error('분석 실패');
+                const data = await res.json();
+
+                // 분석 결과 자동 입력
+                if (data.personalTone)  document.getElementById('personal-tone').value  = data.personalTone;
+                if (data.toneSeason)    document.getElementById('tone-season').value     = data.toneSeason;
+                if (data.faceShape)     document.getElementById('face-shape').value      = data.faceShape;
+                if (data.fitPreference) document.getElementById('fit-preference').value  = data.fitPreference;
+
+                aiStatus.style.color = '#27ae60';
+                aiStatus.textContent = '분석 완료! 결과가 자동으로 입력됐어요. 저장 버튼을 눌러주세요.';
+            } catch (e) {
+                aiStatus.style.color = '#e74c3c';
+                aiStatus.textContent = '분석에 실패했어요. 다시 시도해주세요.';
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-brain"></i> AI 분석 시작';
+            }
+        });
+    }
+
     // Logout button
     if (logoutButton) {
         logoutButton.addEventListener('click', function(e) {
