@@ -400,9 +400,9 @@ async function loadWeatherForRecommend() {
             // Add weather data to page for use by recommendation engine
             window.currentWeatherData = weatherData;
 
-            // Generate AI recommendations based on weather
-            generateWeatherBasedRecommendations();
-            console.log('✅ Recommendations generated');
+            // 스타일 기반 옷장 추천 생성
+            generateStyleBasedRecommendations();
+            console.log('✅ Style recommendations generated');
         } else {
             console.warn('⚠️ No weather data received');
         }
@@ -439,8 +439,33 @@ async function loadRecommendationHistory(userId) {
     }
 }
 
-// 날씨 기반 실제 옷장 추천
-async function generateWeatherBasedRecommendations() {
+// ===== 스타일별 키워드 =====
+const STYLE_KEYWORDS = {
+    '캐주얼': {
+        top:    ['티셔츠','맨투맨','후드','크롭','반팔','긴팔','스웨트'],
+        bottom: ['청바지','데님','반바지','조거','트레이닝','와이드진'],
+        outer:  ['가디건','집업','아노락','야상','점퍼'],
+        shoes:  ['스니커즈','운동화','슬리퍼','샌들']
+    },
+    '포멀': {
+        top:    ['셔츠','블라우스','폴로','터틀넥','니트','집업니트'],
+        bottom: ['슬렉스','정장','와이드팬츠','테이퍼드','치노'],
+        outer:  ['코트','블레이저','재킷','트렌치'],
+        shoes:  ['구두','로퍼','힐','앵클부츠','부츠']
+    },
+    '소프트': {
+        top:    ['니트','블라우스','레이스','플리츠','가디건','리브'],
+        bottom: ['스커트','플리츠스커트','미니스커트','롱스커트','원피스','린넨팬츠'],
+        outer:  ['가디건','숏자켓','볼레로'],
+        shoes:  ['로퍼','플랫','메리제인','뮬','키튼힐']
+    }
+};
+
+// 캐시 (탭 전환 시 재사용)
+window.styleOutfitCache = {};
+
+// 스타일별 옷장 추천 생성 (페이지 로드 시 1회)
+async function generateStyleBasedRecommendations() {
     const userId = localStorage.getItem('userId');
     const grid = document.querySelector('.outfits-grid');
 
@@ -449,18 +474,12 @@ async function generateWeatherBasedRecommendations() {
         return;
     }
 
-    if (grid) grid.innerHTML = '<p style="padding:20px;text-align:center;color:#004f60;"><i class="fas fa-spinner fa-spin"></i> 옷장에서 오늘의 코디를 찾는 중...</p>';
+    if (grid) grid.innerHTML = '<p style="padding:20px;text-align:center;color:#004f60;"><i class="fas fa-spinner fa-spin"></i> 옷장에서 스타일별 코디를 찾는 중...</p>';
 
     try {
         const clothingRes = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
         if (!clothingRes.ok) throw new Error('옷장 불러오기 실패');
         const clothingList = await clothingRes.json();
-
-        // window.currentWeatherData 우선, 없으면 fetchWeatherData
-        const weatherData = window.currentWeatherData || await fetchWeatherData();
-        if (!weatherData) throw new Error('날씨 정보 없음');
-
-        // 세탁 필요 제외
         const available = clothingList.filter(c => !c.isInLaundry);
 
         if (available.length === 0) {
@@ -468,44 +487,64 @@ async function generateWeatherBasedRecommendations() {
             return;
         }
 
-        const temp = parseFloat(weatherData.temperature) || 20;
-        const season = temp >= 23 ? '여름' : temp >= 13 ? '봄가을' : '겨울';
-        const seasonMap = { '여름': ['여름'], '봄가을': ['봄','가을','봄/가을'], '겨울': ['겨울'] };
-        const validSeasons = seasonMap[season];
+        const temp = parseFloat(window.currentWeatherData?.temperature) || 20;
+        const styles = ['캐주얼', '포멀', '소프트'];
 
-        // 카테고리별 사용된 ID 추적 (중복 방지)
-        const usedIds = new Set();
+        // 전체 사용 ID 추적 → 스타일 간 중복 최소화
+        const globalUsed = new Set();
 
-        function pickBySeason(category) {
-            const pool = available.filter(c => c.category === category && !usedIds.has(c.id));
-            if (pool.length === 0) return null;
-            const bySeason = pool.filter(c => validSeasons.some(s => (c.season||'').includes(s)));
-            const picked = bySeason.length > 0
-                ? bySeason[Math.floor(Math.random() * bySeason.length)]
-                : pool[Math.floor(Math.random() * pool.length)];
-            if (picked) usedIds.add(picked.id);
-            return picked;
+        for (const style of styles) {
+            const kw = STYLE_KEYWORDS[style];
+            const localUsed = new Set(globalUsed);
+
+            function pickForStyle(category) {
+                const pool = available.filter(c => c.category === category && !localUsed.has(c.id));
+                if (pool.length === 0) {
+                    // 전체에서 다시 시도 (이 스타일 내 중복 허용)
+                    const fallback = available.filter(c => c.category === category);
+                    if (fallback.length === 0) return null;
+                    return fallback[Math.floor(Math.random() * fallback.length)];
+                }
+                const preferred = pool.filter(c =>
+                    (kw[category] || []).some(k => (c.subcategory || '').toLowerCase().includes(k.toLowerCase()))
+                );
+                const picked = preferred.length > 0
+                    ? preferred[Math.floor(Math.random() * preferred.length)]
+                    : pool[Math.floor(Math.random() * pool.length)];
+                if (picked) { localUsed.add(picked.id); globalUsed.add(picked.id); }
+                return picked;
+            }
+
+            const top    = pickForStyle('top');
+            const bottom = pickForStyle('bottom');
+            const outer  = temp < 18 ? pickForStyle('outer') : null;
+            const shoes  = pickForStyle('shoes');
+
+            window.styleOutfitCache[style] = [top, bottom, outer, shoes].filter(Boolean);
         }
 
-        const outfitSets = [];
-        for (let i = 0; i < 2; i++) {
-            const top    = pickBySeason('top');
-            const bottom = pickBySeason('bottom');
-            const outer  = temp < 18 ? pickBySeason('outer') : null;
-            const shoes  = pickBySeason('shoes');
-            if (top || bottom) outfitSets.push({ top, bottom, outer, shoes });
-        }
+        // 기본 탭(캐주얼) 표시
+        renderStyleOutfit('캐주얼', userId);
 
-        if (outfitSets.length === 0) {
-            if (grid) grid.innerHTML = '<p style="padding:20px;color:#666;">옷장에 상의나 하의가 없습니다. 옷을 먼저 등록해주세요.</p>';
-            return;
-        }
-
-        renderClosetBasedRecommendations(outfitSets, weatherData);
     } catch (e) {
-        console.error('날씨 기반 추천 오류:', e);
+        console.error('스타일 기반 추천 오류:', e);
         if (grid) grid.innerHTML = `<p style="padding:20px;color:#e74c3c;">추천 불러오기 실패: ${e.message}</p>`;
     }
+}
+
+// 스타일 탭 outfit 렌더링
+function renderStyleOutfit(style, userId) {
+    const items = window.styleOutfitCache[style] || [];
+    const grid = document.querySelector('.outfits-grid');
+    const title = document.getElementById('style-section-title');
+    if (title) title.textContent = `${style} 스타일 추천 코디`;
+
+    if (!grid) return;
+    if (items.length === 0) {
+        grid.innerHTML = `<p style="padding:20px;color:#666;">${style} 스타일에 맞는 옷이 없습니다. 옷장을 더 채워보세요!</p>`;
+        return;
+    }
+    renderMatchedCards(items, userId || localStorage.getItem('userId'));
 }
 
 // 실제 옷장 기반 추천 카드 렌더링
@@ -784,49 +823,19 @@ function initializeRecommendPage() {
     const STYLE_MAP = { casual: '캐주얼', formal: '포멀', soft: '소프트' };
 
     tabBtns.forEach(btn => {
-        btn.addEventListener('click', async function() {
+        btn.addEventListener('click', function() {
             tabBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
             const selectedTab = this.getAttribute('data-tab');
-            const userId = localStorage.getItem('userId');
-
-            if (selectedTab === 'all') {
-                generateWeatherBasedRecommendations();
-                return;
-            }
-
             const styleName = STYLE_MAP[selectedTab];
-            if (!styleName || !userId) return;
+            if (!styleName) return;
 
-            const grid = document.querySelector('.outfits-grid');
-            if (grid) {
-                grid.innerHTML = `<p style="padding:20px;text-align:center;color:#004f60;">
-                    <i class="fas fa-spinner fa-spin"></i> AI가 ${styleName} 스타일 코디를 찾는 중...</p>`;
-            }
-
-            try {
-                const wd = window.currentWeatherData;
-                const params = new URLSearchParams();
-                if (wd?.temperature) params.set('temp', wd.temperature);
-                if (wd?.weatherCondition) params.set('weather', wd.weatherCondition);
-                if (wd?.humidity) params.set('humidity', wd.humidity);
-                params.set('style', styleName);
-
-                const res = await fetch(`${API_BASE_URL}/users/${userId}/recommendations/ai-full?${params}`);
-                const aiText = await res.text();
-
-                const resultText = document.getElementById('ai-result-text');
-                const resultArea = document.getElementById('ai-result-area');
-                if (resultText) resultText.textContent = aiText;
-                if (resultArea) resultArea.style.display = 'block';
-
-                await registerOutfit(userId, aiText);
-
-                const sectionTitle = document.querySelector('.outfits-grid')?.closest('.section')?.querySelector('h2');
-                if (sectionTitle) sectionTitle.textContent = `${styleName} 스타일 추천 코디`;
-            } catch (e) {
-                if (grid) grid.innerHTML = '<p style="padding:20px;color:#e74c3c;">추천 생성에 실패했습니다. 다시 시도해주세요.</p>';
+            // 캐시가 있으면 즉시 표시, 없으면 로딩 후 생성
+            if (window.styleOutfitCache && window.styleOutfitCache[styleName]) {
+                renderStyleOutfit(styleName);
+            } else {
+                generateStyleBasedRecommendations();
             }
         });
     });
