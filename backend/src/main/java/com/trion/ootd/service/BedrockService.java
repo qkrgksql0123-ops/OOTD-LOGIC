@@ -37,13 +37,17 @@ public class BedrockService {
     }
 
     public String generateOutfitRecommendation(String userClothing, String weatherInfo) {
-        return generateOutfitRecommendationWithProfile(userClothing, "", weatherInfo);
+        return generateOutfitRecommendationWithProfile(userClothing, "", weatherInfo, null);
     }
 
     public String generateOutfitRecommendationWithProfile(String userClothing, String styleProfile, String weatherInfo) {
-        log.info("Generating outfit recommendation using AWS Bedrock");
+        return generateOutfitRecommendationWithProfile(userClothing, styleProfile, weatherInfo, null);
+    }
+
+    public String generateOutfitRecommendationWithProfile(String userClothing, String styleProfile, String weatherInfo, String selectedStyle) {
+        log.info("Generating outfit recommendation using AWS Bedrock, style: {}", selectedStyle);
         try {
-            String prompt = buildPrompt(userClothing, styleProfile, weatherInfo);
+            String prompt = buildPrompt(userClothing, styleProfile, weatherInfo, selectedStyle);
             return callBedrock(prompt);
         } catch (Exception e) {
             log.error("Error generating outfit recommendation via Bedrock", e);
@@ -82,11 +86,23 @@ public class BedrockService {
         return "응답 형식이 올바르지 않습니다.";
     }
 
-    private String buildPrompt(String userClothing, String styleProfile, String weatherInfo) {
+    private String buildPrompt(String userClothing, String styleProfile, String weatherInfo, String selectedStyle) {
         String styleSection = (styleProfile != null && !styleProfile.isBlank())
                 ? "\n[사용자 스타일 프로필]\n" + styleProfile : "";
 
         String weatherGuide = buildWeatherGuide(weatherInfo);
+
+        String styleInstruction = "";
+        String styleGuide = "";
+        if (selectedStyle != null && !selectedStyle.isBlank()) {
+            styleInstruction = "요청 스타일: " + selectedStyle + "\n";
+            styleGuide = switch (selectedStyle) {
+                case "캐주얼" -> "캐주얼 스타일: 티셔츠·맨투맨·청바지·반바지·스니커즈 등 편안하고 일상적인 아이템 우선 선택.";
+                case "포멀"   -> "포멀 스타일: 셔츠·블라우스·슬렉스·정장 바지·코트·로퍼·구두 등 격식있는 아이템 우선 선택. 티셔츠·청바지·운동화 지양.";
+                case "소프트" -> "소프트 스타일: 블라우스·니트·플리츠 스커트·와이드 팬츠·로퍼·메리제인 등 부드럽고 여성스러운 아이템 우선 선택.";
+                default -> selectedStyle + " 스타일에 맞는 아이템 우선 선택.";
+            };
+        }
 
         return String.format("""
                 당신은 전문 스타일리스트입니다. 사용자의 옷장과 스타일 프로필, 날씨를 분석해 오늘의 최적 코디를 추천해주세요.
@@ -100,17 +116,20 @@ public class BedrockService {
                 [날씨 착장 규칙 - 반드시 준수]
                 %s
 
+                %s
                 요청사항:
                 1. 옷장에 있는 옷만 선택해주세요.
                 2. 위의 날씨 착장 규칙을 반드시 따르세요. 기온에 맞지 않는 옷은 절대 추천하지 마세요.
                 3. 스타일 프로필(선호 스타일, 퍼스널 톤, 얼굴형, 핏)을 반영해주세요.
                 4. 아우터가 필요 없는 날씨면 아우터 없음으로 표시해주세요.
-                5. 한국어로 간결하게 답해주세요.
+                5. 요청 스타일이 있으면 그 스타일에 맞는 아이템을 최우선으로 선택해주세요.
+                6. 한국어로 간결하게 답해주세요.
 
                 형식:
                 추천 코디: [상의], [하의], [아우터 또는 없음]
                 추천 이유: [날씨와 스타일 이유]
-                """, userClothing, styleSection, weatherInfo, weatherGuide);
+                """, userClothing, styleSection, weatherInfo, weatherGuide,
+                styleGuide.isBlank() ? "" : "[요청 스타일 가이드]\n" + styleGuide + "\n");
     }
 
     private String buildWeatherGuide(String weatherInfo) {

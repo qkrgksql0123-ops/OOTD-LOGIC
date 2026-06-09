@@ -150,25 +150,26 @@ public class RecommendationService {
      * 옷장 + 스타일 프로필 + 실제 날씨 기반 AI 추천
      */
     public String generateFullAIRecommendation(String userId, String temp, String weather, String humidity) {
-        log.info("Generating full AI recommendation for user: {}", userId);
+        return generateFullAIRecommendation(userId, temp, weather, humidity, null);
+    }
 
-        // 1. 옷장 데이터 (세탁 필요 제외)
+    public String generateFullAIRecommendation(String userId, String temp, String weather, String humidity, String style) {
+        log.info("Generating full AI recommendation for user: {}, style: {}", userId, style);
+
         List<ClothingDTO> clothingList = clothingService.getAllClothing(userId).stream()
                 .filter(c -> !Boolean.TRUE.equals(c.getIsInLaundry()))
                 .collect(java.util.stream.Collectors.toList());
         String clothingData = formatClothingData(clothingList);
 
-        // 2. 스타일 프로필
         String styleProfile = "";
         Optional<User> userOpt = userService.getUserById(userId);
         if (userOpt.isPresent()) {
             styleProfile = formatStyleProfile(userOpt.get());
         }
 
-        // 3. 날씨 (프론트에서 전달받은 실제 날씨 우선, 없으면 기본값)
         String weatherInfo = buildWeatherInfo(temp, weather, humidity);
 
-        return bedrockService.generateOutfitRecommendationWithProfile(clothingData, styleProfile, weatherInfo);
+        return bedrockService.generateOutfitRecommendationWithProfile(clothingData, styleProfile, weatherInfo, style);
     }
 
     private String buildWeatherInfo(String temp, String weather, String humidity) {

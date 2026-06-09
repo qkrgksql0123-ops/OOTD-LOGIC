@@ -126,10 +126,11 @@ public class RecommendationController {
             @PathVariable String userId,
             @RequestParam(required = false) String temp,
             @RequestParam(required = false) String weather,
-            @RequestParam(required = false) String humidity) {
-        log.info("Generating full AI recommendation for user: {}, weather: {}°C {}", userId, temp, weather);
+            @RequestParam(required = false) String humidity,
+            @RequestParam(required = false) String style) {
+        log.info("Generating full AI recommendation for user: {}, weather: {}°C {}, style: {}", userId, temp, weather, style);
         try {
-            String recommendation = recommendationService.generateFullAIRecommendation(userId, temp, weather, humidity);
+            String recommendation = recommendationService.generateFullAIRecommendation(userId, temp, weather, humidity, style);
             return ResponseEntity.ok(recommendation);
         } catch (Exception e) {
             log.error("Error generating full AI recommendation", e);

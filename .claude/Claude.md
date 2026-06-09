@@ -9,7 +9,7 @@
 ## 프로젝트 정보
 
 **프로젝트명**: OOTD-Logic (옷차림 추천 앱)
-**EC2 서버**: http://3.36.77.116:8095
+**EC2 서버**: http://54.116.165.249:8095
 **GitHub**: https://github.com/qkrgksql0123-ops/OOTD-LOGIC
 **배포 브랜치**: hanbi
 **자동 배포**: 현재 비활성 → EC2에서 수동 배포 (MobaXterm 사용)
