@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const userId = getCurrentUserId();
     if (userId) {
         loadUserProfile(userId);
+        loadUserStats(userId);
     }
     initializeMypagePage();
 });
@@ -182,10 +183,7 @@ async function loadUserProfile(userId) {
             // 프로필 폼 필드
             const fields = {
                 nickname: user.nickname || cachedNickname || '',
-                phone:     user.phone     || '',
-                birthdate: user.birthdate || '',
-                gender:    user.gender    || '',
-                location:  user.location  || ''
+                gender:   user.gender   || ''
             };
             Object.entries(fields).forEach(([id, val]) => {
                 const el = document.getElementById(id);
@@ -231,11 +229,8 @@ async function saveProfile(userId) {
         if (!getRes.ok) throw new Error('사용자 정보를 불러올 수 없습니다.');
         const user = await getRes.json();
 
-        user.nickname  = nickname;
-        user.phone     = document.getElementById('phone')?.value.trim()     || user.phone     || '';
-        user.birthdate = document.getElementById('birthdate')?.value         || user.birthdate || '';
-        user.gender    = document.getElementById('gender')?.value            || user.gender    || '';
-        user.location  = document.getElementById('location')?.value.trim()  || user.location  || '';
+        user.nickname = nickname;
+        user.gender   = document.getElementById('gender')?.value || user.gender || '';
 
         const putRes = await fetch(`${API_BASE_URL}/users/${userId}`, {
             method: 'PUT',
@@ -277,6 +272,51 @@ function applySelectedColors(colorStr) {
         item.style.outline = isSelected ? '3px solid #004f60' : '';
         item.style.transform = isSelected ? 'scale(1.2)' : '';
     });
+}
+
+// 실제 통계 데이터 로드
+async function loadUserStats(userId) {
+    try {
+        const clothingRes = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
+        const clothingList = clothingRes.ok ? await clothingRes.json() : [];
+
+        const total      = clothingList.length;
+        const laundry    = clothingList.filter(c => c.isInLaundry).length;
+        const totalWorn  = clothingList.reduce((sum, c) => sum + (c.wearCount || 0), 0);
+        const utilized   = total > 0
+            ? Math.round(clothingList.filter(c => (c.wearCount || 0) > 0).length / total * 100)
+            : 0;
+
+        const el = id => document.getElementById(id);
+        if (el('stat-total-clothing'))  el('stat-total-clothing').textContent  = total;
+        if (el('stat-laundry-needed'))  el('stat-laundry-needed').textContent  = laundry;
+        if (el('stat-total-worn'))      el('stat-total-worn').textContent      = totalWorn;
+        if (el('stat-utilization'))     el('stat-utilization').textContent     = utilized + '%';
+
+        // 최근 등록 의류 3개
+        const activityList = document.getElementById('recent-activity-list');
+        if (!activityList) return;
+
+        const recent = [...clothingList]
+            .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+            .slice(0, 3);
+
+        if (recent.length === 0) {
+            activityList.innerHTML = '<p style="color:#999;padding:12px;">아직 등록된 의류가 없습니다.</p>';
+            return;
+        }
+
+        activityList.innerHTML = recent.map(item => `
+            <div class="activity-item">
+                <div class="activity-icon"><i class="fas fa-plus"></i></div>
+                <div class="activity-info">
+                    <p>${item.color || ''} ${item.subcategory || item.category} 등록</p>
+                    <span class="activity-date">${(item.createdAt || '').substring(0, 10)}</span>
+                </div>
+            </div>`).join('');
+    } catch (e) {
+        console.error('통계 로드 실패:', e);
+    }
 }
 
 // 스타일 프로필 저장
