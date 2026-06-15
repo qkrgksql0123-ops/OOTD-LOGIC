@@ -280,9 +280,12 @@ async function loadUserStats(userId) {
         const clothingRes = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
         const clothingList = clothingRes.ok ? await clothingRes.json() : [];
 
-        const total      = clothingList.length;
-        const laundry    = clothingList.filter(c => c.isInLaundry).length;
-        const totalWorn  = clothingList.reduce((sum, c) => sum + (c.wearCount || 0), 0);
+        const now = new Date();
+        const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+        const total       = clothingList.length;
+        const laundry     = clothingList.filter(c => c.isInLaundry).length;
+        const wornThisMonth = clothingList.filter(c => (c.lastWornDate || '').startsWith(thisMonth)).length;
         const utilized   = total > 0
             ? Math.round(clothingList.filter(c => (c.wearCount || 0) > 0).length / total * 100)
             : 0;
@@ -290,7 +293,7 @@ async function loadUserStats(userId) {
         const el = id => document.getElementById(id);
         if (el('stat-total-clothing'))  el('stat-total-clothing').textContent  = total;
         if (el('stat-laundry-needed'))  el('stat-laundry-needed').textContent  = laundry;
-        if (el('stat-total-worn'))      el('stat-total-worn').textContent      = totalWorn;
+        if (el('stat-total-worn'))      el('stat-total-worn').textContent      = wornThisMonth;
         if (el('stat-utilization'))     el('stat-utilization').textContent     = utilized + '%';
 
         // 최근 등록 의류 3개
@@ -359,7 +362,6 @@ async function saveStyleProfile(userId) {
 function setupButtonHandlers() {
     const logoutButton = document.querySelector('.btn-logout');
     const deleteAccountButton = document.querySelector('.btn-danger');
-    const editPasswordButton = document.querySelectorAll('.btn-secondary')[0];
 
     // 프로필 저장 버튼
     const profileSaveBtn = document.getElementById('profile-save-btn');
@@ -445,7 +447,7 @@ function setupButtonHandlers() {
                 if (data.fitPreference) document.getElementById('fit-preference').value  = data.fitPreference;
 
                 aiStatus.style.color = '#27ae60';
-                aiStatus.textContent = '분석 완료! 결과가 자동으로 입력됐어요. 저장 버튼을 눌러주세요.';
+                aiStatus.textContent = '분석 완료! 퍼스널 정보가 자동으로 반영 및 저장되었습니다.';
             } catch (e) {
                 aiStatus.style.color = '#e74c3c';
                 aiStatus.textContent = '분석에 실패했어요. 다시 시도해주세요.';
@@ -509,32 +511,75 @@ function setupButtonHandlers() {
         });
     }
 
-    // Edit password button
-    if (editPasswordButton) {
-        editPasswordButton.addEventListener('click', function(e) {
+    // 비밀번호 변경 폼 토글
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const passwordChangeForm = document.getElementById('password-change-form');
+    if (changePasswordBtn && passwordChangeForm) {
+        changePasswordBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            const visible = passwordChangeForm.style.display !== 'none';
+            passwordChangeForm.style.display = visible ? 'none' : 'block';
+        });
+    }
 
-            const currentPassword = prompt('현재 비밀번호를 입력하세요:');
-            if (!currentPassword) return;
+    // 비밀번호 변경 제출
+    const submitPasswordChangeBtn = document.getElementById('submit-password-change');
+    if (submitPasswordChangeBtn) {
+        submitPasswordChangeBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const userId = getCurrentUserId();
+            if (!userId) return;
 
-            const newPassword = prompt('새로운 비밀번호를 입력하세요:');
-            if (!newPassword) return;
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const newPasswordConfirm = document.getElementById('new-password-confirm').value;
+            const statusEl = document.getElementById('password-change-status');
 
-            const confirmPassword = prompt('새로운 비밀번호를 다시 입력하세요:');
-            if (!confirmPassword) return;
+            const showStatus = (msg, color) => {
+                statusEl.style.display = 'block';
+                statusEl.style.color = color;
+                statusEl.textContent = msg;
+            };
 
-            if (newPassword !== confirmPassword) {
-                alert('비밀번호가 일치하지 않습니다.');
+            if (!currentPassword || !newPassword || !newPasswordConfirm) {
+                showStatus('모든 항목을 입력해주세요.', '#e74c3c');
                 return;
             }
-
             if (newPassword.length < 8) {
-                alert('비밀번호는 최소 8자 이상이어야 합니다.');
+                showStatus('새 비밀번호는 최소 8자 이상이어야 합니다.', '#e74c3c');
+                return;
+            }
+            if (newPassword !== newPasswordConfirm) {
+                showStatus('새 비밀번호가 일치하지 않습니다.', '#e74c3c');
                 return;
             }
 
-            alert('비밀번호가 변경되었습니다.');
-            showNotification('비밀번호가 성공적으로 변경되었습니다.', 'success');
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 변경 중...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/change-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, currentPassword, newPassword })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showStatus(data.message || '비밀번호가 변경되었습니다.', '#27ae60');
+                    showNotification('비밀번호가 성공적으로 변경되었습니다.', 'success');
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                    document.getElementById('new-password-confirm').value = '';
+                } else {
+                    showStatus(data.message || '비밀번호 변경에 실패했습니다.', '#e74c3c');
+                }
+            } catch (err) {
+                showStatus('오류가 발생했습니다. 다시 시도해주세요.', '#e74c3c');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
         });
     }
 

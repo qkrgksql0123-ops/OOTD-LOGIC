@@ -201,6 +201,7 @@ public class RecommendationService {
 
     private String formatStyleProfile(User user) {
         StringBuilder sb = new StringBuilder();
+        if (str(user.getGender()))        sb.append("성별: ").append(user.getGender()).append("\n");
         if (str(user.getStyleTypes()))    sb.append("선호 스타일: ").append(user.getStyleTypes()).append("\n");
         if (str(user.getPreferredColors())) sb.append("선호 색상: ").append(user.getPreferredColors()).append("\n");
         if (str(user.getPersonalTone())) {

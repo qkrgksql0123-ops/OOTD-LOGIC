@@ -106,6 +106,38 @@ public class AuthController {
         ));
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<AuthResponse> changePassword(@RequestBody Map<String, String> request) {
+        String userId = request.get("userId");
+        String currentPassword = request.get("currentPassword");
+        String newPassword = request.get("newPassword");
+
+        log.info("Change password request for user: {}", userId);
+
+        Optional<User> userOpt = userService.getUserById(userId);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(new AuthResponse(
+                    null, null, null, "사용자를 찾을 수 없습니다.", null, null
+            ));
+        }
+
+        User user = userOpt.get();
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            log.warn("Current password mismatch for user: {}", userId);
+            return ResponseEntity.badRequest().body(new AuthResponse(
+                    null, null, null, "현재 비밀번호가 일치하지 않습니다.", null, null
+            ));
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userService.updateUser(user);
+        log.info("Password changed successfully for user: {}", userId);
+
+        return ResponseEntity.ok(new AuthResponse(
+                user.getUserId(), user.getEmail(), user.getNickname(), "비밀번호가 변경되었습니다.", null, null
+        ));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<AuthResponse> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         log.info("Logout request received");

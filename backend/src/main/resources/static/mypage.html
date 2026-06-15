@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/mypage.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
 </head>
 <body>
     <div id="app">
@@ -14,7 +15,7 @@
         <header class="navbar-main">
             <div class="navbar-container">
                 <div class="navbar-brand">
-                    <h1 class="logo">🧵 OOTD-Logic</h1>
+                    <h1 class="logo"><img src="images/logo.png" alt="OOTD-Logic" class="logo-img"></h1>
                 </div>
                 <nav class="navbar-menu">
                     <ul>
@@ -252,7 +253,7 @@
                             <div class="stat-card">
                                 <div class="stat-icon"><i class="fas fa-redo"></i></div>
                                 <div class="stat-content">
-                                    <h3>총 착용 횟수</h3>
+                                    <h3>이번 달 착용</h3>
                                     <p class="stat-number" id="stat-total-worn">-</p>
                                     <p class="stat-desc">전체 착용 누적</p>
                                 </div>
@@ -284,22 +285,28 @@
                             <div class="account-item">
                                 <div class="item-info">
                                     <label>비밀번호</label>
-                                    <p>마지막 변경: 2024년 6월 10일</p>
+                                    <p>비밀번호를 변경할 수 있습니다.</p>
                                 </div>
-                                <button class="btn btn-secondary">
+                                <button class="btn btn-secondary" id="change-password-btn">
                                     <i class="fas fa-edit"></i> 변경
                                 </button>
                             </div>
 
-                            <div class="account-item">
-                                <div class="item-info">
-                                    <label>2단계 인증</label>
-                                    <p>이메일 확인 인증 설정</p>
+                            <div id="password-change-form" style="display:none;margin-top:16px;">
+                                <div class="form-group">
+                                    <label for="current-password">현재 비밀번호</label>
+                                    <input type="password" id="current-password" placeholder="현재 비밀번호">
                                 </div>
-                                <label class="toggle">
-                                    <input type="checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
+                                <div class="form-group">
+                                    <label for="new-password">새 비밀번호</label>
+                                    <input type="password" id="new-password" placeholder="새 비밀번호 (8자 이상)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password-confirm">새 비밀번호 확인</label>
+                                    <input type="password" id="new-password-confirm" placeholder="새 비밀번호 확인">
+                                </div>
+                                <button class="btn btn-primary" id="submit-password-change">변경하기</button>
+                                <p id="password-change-status" style="display:none;margin-top:8px;font-size:14px;"></p>
                             </div>
                         </div>
 

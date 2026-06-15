@@ -452,6 +452,13 @@ body::before {
     font-weight: 700;
     color: var(--ink);
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand .logo-img {
+    height: 40px;
+    display: block;
 }
 
 .navbar-menu ul {
@@ -937,6 +944,10 @@ body::before {
 
     .navbar-brand .logo {
         font-size: 1.4rem;
+    }
+
+    .navbar-brand .logo-img {
+        height: 32px;
     }
 
     .hero {

@@ -167,7 +167,7 @@ function renderLaundryItems(list, userId) {
                 <div style="width:${pct}%;height:100%;background:${barColor};border-radius:4px;transition:width 0.4s;"></div>
             </div>
             <p style="font-size:11px;color:#888;margin-bottom:8px;text-align:right;">${pct}%</p>
-            ${status === 'needed' ? `
+            ${status === 'needed' || status === 'caution' ? `
             <button class="btn btn-mark-clean" data-id="${c.id}"
                 style="width:100%;background:#27ae60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">
                 <i class="fas fa-check"></i> 세탁 완료
