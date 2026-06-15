@@ -461,6 +461,15 @@ body::before {
     display: block;
 }
 
+.navbar-brand .logo-text {
+    margin-left: 8px;
+    background: linear-gradient(138deg, var(--pastel-blue-dark), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
 .navbar-menu ul {
     list-style: none;
     display: flex;
