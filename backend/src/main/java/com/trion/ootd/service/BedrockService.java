@@ -76,28 +76,20 @@ public class BedrockService {
                     "data", base64Data
                 )),
                 Map.of("type", "text", "text",
-                    "이 셀카 사진을 보고 아래 기준에 따라 분석해주세요.\n\n" +
-                    "1. 퍼스널 컬러 톤 (반드시 피부의 언더톤을 기준으로 판단):\n" +
-                    "   - cool: 피부에 핑크/붉은/파란 기운이 돌고, 혈관이 파랗게 보이는 편\n" +
-                    "   - warm: 피부에 노란/황금/복숭아 기운이 돌고, 혈관이 녹색으로 보이는 편\n" +
-                    "   - neutral: 쿨과 웜이 혼합되어 어느 쪽도 뚜렷하지 않은 경우\n\n" +
-                    "2. 세부 톤 (1번 결과를 기반으로 선택):\n" +
-                    "   - summer-cool: 밝고 부드러운 쿨톤, 채도 낮은 파스텔 계열 잘 어울림\n" +
-                    "   - winter-cool: 강하고 선명한 쿨톤, 원색/흑백 계열 잘 어울림\n" +
-                    "   - spring-warm: 밝고 화사한 웜톤, 코럴/피치/밝은 황색 잘 어울림\n" +
-                    "   - autumn-warm: 깊고 차분한 웜톤, 카키/브라운/머스터드 잘 어울림\n\n" +
-                    "3. 얼굴형 (윤곽선 기준):\n" +
-                    "   - oval: 이마가 넓고 턱으로 갈수록 부드럽게 좁아짐\n" +
-                    "   - round: 가로세로 비율이 비슷하고 부드러운 곡선\n" +
-                    "   - square: 이마와 턱 너비가 비슷하고 각진 느낌\n" +
-                    "   - heart: 이마가 넓고 턱이 뾰족한 하트 모양\n" +
-                    "   - long: 얼굴 세로가 가로보다 길고 좁은 느낌\n\n" +
-                    "4. 체형 핏 (전반적인 체형 인상 기준):\n" +
-                    "   - slim: 마른 체형\n" +
-                    "   - regular: 보통 체형\n" +
-                    "   - loose: 여유 있는 체형\n" +
-                    "   - oversized: 오버사이즈가 잘 어울리는 체형\n\n" +
-                    "반드시 JSON 형식으로만 답하고 다른 말은 쓰지 마세요:\n" +
+                    "이 셀카 사진 속 인물의 외모를 분석해주세요.\n\n" +
+                    "【퍼스널 컬러 판단 기준 - 아래 특징을 종합해서 판단】\n" +
+                    "사진에서 보이는 피부색, 머리카락 색, 눈동자 색, 입술 색을 관찰하세요.\n" +
+                    "- warm 특징: 피부가 전반적으로 노랗거나 황금빛/복숭아빛, 머리카락이 갈색/브라운/황금빛, 눈동자가 갈색/헤이즐\n" +
+                    "- cool 특징: 피부가 핑크빛/붉은기/창백한 흰색, 머리카락이 검정/어두운 회색/보라빛, 눈동자가 짙은 검정/회색\n" +
+                    "- neutral 특징: warm과 cool의 특징이 섞여 있어 어느 쪽도 뚜렷하지 않은 경우\n\n" +
+                    "1. personalTone: cool / warm / neutral 중 하나\n\n" +
+                    "2. toneSeason (personalTone 기반으로 반드시 선택):\n" +
+                    "   - personalTone이 cool이면: summer-cool(피부가 밝고 부드러움) 또는 winter-cool(피부 대비가 강하고 선명함)\n" +
+                    "   - personalTone이 warm이면: spring-warm(피부가 밝고 화사함) 또는 autumn-warm(피부가 깊고 차분함)\n" +
+                    "   - personalTone이 neutral이면: summer-cool 또는 spring-warm 중 더 가까운 것\n\n" +
+                    "3. faceShape: oval / round / square / heart / long 중 하나 (얼굴 윤곽 기준)\n\n" +
+                    "4. fitPreference: slim / regular / loose / oversized 중 하나 (전체적인 체형 인상)\n\n" +
+                    "다른 설명 없이 JSON만 출력하세요:\n" +
                     "{\"personalTone\":\"값\",\"toneSeason\":\"값\",\"faceShape\":\"값\",\"fitPreference\":\"값\"}")
             );
 
