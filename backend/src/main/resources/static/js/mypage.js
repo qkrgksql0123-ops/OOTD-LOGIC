@@ -207,7 +207,10 @@ async function loadUserProfile(userId) {
             };
             Object.entries(styleFields).forEach(([id, val]) => {
                 const el = document.getElementById(id);
-                if (el && val) el.value = val;
+                if (el) {
+                    if (val) el.value = val;
+                    else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                }
             });
         }
     } catch (error) {
@@ -440,14 +443,22 @@ function setupButtonHandlers() {
                 if (!res.ok) throw new Error('분석 실패');
                 const data = await res.json();
 
-                // 분석 결과 자동 입력
-                if (data.personalTone)  document.getElementById('personal-tone').value  = data.personalTone;
-                if (data.toneSeason)    document.getElementById('tone-season').value     = data.toneSeason;
-                if (data.faceShape)     document.getElementById('face-shape').value      = data.faceShape;
-                if (data.fitPreference) document.getElementById('fit-preference').value  = data.fitPreference;
+                // 분석 결과 직접 반영 (select value 강제 설정)
+                const toneEl   = document.getElementById('personal-tone');
+                const seasonEl = document.getElementById('tone-season');
+                const faceEl   = document.getElementById('face-shape');
+                const fitEl    = document.getElementById('fit-preference');
+
+                if (toneEl   && data.personalTone)  toneEl.value   = data.personalTone;
+                if (seasonEl && data.toneSeason)     seasonEl.value = data.toneSeason;
+                if (faceEl   && data.faceShape)      faceEl.value   = data.faceShape;
+                if (fitEl    && data.fitPreference)  fitEl.value    = data.fitPreference;
+
+                // DB에서 다시 불러와 실제 저장 확인
+                await loadUserProfile(userId);
 
                 aiStatus.style.color = '#27ae60';
-                aiStatus.textContent = '분석 완료! 퍼스널 정보가 자동으로 반영 및 저장되었습니다.';
+                aiStatus.textContent = `분석 완료! 퍼스널톤: ${data.personalTone || '-'}, 세부톤: ${data.toneSeason || '-'}`;
             } catch (e) {
                 aiStatus.style.color = '#e74c3c';
                 aiStatus.textContent = '분석에 실패했어요. 다시 시도해주세요.';
