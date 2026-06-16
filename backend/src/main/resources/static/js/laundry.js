@@ -70,6 +70,7 @@ function getThreshold(c) {
 
 // 세탁 상태 판별: needed / caution / safe
 function getStatus(c) {
+    if (c.category === 'accessory') return 'safe';
     if (c.isInLaundry) return 'needed';
     const threshold = getThreshold(c);
     const worn = c.wearCount || 0;

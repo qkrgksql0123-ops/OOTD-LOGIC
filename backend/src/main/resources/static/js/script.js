@@ -264,8 +264,9 @@ async function loadDashboardStats() {
             return 1;
         }
 
-        const urgent = clothings.filter(c => c.isInLaundry).length;
+        const urgent = clothings.filter(c => c.category !== 'accessory' && c.isInLaundry).length;
         const scheduled = clothings.filter(c => {
+            if (c.category === 'accessory') return false;
             if (c.isInLaundry) return false;
             return (c.wearCount || 0) >= Math.ceil(getLaundryThreshold(c) * 0.5);
         }).length;
