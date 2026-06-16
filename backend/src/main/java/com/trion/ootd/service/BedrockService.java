@@ -76,18 +76,23 @@ public class BedrockService {
                     "data", base64Data
                 )),
                 Map.of("type", "text", "text",
-                    "이 셀카 사진 속 인물의 외모를 분석해주세요.\n\n" +
-                    "【퍼스널 컬러 판단 기준 - 아래 특징을 종합해서 판단】\n" +
-                    "사진에서 보이는 피부색, 머리카락 색, 눈동자 색, 입술 색을 관찰하세요.\n" +
-                    "- warm 특징: 피부가 전반적으로 노랗거나 황금빛/복숭아빛, 머리카락이 갈색/브라운/황금빛, 눈동자가 갈색/헤이즐\n" +
-                    "- cool 특징: 피부가 핑크빛/붉은기/창백한 흰색, 머리카락이 검정/어두운 회색/보라빛, 눈동자가 짙은 검정/회색\n" +
-                    "- neutral 특징: warm과 cool의 특징이 섞여 있어 어느 쪽도 뚜렷하지 않은 경우\n\n" +
-                    "1. personalTone: cool / warm / neutral 중 하나\n\n" +
-                    "2. toneSeason (personalTone 기반으로 반드시 선택):\n" +
-                    "   - personalTone이 cool이면: summer-cool(피부가 밝고 부드러움) 또는 winter-cool(피부 대비가 강하고 선명함)\n" +
-                    "   - personalTone이 warm이면: spring-warm(피부가 밝고 화사함) 또는 autumn-warm(피부가 깊고 차분함)\n" +
-                    "   - personalTone이 neutral이면: summer-cool 또는 spring-warm 중 더 가까운 것\n\n" +
-                    "3. faceShape: oval / round / square / heart / long 중 하나 (얼굴 윤곽 기준)\n\n" +
+                    "이 셀카 사진 속 인물의 퍼스널 컬러를 분석해주세요.\n\n" +
+                    "【Step 1: 피부 언더톤 파악 - 가장 중요한 기준】\n" +
+                    "머리카락·눈동자 색은 참고만 하고, 피부 자체의 색조를 최우선으로 판단하세요.\n" +
+                    "- warm 피부: 노란빛·황금빛·복숭아빛·황토빛이 돌며, 햇볕에 타면 황금색이 되는 느낌\n" +
+                    "- cool 피부: 핑크빛·장밋빛·파란빛·자줏빛이 돌며, 창백하거나 붉은기가 있는 느낌\n" +
+                    "- neutral 피부: 노란빛과 핑크빛이 섞여 어느 쪽도 뚜렷하지 않음\n\n" +
+                    "【Step 2: 전체 조화 관찰】\n" +
+                    "눈 밑 그늘·목·손목 안쪽의 피부색을 보조 기준으로 활용하세요.\n" +
+                    "머리카락이 검어도 피부가 노란빛이면 warm, 피부가 핑크빛이면 cool입니다.\n\n" +
+                    "【Step 3: 세부 시즌 결정】\n" +
+                    "- warm + 밝고 선명한 피부 → spring-warm\n" +
+                    "- warm + 깊고 차분한 피부(황토·구릿빛) → autumn-warm\n" +
+                    "- cool + 밝고 부드러운 피부(뮤트·파스텔 느낌) → summer-cool\n" +
+                    "- cool + 선명하고 대비 강한 피부(눈처럼 흰 피부 또는 진한 피부) → winter-cool\n\n" +
+                    "1. personalTone: warm / cool / neutral 중 피부 언더톤 기준으로 선택\n" +
+                    "2. toneSeason: spring-warm / autumn-warm / summer-cool / winter-cool 중 하나\n" +
+                    "3. faceShape: oval / round / square / heart / long 중 하나 (얼굴 윤곽 기준)\n" +
                     "4. fitPreference: slim / regular / loose / oversized 중 하나 (전체적인 체형 인상)\n\n" +
                     "다른 설명 없이 JSON만 출력하세요:\n" +
                     "{\"personalTone\":\"값\",\"toneSeason\":\"값\",\"faceShape\":\"값\",\"fitPreference\":\"값\"}")
