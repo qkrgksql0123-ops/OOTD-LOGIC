@@ -76,12 +76,28 @@ public class BedrockService {
                     "data", base64Data
                 )),
                 Map.of("type", "text", "text",
-                    "이 사진을 보고 아래 항목을 분석해주세요.\n" +
-                    "1. 퍼스널 컬러 톤: cool(쿨톤) 또는 warm(웜톤) 또는 neutral(뉴트럴)\n" +
-                    "2. 세부 톤: summer-cool / winter-cool / spring-warm / autumn-warm 중 하나\n" +
-                    "3. 얼굴형: oval(계란형) / round(둥근형) / square(각진형) / heart(하트형) / long(긴형) 중 하나\n" +
-                    "4. 체형별 선호 핏: slim(슬림핏) / regular(레귤러핏) / loose(루즈핏) / oversized(오버사이즈) 중 하나\n" +
-                    "반드시 JSON 형식으로만 답하세요: " +
+                    "이 셀카 사진을 보고 아래 기준에 따라 분석해주세요.\n\n" +
+                    "1. 퍼스널 컬러 톤 (반드시 피부의 언더톤을 기준으로 판단):\n" +
+                    "   - cool: 피부에 핑크/붉은/파란 기운이 돌고, 혈관이 파랗게 보이는 편\n" +
+                    "   - warm: 피부에 노란/황금/복숭아 기운이 돌고, 혈관이 녹색으로 보이는 편\n" +
+                    "   - neutral: 쿨과 웜이 혼합되어 어느 쪽도 뚜렷하지 않은 경우\n\n" +
+                    "2. 세부 톤 (1번 결과를 기반으로 선택):\n" +
+                    "   - summer-cool: 밝고 부드러운 쿨톤, 채도 낮은 파스텔 계열 잘 어울림\n" +
+                    "   - winter-cool: 강하고 선명한 쿨톤, 원색/흑백 계열 잘 어울림\n" +
+                    "   - spring-warm: 밝고 화사한 웜톤, 코럴/피치/밝은 황색 잘 어울림\n" +
+                    "   - autumn-warm: 깊고 차분한 웜톤, 카키/브라운/머스터드 잘 어울림\n\n" +
+                    "3. 얼굴형 (윤곽선 기준):\n" +
+                    "   - oval: 이마가 넓고 턱으로 갈수록 부드럽게 좁아짐\n" +
+                    "   - round: 가로세로 비율이 비슷하고 부드러운 곡선\n" +
+                    "   - square: 이마와 턱 너비가 비슷하고 각진 느낌\n" +
+                    "   - heart: 이마가 넓고 턱이 뾰족한 하트 모양\n" +
+                    "   - long: 얼굴 세로가 가로보다 길고 좁은 느낌\n\n" +
+                    "4. 체형 핏 (전반적인 체형 인상 기준):\n" +
+                    "   - slim: 마른 체형\n" +
+                    "   - regular: 보통 체형\n" +
+                    "   - loose: 여유 있는 체형\n" +
+                    "   - oversized: 오버사이즈가 잘 어울리는 체형\n\n" +
+                    "반드시 JSON 형식으로만 답하고 다른 말은 쓰지 마세요:\n" +
                     "{\"personalTone\":\"값\",\"toneSeason\":\"값\",\"faceShape\":\"값\",\"fitPreference\":\"값\"}")
             );
 
