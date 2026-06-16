@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateAuthenticationUI();
     initializeMainPage();
     getWeatherInfo(); // Load weather data
+    loadDashboardStats();
 
     // 기존 함수들 초기화
     const tempSlider = document.getElementById('tempSensitivity');
@@ -233,6 +234,53 @@ async function updateWeatherWarning(weatherData) {
         }
     } catch (error) {
         console.error('Error updating weather warning:', error);
+    }
+}
+
+// Dashboard Stats
+async function loadDashboardStats() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);
+        if (!res.ok) return;
+        const clothings = await res.json();
+
+        const total = clothings.length;
+        const thisMonth = new Date().toISOString().slice(0, 7);
+        const monthNew = clothings.filter(c => c.createdAt && c.createdAt.startsWith(thisMonth)).length;
+
+        function getLaundryThreshold(c) {
+            const sub = (c.subcategory || '').toLowerCase();
+            if (c.category === 'shoes') return 15;
+            if (c.category === 'outer') return 5;
+            if (c.category === 'bottom') {
+                if (sub.includes('청바지') || sub.includes('데님')) return 5;
+                if (sub.includes('반바지')) return 2;
+                return 3;
+            }
+            if (sub.includes('니트') || sub.includes('스웨터') || sub.includes('가디건')) return 3;
+            return 1;
+        }
+
+        const urgent = clothings.filter(c => c.isInLaundry).length;
+        const scheduled = clothings.filter(c => {
+            if (c.isInLaundry) return false;
+            return (c.wearCount || 0) >= Math.ceil(getLaundryThreshold(c) * 0.5);
+        }).length;
+
+        const totalEl = document.getElementById('dashTotalCount');
+        const monthEl = document.getElementById('dashMonthCount');
+        const weekEl = document.getElementById('dashLaundryWeek');
+        const urgentEl = document.getElementById('dashLaundryUrgent');
+
+        if (totalEl) totalEl.textContent = `${total}개`;
+        if (monthEl) monthEl.textContent = `${monthNew}개`;
+        if (weekEl) weekEl.textContent = `${scheduled}개`;
+        if (urgentEl) urgentEl.textContent = `${urgent}개`;
+    } catch (e) {
+        console.error('대시보드 통계 로드 실패:', e);
     }
 }
 
