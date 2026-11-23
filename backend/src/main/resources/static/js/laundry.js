@@ -137,42 +137,30 @@ function renderLaundryItems(list, userId) {
         const worn = c.wearCount || 0;
         const card = document.createElement('div');
         card.className = 'laundry-card';
-        card.style.borderLeft = `4px solid ${cfg.color}`;
-        card.style.background = cfg.bg;
         card.dataset.id = c.id;
+        card.dataset.status = status;
 
         const imgHtml = c.imageUrl
-            ? `<img src="${c.imageUrl}" alt="${c.category}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:10px;">`
-            : `<div style="height:120px;background:#f0f4f8;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
-                   <i class="fas fa-shirt" style="font-size:36px;color:#aaa;"></i></div>`;
+            ? `<img src="${c.imageUrl}" alt="${c.category}">`
+            : `<div class="item-placeholder"><i class="fas fa-shirt"></i></div>`;
 
         // 진행도 바
         const pct = Math.min(100, Math.round((worn / threshold) * 100));
-        const barColor = cfg.color;
+        const meta = [c.category, c.material].filter(Boolean).join(' · ') || '-';
 
         card.innerHTML = `
-            ${imgHtml}
-            <div class="laundry-header">
+            <div class="item-image">
+                ${imgHtml}
+                <span class="status-badge" style="background:${cfg.color};">${cfg.label}</span>
+            </div>
+            <div class="item-info">
                 <h3>${c.color ? c.color + ' ' : ''}${c.subcategory || c.category}</h3>
-                <span class="urgency-badge" style="background:${cfg.color};color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">
-                    <i class="fas fa-${cfg.icon}"></i> ${cfg.label}
-                </span>
-            </div>
-            <div class="laundry-info" style="margin:10px 0;">
-                <div class="info-row"><strong>카테고리:</strong> <span>${c.category || '-'}</span></div>
-                ${c.material ? `<div class="info-row"><strong>소재:</strong> <span>${c.material}</span></div>` : ''}
-                ${c.lastWornDate ? `<div class="info-row"><strong>마지막 착용:</strong> <span>${c.lastWornDate}</span></div>` : ''}
-                <div class="info-row"><strong>착용 횟수:</strong> <span>${worn}회 / 기준 ${threshold}회</span></div>
-            </div>
-            <div style="background:#e0e0e0;border-radius:4px;height:8px;margin:8px 0;">
-                <div style="width:${pct}%;height:100%;background:${barColor};border-radius:4px;transition:width 0.4s;"></div>
-            </div>
-            <p style="font-size:11px;color:#888;margin-bottom:8px;text-align:right;">${pct}%</p>
-            ${status === 'needed' || status === 'caution' ? `
-            <button class="btn btn-mark-clean" data-id="${c.id}"
-                style="width:100%;background:#27ae60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:600;">
-                <i class="fas fa-check"></i> 세탁 완료
-            </button>` : ''}`;
+                <p class="meta">${meta}</p>
+                <div class="wear-bar"><div style="width:${pct}%;background:${cfg.color};"></div></div>
+                <p class="wear-text">착용 ${worn}회 / 기준 ${threshold}회${c.lastWornDate ? ' · 마지막 ' + c.lastWornDate : ''}</p>
+                ${status === 'needed' || status === 'caution' ? `
+                <button class="btn-card btn-mark-clean" data-id="${c.id}">세탁 완료</button>` : ''}
+            </div>`;
 
         grid.appendChild(card);
     });
@@ -198,7 +186,7 @@ function renderLaundryItems(list, userId) {
                     }
                 } catch (e) {
                     this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-check"></i> 세탁 완료';
+                    this.innerHTML = '세탁 완료';
                 }
             });
         });

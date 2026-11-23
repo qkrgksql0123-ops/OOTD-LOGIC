@@ -72,9 +72,7 @@ textarea:focus-visible {
     border-radius: 2px;
     padding: clamp(24px, 4vw, 44px);
     background: var(--surface-2);
-    backdrop-filter: blur(8px);
     box-shadow: none;
-    animation: riseIn 0.65s ease;
 }
 
 .header h1 {
@@ -97,7 +95,6 @@ textarea:focus-visible {
     border-radius: 2px;
     padding: 8px 10px;
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(8px);
     position: sticky;
     top: 12px;
     z-index: 10;
@@ -127,7 +124,6 @@ textarea:focus-visible {
 }
 
 .navbar a:hover {
-    transform: translateY(-1px);
     border-color: rgba(26, 31, 40, 0.24);
     background: rgba(255, 255, 255, 0.9);
 }
@@ -145,23 +141,18 @@ textarea:focus-visible {
     background: var(--panel);
     box-shadow: none;
     margin-top: 24px;
-    animation: riseIn 0.56s ease both;
 }
 
 .section:nth-of-type(1) {
-    animation-delay: 0.05s;
 }
 
 .section:nth-of-type(2) {
-    animation-delay: 0.12s;
 }
 
 .section:nth-of-type(3) {
-    animation-delay: 0.2s;
 }
 
 .section:nth-of-type(4) {
-    animation-delay: 0.27s;
 }
 
 .section h2 {
@@ -207,7 +198,6 @@ textarea:focus-visible {
 }
 
 .btn:hover {
-    transform: translateY(-1px);
 }
 
 .btn:disabled {
@@ -253,7 +243,6 @@ textarea:focus-visible {
 }
 
 .clothing-item:hover {
-    transform: translateY(-2px);
     border-color: rgba(255, 93, 31, 0.45);
     box-shadow: none;
 }
@@ -301,7 +290,6 @@ textarea:focus-visible {
 }
 
 .recommendation-card:hover {
-    transform: translateY(-2px);
     border-color: rgba(17, 17, 17, 0.30);
 }
 
@@ -430,7 +418,6 @@ textarea:focus-visible {
 
 @keyframes slideDown {
     from {
-        transform: translateY(-12px);
         opacity: 0;
     }
     to {
@@ -672,7 +659,6 @@ textarea:focus-visible {
     border-bottom: 1px solid var(--ink);
     border-radius: 0;
     box-shadow: none;
-    backdrop-filter: none;
 }
 
 .navbar-container {
@@ -766,7 +752,6 @@ textarea:focus-visible {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    backdrop-filter: none;
 }
 
 .hero-content {
@@ -871,7 +856,6 @@ textarea:focus-visible {
     border-top: 1px solid var(--line);
     border-radius: 0;
     background: transparent;
-    backdrop-filter: none;
 }
 
 .feature-card:hover {
@@ -965,7 +949,6 @@ textarea:focus-visible {
     border-radius: 0;
     background: var(--ink);
     box-shadow: none;
-    backdrop-filter: none;
     text-align: left;
 }
 

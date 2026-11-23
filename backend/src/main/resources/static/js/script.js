@@ -200,7 +200,6 @@ async function getWeatherInfo() {
                 <p><strong>최저/최고:</strong> ${minTemp}°C / ${maxTemp}°C</p>
                 <p><strong>날씨:</strong> ${condition}</p>
                 <p><strong>습도:</strong> ${humidity}%</p>
-                <p style="font-size: 0.85em; color: #999; margin-top: 10px;">기상청 공공 API 연동</p>
             `;
 
             if (weatherInfo) weatherInfo.innerHTML = weatherHTML;

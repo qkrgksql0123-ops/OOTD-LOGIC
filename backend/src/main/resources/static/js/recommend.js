@@ -108,8 +108,8 @@ function renderMatchedCards(items, userId) {
         card.className = 'outfit-card';
         card.dataset.clothingId = item.id;
         const imgHtml = item.imageUrl
-            ? `<img src="${item.imageUrl}" alt="${item.category}" style="width:100%;height:200px;object-fit:cover;border-radius:8px;">`
-            : `<div class="outfit-placeholder" style="height:200px;display:flex;align-items:center;justify-content:center;background:#f0f4f8;border-radius:8px;"><i class="fas fa-shirt" style="font-size:48px;color:#aaa;"></i></div>`;
+            ? `<img src="${item.imageUrl}" alt="${item.category}">`
+            : `<div class="outfit-placeholder"><i class="fas fa-shirt"></i></div>`;
 
         const threshold = LAUNDRY_THRESHOLD[item.category] || 1;
         const wornSoFar = item.wearCount || 0;
@@ -121,18 +121,9 @@ function renderMatchedCards(items, userId) {
             <div class="outfit-image">${imgHtml}</div>
             <div class="outfit-info">
                 <h3>${item.color || ''} ${item.subcategory || item.category}</h3>
-                <div class="outfit-items">
-                    <p><i class="fas fa-tag"></i> ${item.category}</p>
-                    ${item.season ? `<p><i class="fas fa-leaf"></i> ${item.season}</p>` : ''}
-                    ${item.material ? `<p><i class="fas fa-layer-group"></i> ${item.material}</p>` : ''}
-                </div>
-                <p style="font-size:12px;color:#888;margin-top:6px;">
-                    <i class="fas fa-water"></i> ${laundryHint}
-                </p>
-                <button class="btn btn-wear" data-id="${item.id}"
-                    style="margin-top:10px;width:100%;background:#004f60;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">
-                    <i class="fas fa-tshirt"></i> 착용 완료
-                </button>
+                <p class="meta">${[item.category, item.season, item.material].filter(Boolean).join(' · ')}</p>
+                <p class="wear-text">${laundryHint}</p>
+                <button class="btn-card btn-wear" data-id="${item.id}">착용 완료</button>
             </div>`;
         grid.appendChild(card);
     });
@@ -148,14 +139,14 @@ function renderMatchedCards(items, userId) {
                     method: 'PATCH'
                 });
                 if (res.ok) {
-                    this.innerHTML = '<i class="fas fa-check"></i> 착용 완료!';
-                    this.style.background = '#27ae60';
+                    this.innerHTML = '착용 완료!';
+                    this.style.background = '#111'; this.style.color = '#fff';
                     this.closest('.outfit-card').style.opacity = '0.6';
                     showLaundryNotice();
                 }
             } catch (e) {
                 this.disabled = false;
-                this.innerHTML = '<i class="fas fa-tshirt"></i> 착용 완료';
+                this.innerHTML = '착용 완료';
             }
         });
     });
@@ -574,29 +565,22 @@ function renderClosetBasedRecommendations(outfitSets, weatherData) {
 
         const itemsHtml = items.map(item => {
             const imgHtml = item.imageUrl
-                ? `<img src="${item.imageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-right:8px;vertical-align:middle;">`
-                : `<i class="fas fa-shirt" style="font-size:24px;color:#aaa;margin-right:8px;"></i>`;
-            return `<p style="display:flex;align-items:center;margin:4px 0;">
-                ${imgHtml}<span>${item.color || ''} ${item.subcategory || item.category}</span></p>`;
+                ? `<img class="thumb" src="${item.imageUrl}" alt="">`
+                : `<i class="fas fa-shirt thumb-icon"></i>`;
+            return `<p>${imgHtml}<span>${item.color || ''} ${item.subcategory || item.category}</span></p>`;
         }).join('');
 
         card.innerHTML = `
             <div class="outfit-image">
-                <div class="outfit-placeholder" style="background:#f8f9fa;padding:12px;border-radius:8px;">
-                    ${items[0]?.imageUrl
-                        ? `<img src="${items[0].imageUrl}" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">`
-                        : `<i class="fas fa-shirt" style="font-size:48px;color:#aaa;display:block;text-align:center;padding:40px 0;"></i>`}
-                </div>
-                <span class="confidence-badge">
-                    <i class="fas fa-thermometer-half"></i> ${weatherData.temperature}°C 기준
-                </span>
+                ${items[0]?.imageUrl
+                    ? `<img src="${items[0].imageUrl}" alt="">`
+                    : `<div class="outfit-placeholder"><i class="fas fa-shirt"></i></div>`}
+                <span class="confidence-badge">${weatherData.temperature}°C 기준</span>
             </div>
             <div class="outfit-info">
                 <h3>오늘의 추천 코디 ${idx + 1}</h3>
                 <div class="outfit-items">${itemsHtml}</div>
-                <div class="outfit-reason" style="margin-top:8px;">
-                    <strong>추천 이유:</strong> ${weatherData.temperature}°C ${weatherData.weatherCondition || ''} 날씨에 맞는 내 옷장 코디예요.
-                </div>
+                <p class="wear-text">${weatherData.temperature}°C ${weatherData.weatherCondition || ''} 날씨에 맞는 코디</p>
             </div>`;
         grid.appendChild(card);
     });
