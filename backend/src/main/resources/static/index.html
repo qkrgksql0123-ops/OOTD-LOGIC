@@ -6,15 +6,35 @@
     <title>OOTD-Logic - AI 기반 패션 추천 플랫폼</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/intro.css">
+    <script>
+        // 이번 접속(탭)에서 인트로를 아직 안 봤다면 깜빡임 없이 바로 인트로를 띄운다
+        try {
+            if (!sessionStorage.getItem('ootd_intro_seen')) document.documentElement.classList.add('intro-on');
+        } catch (e) {}
+    </script>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
 </head>
 <body>
+    <!-- Intro (처음 접속 시 한 번만 표시) -->
+    <div class="intro" id="intro" role="dialog" aria-label="OOTD-LOGIC 소개 화면">
+        <div class="intro-slides" aria-hidden="true"></div>
+        <div class="intro-top">
+            <span class="intro-brand"><img src="images/favicon.svg" alt="">OOTD-LOGIC</span>
+            <button type="button" class="intro-skip">건너뛰기</button>
+        </div>
+        <div class="intro-bottom">
+            <p class="intro-title">오늘의 날씨에,<br>내 옷장에서 고르는 코디</p>
+            <div class="intro-progress" aria-hidden="true"></div>
+        </div>
+    </div>
+
     <div id="app">
         <!-- Navigation Bar -->
         <header class="navbar-main">
             <div class="navbar-container">
                 <div class="navbar-brand">
-                    <h1 class="logo"><img src="images/logo.png" alt="OOTD-Logic" class="logo-img"><span class="logo-text">OOTD-LOGIC</span></h1>
+                    <h1 class="logo"><img src="images/favicon.svg" alt="OOTD-Logic" class="logo-img"><span class="logo-text">OOTD-LOGIC</span></h1>
                 </div>
                 <nav class="navbar-menu">
                     <ul>
@@ -104,6 +124,7 @@
         </footer>
     </div>
 
+    <script src="js/intro.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

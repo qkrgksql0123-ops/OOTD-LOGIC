@@ -23,7 +23,7 @@ function updateAuthenticationUI() {
         const li = loginBtn.parentElement;
 
         const nicknameEl = document.createElement('li');
-        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #111; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-user-circle"></i>
             ${nickname || '사용자'}
         </span>`;
@@ -259,7 +259,7 @@ function initColorPalette() {
         item.addEventListener('click', function() {
             this.classList.toggle('selected');
             this.style.outline = this.classList.contains('selected')
-                ? '3px solid #004f60' : '';
+                ? '3px solid #111' : '';
             this.style.transform = this.classList.contains('selected')
                 ? 'scale(1.2)' : '';
         });
@@ -272,7 +272,7 @@ function applySelectedColors(colorStr) {
     document.querySelectorAll('.color-item[data-color]').forEach(item => {
         const isSelected = selected.includes(item.dataset.color);
         item.classList.toggle('selected', isSelected);
-        item.style.outline = isSelected ? '3px solid #004f60' : '';
+        item.style.outline = isSelected ? '3px solid #111' : '';
         item.style.transform = isSelected ? 'scale(1.2)' : '';
     });
 }
@@ -432,7 +432,7 @@ function setupButtonHandlers() {
             this.disabled = true;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 분석 중...';
             aiStatus.style.display = 'block';
-            aiStatus.style.color = '#004f60';
+            aiStatus.style.color = '#111';
             aiStatus.textContent = 'AI가 사진을 분석하고 있어요... (약 10초)';
             try {
                 const res = await fetch(`${API_BASE_URL}/users/${userId}/analyze-profile`, {

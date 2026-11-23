@@ -48,7 +48,7 @@ function updateAuthenticationUI() {
         const li = loginBtn.parentElement;
 
         const nicknameEl = document.createElement('li');
-        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #111; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-user-circle"></i>
             ${nickname || '사용자'}
         </span>`;
@@ -198,7 +198,7 @@ function renderWearingHistory(clothings) {
                 <p style="font-weight:600;margin:0;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.color || ''} ${item.subcategory || item.category}</p>
                 <p style="color:#888;font-size:12px;margin:2px 0;">마지막 착용: ${item.lastWornDate || '기록 없음'}</p>
             </div>
-            <span style="background:#004f60;color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;">${item.wearCount}회</span>
+            <span style="background:#111;color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;">${item.wearCount}회</span>
         </div>`;
     }).join('');
 }

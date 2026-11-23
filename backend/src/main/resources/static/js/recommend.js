@@ -14,7 +14,7 @@ function updateAuthenticationUI() {
         const li = loginBtn.parentElement;
 
         const nicknameEl = document.createElement('li');
-        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #111; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-user-circle"></i>
             ${nickname || '사용자'}
         </span>`;
@@ -161,7 +161,7 @@ function showLaundryNotice() {
         notice.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:14px 20px;margin:12px 0;text-align:center;';
         notice.innerHTML = `<i class="fas fa-water" style="color:#e67e22;"></i>
             <strong> 착용한 옷이 세탁 관리에 추가되었어요!</strong>
-            <a href="laundry.html" style="margin-left:12px;color:#004f60;font-weight:700;">세탁 관리로 이동 →</a>`;
+            <a href="laundry.html" style="margin-left:12px;color:#111;font-weight:700;">세탁 관리로 이동 →</a>`;
         document.querySelector('.outfits-grid')?.before(notice);
     }
 }
@@ -260,7 +260,7 @@ async function loadUserStyleProfile(userId) {
                 profileGrid.innerHTML = `
                     <div style="grid-column:1/-1;text-align:center;padding:24px;background:#f8f9fa;border-radius:12px;border:1px dashed #ccc;">
                         <p style="color:#666;margin-bottom:12px;"><i class="fas fa-user-edit"></i> 스타일 프로필이 아직 설정되지 않았어요.</p>
-                        <a href="mypage.html" style="background:#004f60;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">
+                        <a href="mypage.html" style="background:#111;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">
                             마이페이지에서 설정하기 →
                         </a>
                     </div>`;
@@ -286,7 +286,7 @@ async function loadUserStyleProfile(userId) {
         }
         if (user.fitPreference) {
             const el = document.querySelector('.fit-bar');
-            if (el) el.innerHTML = `<p style="font-weight:600;color:#004f60;">${user.fitPreference}</p>`;
+            if (el) el.innerHTML = `<p style="font-weight:600;color:#111;">${user.fitPreference}</p>`;
         }
     } catch (e) {
         console.error('스타일 프로필 로드 실패:', e);
@@ -325,7 +325,7 @@ function setupAIRecommendButton(userId) {
             if (!regBtn) {
                 regBtn = document.createElement('button');
                 regBtn.id = 'register-outfit-btn';
-                regBtn.style.cssText = 'margin-top:14px;width:100%;padding:12px;background:#004f60;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;';
+                regBtn.style.cssText = 'margin-top:14px;width:100%;padding:12px;background:#111;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;';
                 regBtn.innerHTML = '<i class="fas fa-plus-circle"></i> 내 옷장에서 코디 찾기';
                 resultArea.querySelector('div').appendChild(regBtn);
                 regBtn.addEventListener('click', () => registerOutfit(userId, text));
@@ -478,7 +478,7 @@ async function generateStyleBasedRecommendations() {
         return;
     }
 
-    if (grid) grid.innerHTML = '<p style="padding:20px;text-align:center;color:#004f60;"><i class="fas fa-spinner fa-spin"></i> 옷장에서 스타일별 코디를 찾는 중...</p>';
+    if (grid) grid.innerHTML = '<p style="padding:20px;text-align:center;color:#111;"><i class="fas fa-spinner fa-spin"></i> 옷장에서 스타일별 코디를 찾는 중...</p>';
 
     try {
         const clothingRes = await fetch(`${API_BASE_URL}/users/${userId}/clothing`);

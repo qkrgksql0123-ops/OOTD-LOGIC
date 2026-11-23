@@ -1,0 +1,291 @@
+/* 로그인 / 회원가입 공통 스타일 — 메인(style.css)과 같은 흑백 + 포인트 1색 톤 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --ink: #111111;
+    --muted: #767676;
+    --line: #e5e5e2;
+    --surface-2: #f6f6f4;
+    --accent: #ff4d1c;
+    --ok: #1a7f4b;
+    --danger: #d0342c;
+}
+
+body {
+    font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    color: var(--ink);
+    background: var(--surface-2);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid rgba(17, 17, 17, 0.36);
+    outline-offset: 2px;
+}
+
+/* 카드 */
+.login-container,
+.signup-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 44px 40px 36px;
+    background: #fff;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.login-header,
+.signup-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+}
+
+.brand img {
+    height: 28px;
+    display: block;
+}
+
+.login-header h1,
+.signup-header h1 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.login-header p,
+.signup-header p {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+/* 폼 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--ink);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: #fff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--ink);
+    transition: border-color 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #b0b0aa;
+}
+
+.form-group input:hover,
+.form-group select:hover {
+    border-color: #bdbdb8;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--ink);
+}
+
+.error-message {
+    display: none;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--danger);
+}
+
+/* 스타일 선택 태그 (회원가입) */
+.style-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.style-tags label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.style-tags label:hover {
+    border-color: var(--ink);
+}
+
+.style-tags input {
+    width: auto;
+    margin: 0;
+    accent-color: var(--ink);
+}
+
+.style-tags label:has(input:checked) {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+}
+
+.style-tags label:has(input:checked) input {
+    accent-color: #fff;
+}
+
+/* 체크박스 */
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.checkbox-group input {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    accent-color: var(--ink);
+}
+
+.checkbox-group span {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+/* 버튼 */
+.login-btn,
+.signup-btn {
+    width: 100%;
+    min-height: 48px;
+    padding: 13px;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.login-btn:hover,
+.signup-btn:hover {
+    background: #333;
+}
+
+.login-btn:disabled,
+.signup-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* 상태 메시지 */
+.status-message {
+    min-height: 18px;
+    margin: 14px 0 0;
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--muted);
+}
+
+.status-message.ok {
+    color: var(--ok);
+    font-weight: 600;
+}
+
+.status-message.error {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+/* 하단 링크 */
+.login-footer,
+.signup-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--muted);
+}
+
+.login-footer a,
+.signup-footer a {
+    color: var(--ink);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+}
+
+.login-footer a:hover,
+.signup-footer a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+        align-items: stretch;
+        background: #fff;
+    }
+
+    .login-container,
+    .signup-container {
+        max-width: none;
+        border: 0;
+        padding: 32px 20px 28px;
+    }
+}

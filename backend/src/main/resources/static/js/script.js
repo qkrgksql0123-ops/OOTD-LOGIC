@@ -44,7 +44,7 @@ function updateAuthenticationUI() {
 
         // 닉네임 표시
         const nicknameEl = document.createElement('li');
-        nicknameEl.innerHTML = `<span class="user-info" style="color: #004f60; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+        nicknameEl.innerHTML = `<span class="user-info" style="color: #111; font-weight: 600; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-user-circle"></i>
             ${nickname || '사용자'}
         </span>`;
