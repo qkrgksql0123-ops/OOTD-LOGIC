@@ -4,9 +4,9 @@
 .laundry-header {
     margin-top: 20px;
     padding: 40px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, rgba(179, 217, 232, 0.3), rgba(255, 255, 255, 0.95));
-    border: 1px solid rgba(179, 217, 232, 0.4);
+    border-radius: 2px;
+    background: var(--surface-2);
+    border: 1px solid rgba(17, 17, 17, 0.12);
     text-align: center;
     animation: riseIn 0.7s ease;
 }
@@ -43,7 +43,7 @@
 
 .overview-card {
     padding: 24px;
-    border-radius: 16px;
+    border-radius: 2px;
     text-align: center;
     transition: all 0.3s ease;
     animation: riseIn 0.6s ease both;
@@ -88,7 +88,7 @@
 
 .urgent-count:hover {
     border-color: var(--danger);
-    box-shadow: 0 8px 20px rgba(199, 58, 58, 0.15);
+    box-shadow: none;
 }
 
 .urgent-count .count {
@@ -106,7 +106,7 @@
 
 .scheduled-count:hover {
     border-color: var(--accent);
-    box-shadow: 0 8px 20px rgba(255, 93, 31, 0.15);
+    box-shadow: none;
 }
 
 .scheduled-count .count {
@@ -124,7 +124,7 @@
 
 .clean-count:hover {
     border-color: var(--ok);
-    box-shadow: 0 8px 20px rgba(15, 140, 97, 0.15);
+    box-shadow: none;
 }
 
 .clean-count .count {
@@ -132,8 +132,8 @@
 }
 
 .total-count {
-    background: rgba(179, 217, 232, 0.15);
-    border: 1.5px solid rgba(179, 217, 232, 0.3);
+    background: rgba(17, 17, 17, 0.04);
+    border: 1.5px solid rgba(17, 17, 17, 0.09);
 }
 
 .total-count:nth-child(4) {
@@ -142,7 +142,7 @@
 
 .total-count:hover {
     border-color: var(--pastel-blue-dark);
-    box-shadow: 0 8px 20px rgba(179, 217, 232, 0.2);
+    box-shadow: none;
 }
 
 .total-count .count {
@@ -160,7 +160,7 @@
 .laundry-tab {
     padding: 12px 18px;
     border: 2px solid var(--line);
-    border-radius: 12px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.8);
     color: var(--ink);
     font-weight: 700;
@@ -174,11 +174,11 @@
 
 .laundry-tab:hover {
     border-color: var(--pastel-blue);
-    background: rgba(179, 217, 232, 0.15);
+    background: rgba(17, 17, 17, 0.04);
 }
 
 .laundry-tab.active {
-    background: linear-gradient(138deg, var(--pastel-blue), var(--pastel-blue-dark));
+    background: var(--ink);
     color: #fff;
     border-color: var(--pastel-blue-dark);
 }
@@ -194,7 +194,7 @@
 .laundry-card {
     padding: 24px;
     border: 1.5px solid var(--line);
-    border-radius: 16px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.85);
     transition: all 0.3s ease;
     animation: riseIn 0.6s ease both;
@@ -207,7 +207,7 @@
 
 .laundry-card.urgent:hover {
     border-color: var(--danger);
-    box-shadow: 0 12px 32px rgba(199, 58, 58, 0.2);
+    box-shadow: none;
     transform: translateY(-4px);
 }
 
@@ -218,7 +218,7 @@
 
 .laundry-card.scheduled:hover {
     border-color: var(--accent);
-    box-shadow: 0 12px 32px rgba(255, 93, 31, 0.2);
+    box-shadow: none;
     transform: translateY(-4px);
 }
 
@@ -229,7 +229,7 @@
 
 .laundry-card.clean:hover {
     border-color: var(--ok);
-    box-shadow: 0 12px 32px rgba(15, 140, 97, 0.2);
+    box-shadow: none;
     transform: translateY(-4px);
 }
 
@@ -251,7 +251,7 @@
 .urgency-badge {
     display: inline-block;
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 2px;
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -314,21 +314,21 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--pastel-blue), var(--pastel-blue-dark));
+    background: var(--ink);
     border-radius: 4px;
     transition: width 0.5s ease;
 }
 
 .urgent .progress-fill {
-    background: linear-gradient(90deg, #e74c3c, #c0392b);
+    background: var(--surface-2);
 }
 
 .scheduled .progress-fill {
-    background: linear-gradient(90deg, var(--accent), #e67e22);
+    background: var(--ink), #e67e22);
 }
 
 .clean .progress-fill {
-    background: linear-gradient(90deg, var(--ok), #27ae60);
+    background: var(--surface-2);
 }
 
 .progress-text {
@@ -341,10 +341,10 @@
 .btn-mark-clean {
     width: 100%;
     padding: 12px 16px;
-    background: linear-gradient(138deg, var(--pastel-blue), var(--pastel-blue-dark));
+    background: var(--ink);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: 2px;
     font-weight: 700;
     cursor: pointer;
     font-size: 0.9rem;
@@ -357,7 +357,7 @@
 
 .btn-mark-clean:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(126, 200, 227, 0.3);
+    box-shadow: none;
 }
 
 /* Methods Grid */
@@ -370,9 +370,9 @@
 
 .method-card {
     padding: 24px;
-    border: 1px solid rgba(179, 217, 232, 0.3);
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(179, 217, 232, 0.1));
+    border: 1px solid rgba(17, 17, 17, 0.09);
+    border-radius: 2px;
+    background: var(--surface-2);
     transition: all 0.3s ease;
     animation: riseIn 0.6s ease both;
 }
@@ -395,7 +395,7 @@
 
 .method-card:hover {
     border-color: var(--pastel-blue-dark);
-    box-shadow: 0 12px 28px rgba(179, 217, 232, 0.2);
+    box-shadow: none;
     transform: translateY(-4px);
 }
 
@@ -449,7 +449,7 @@
     gap: 16px;
     padding: 20px;
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.8);
     transition: all 0.3s ease;
     animation: riseIn 0.6s ease both;
@@ -481,7 +481,7 @@
 
 .tip-card:hover {
     border-color: var(--pastel-blue);
-    box-shadow: 0 8px 20px rgba(179, 217, 232, 0.15);
+    box-shadow: none;
     transform: translateX(4px);
 }
 
@@ -492,7 +492,7 @@
     min-width: 50px;
     width: 50px;
     height: 50px;
-    background: linear-gradient(138deg, var(--pastel-blue), var(--pastel-blue-dark));
+    background: var(--ink);
     color: #fff;
     border-radius: 50%;
     font-weight: 800;
@@ -526,9 +526,9 @@
 
 .schedule-day {
     padding: 20px;
-    border: 1px solid rgba(179, 217, 232, 0.3);
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(179, 217, 232, 0.08));
+    border: 1px solid rgba(17, 17, 17, 0.09);
+    border-radius: 2px;
+    background: var(--surface-2);
     animation: riseIn 0.6s ease both;
 }
 
@@ -565,7 +565,7 @@
 .schedule-items span {
     display: inline-block;
     padding: 8px 12px;
-    border-radius: 10px;
+    border-radius: 2px;
     font-size: 0.85rem;
     font-weight: 600;
 }
@@ -584,7 +584,7 @@
 @media (max-width: 920px) {
     .laundry-header {
         padding: 30px 24px;
-        border-radius: 22px;
+        border-radius: 2px;
     }
 
     .laundry-grid {
@@ -599,7 +599,7 @@
 @media (max-width: 720px) {
     .laundry-header {
         padding: 24px 18px;
-        border-radius: 18px;
+        border-radius: 2px;
     }
 
     .laundry-header h1 {
@@ -653,7 +653,7 @@
 @media (max-width: 480px) {
     .laundry-header {
         padding: 20px 14px;
-        border-radius: 16px;
+        border-radius: 2px;
         margin-top: 16px;
     }
 

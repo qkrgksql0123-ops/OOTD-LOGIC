@@ -26,7 +26,7 @@
                         <li><a href="login.html" class="nav-link btn-login">로그인</a></li>
                     </ul>
                 </nav>
-                <button class="navbar-toggle">
+                <button class="navbar-toggle" type="button" aria-label="메뉴 열기">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -39,13 +39,18 @@
             <div class="hero-content">
                 <h2 class="hero-title">AI 기반 패션 추천 플랫폼</h2>
                 <p class="hero-subtitle">당신의 스타일, 날씨, 환경 데이터를 분석해 오늘의 코디를 추천합니다.</p>
-                <a href="recommend.html" class="btn btn-hero">
-                    <i class="fas fa-sparkles"></i> 코디 추천 받기
-                </a>
+                <div class="hero-actions">
+                    <a href="recommend.html" class="btn-hero">
+                        <i class="fas fa-wand-magic-sparkles"></i> 코디 추천 받기
+                    </a>
+                    <a href="closet.html" class="hero-secondary">내 옷장 보기 <i class="fas fa-arrow-right"></i></a>
+                </div>
             </div>
             <div class="hero-image">
-                <div class="hero-placeholder">
-                    <i class="fas fa-shirt"></i>
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="hero-chip"><i class="fas fa-cloud-sun"></i><div><strong>오늘 날씨 반영</strong><span>기온·미세먼지 기반 추천</span></div></div>
+                    <div class="hero-chip"><i class="fas fa-shirt"></i><div><strong>내 옷장에서 조합</strong><span>가진 옷으로 바로 코디</span></div></div>
+                    <div class="hero-chip"><i class="fas fa-palette"></i><div><strong>퍼스널 컬러 분석</strong><span>셀카 한 장으로 톤 확인</span></div></div>
                 </div>
             </div>
         </section>
@@ -95,9 +100,7 @@
                         <h3>날씨 및 미세먼지</h3>
                     </div>
                     <div class="weather-info">
-                        <p><strong>기온:</strong> 18°C</p>
-                        <p><strong>습도:</strong> 65%</p>
-                        <p><strong>미세먼지:</strong> 좋음</p>
+                        <p>날씨 정보를 불러오는 중입니다...</p>
                     </div>
                 </div>
                 <div class="preview-card">
